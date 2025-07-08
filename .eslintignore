@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Environment files
+*.env
+*.env.local
+*.env.production
+
+# Test files
+__tests__/
+jest.config.js
+jest.setup.js
+
+# Scripts
+scripts/
+
+# Build artifacts
+dist/
+build/
+
+# Other
+*.min.js
+public/sw.js
