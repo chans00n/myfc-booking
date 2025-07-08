@@ -1,15 +1,28 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://aolmkeaaytpqqaigekdh.supabase.co";
-const supabaseServiceKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvbG1rZWFheXRwcXFhaWdla2RoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTc3NDEyNCwiZXhwIjoyMDY3MzUwMTI0fQ.7uQRRGfqEfalWV4ECOMl5IM5sMH7PmMEGzmzNhnnSFk";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error("Missing required environment variables.");
+  console.error("Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+  process.exit(1);
+}
 
 // Use service role key to bypass RLS
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function makeUserAdmin() {
-  const userId = "a4e29779-ea55-4f20-aeb2-24d1b39dcc46";
+  const userId = process.argv[2];
+  const email = process.argv[3];
+  const firstName = process.argv[4];
+  const lastName = process.argv[5];
+  const phone = process.argv[6];
+
+  if (!userId || !email) {
+    console.error("Usage: node scripts/make-user-admin.js <userId> <email> [firstName] [lastName] [phone]");
+    process.exit(1);
+  }
 
   console.log("Making user admin:", userId);
 
@@ -30,10 +43,10 @@ async function makeUserAdmin() {
         .from("profiles")
         .insert({
           id: userId,
-          email: "chanson@barbellsforboobs.org",
-          first_name: "Chris",
-          last_name: "Hanson",
-          phone: "9492955330",
+          email: email,
+          first_name: firstName || "Admin",
+          last_name: lastName || "User",
+          phone: phone || "",
           role: "admin",
         })
         .select()

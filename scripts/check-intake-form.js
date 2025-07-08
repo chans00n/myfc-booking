@@ -1,17 +1,25 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://aolmkeaaytpqqaigekdh.supabase.co";
-const supabaseServiceKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvbG1rZWFheXRwcXFhaWdla2RoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTc3NDEyNCwiZXhwIjoyMDY3MzUwMTI0fQ.7uQRRGfqEfalWV4ECOMl5IM5sMH7PmMEGzmzNhnnSFk";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error("Missing required environment variables.");
+  console.error("Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+  process.exit(1);
+}
 
 // Use service role key to bypass RLS
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function checkIntakeForm() {
-  // Extract the full form ID from the error URL
-  const formId = "8202e27"; // This seems to be partial, let me check all forms
-  const userId = "a4e29779-ea55-4f20-aeb2-24d1b39dcc46";
+  const userId = process.argv[2];
+  const formId = process.argv[3];
+  
+  if (!userId) {
+    console.error("Usage: node scripts/check-intake-form.js <userId> [formId]");
+    process.exit(1);
+  }
 
   console.log("Checking intake form and user details...\n");
 

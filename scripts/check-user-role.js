@@ -1,15 +1,23 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://aolmkeaaytpqqaigekdh.supabase.co";
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvbG1rZWFheXRwcXFhaWdla2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NzQxMjQsImV4cCI6MjA2NzM1MDEyNH0.w8VzXBccmDsiwhkCfCA-8ommeWW1_N-ZjsaQnehbZ3c";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("Missing required environment variables.");
+  console.error("Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function checkUserRole() {
-  const userId = "a4e29779-ea55-4f20-aeb2-24d1b39dcc46"; // Your user ID from the logs
+  const userId = process.argv[2];
+  
+  if (!userId) {
+    console.error("Usage: node scripts/check-user-role.js <userId>");
+    process.exit(1);
+  }
 
   console.log("Checking role for user:", userId);
 
