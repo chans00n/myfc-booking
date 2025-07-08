@@ -1,40 +1,40 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { createTimeBlock } from '@/lib/availability'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { createTimeBlock } from "@/lib/availability";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
-import { Loader2 } from 'lucide-react'
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const timeBlockSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  date: z.string().min(1, 'Date is required'),
-  startTime: z.string().min(1, 'Start time is required'),
-  endTime: z.string().min(1, 'End time is required'),
-  blockType: z.enum(['vacation', 'break', 'personal', 'holiday']),
-})
+  title: z.string().min(1, "Title is required"),
+  date: z.string().min(1, "Date is required"),
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
+  blockType: z.enum(["vacation", "break", "personal", "holiday"]),
+});
 
-type TimeBlockFormData = z.infer<typeof timeBlockSchema>
+type TimeBlockFormData = z.infer<typeof timeBlockSchema>;
 
 interface TimeBlockFormProps {
-  onSuccess: () => void
-  onCancel: () => void
-  defaultDate?: Date
-  defaultStartTime?: string
-  defaultEndTime?: string
+  onSuccess: () => void;
+  onCancel: () => void;
+  defaultDate?: Date;
+  defaultStartTime?: string;
+  defaultEndTime?: string;
 }
 
 export function TimeBlockForm({
@@ -44,9 +44,9 @@ export function TimeBlockForm({
   defaultStartTime,
   defaultEndTime,
 }: TimeBlockFormProps) {
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
-  
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
   const {
     register,
     handleSubmit,
@@ -55,43 +55,38 @@ export function TimeBlockForm({
   } = useForm<TimeBlockFormData>({
     resolver: zodResolver(timeBlockSchema),
     defaultValues: {
-      date: defaultDate ? defaultDate.toISOString().split('T')[0] : '',
-      startTime: defaultStartTime || '',
-      endTime: defaultEndTime || '',
-      blockType: 'personal',
+      date: defaultDate ? defaultDate.toISOString().split("T")[0] : "",
+      startTime: defaultStartTime || "",
+      endTime: defaultEndTime || "",
+      blockType: "personal",
     },
-  })
+  });
 
   const onSubmit = async (data: TimeBlockFormData) => {
-    setLoading(true)
-    
+    setLoading(true);
+
     // Combine date and time
-    const startDatetime = new Date(`${data.date}T${data.startTime}`)
-    const endDatetime = new Date(`${data.date}T${data.endTime}`)
-    
-    const result = await createTimeBlock(
-      data.title,
-      startDatetime,
-      endDatetime,
-      data.blockType
-    )
-    
+    const startDatetime = new Date(`${data.date}T${data.startTime}`);
+    const endDatetime = new Date(`${data.date}T${data.endTime}`);
+
+    const result = await createTimeBlock(data.title, startDatetime, endDatetime, data.blockType);
+
     if (result) {
       toast({
-        title: 'Success',
-        description: 'Time block created successfully',
-      })
-      onSuccess()
+        title: "Success",
+        description: "Time block created successfully",
+      });
+      onSuccess();
     } else {
       toast({
-        title: 'Error',
-        description: 'Failed to create time block',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "Failed to create time block",
+        variant: "destructive",
+      });
     }
-    
-    setLoading(false)
-  }
+
+    setLoading(false);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -100,17 +95,15 @@ export function TimeBlockForm({
         <Input
           id="title"
           placeholder="e.g., Lunch break, Doctor's appointment"
-          {...register('title')}
+          {...register("title")}
         />
-        {errors.title && (
-          <p className="text-sm text-red-500">{errors.title.message}</p>
-        )}
+        {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="blockType">Type</Label>
         <Select
-          onValueChange={(value) => setValue('blockType', value as any)}
+          onValueChange={(value) => setValue("blockType", value as any)}
           defaultValue="personal"
         >
           <SelectTrigger>
@@ -128,40 +121,22 @@ export function TimeBlockForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="date">Date</Label>
-          <Input
-            id="date"
-            type="date"
-            {...register('date')}
-          />
-          {errors.date && (
-            <p className="text-sm text-red-500">{errors.date.message}</p>
-          )}
+          <Input id="date" type="date" {...register("date")} />
+          {errors.date && <p className="text-sm text-red-500">{errors.date.message}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="startTime">Start Time</Label>
-          <Input
-            id="startTime"
-            type="time"
-            {...register('startTime')}
-          />
-          {errors.startTime && (
-            <p className="text-sm text-red-500">{errors.startTime.message}</p>
-          )}
+          <Input id="startTime" type="time" {...register("startTime")} />
+          {errors.startTime && <p className="text-sm text-red-500">{errors.startTime.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="endTime">End Time</Label>
-          <Input
-            id="endTime"
-            type="time"
-            {...register('endTime')}
-          />
-          {errors.endTime && (
-            <p className="text-sm text-red-500">{errors.endTime.message}</p>
-          )}
+          <Input id="endTime" type="time" {...register("endTime")} />
+          {errors.endTime && <p className="text-sm text-red-500">{errors.endTime.message}</p>}
         </div>
       </div>
 
@@ -175,5 +150,5 @@ export function TimeBlockForm({
         </Button>
       </div>
     </form>
-  )
+  );
 }

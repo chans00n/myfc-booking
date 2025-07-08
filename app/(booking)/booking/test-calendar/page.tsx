@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { DatePicker } from '@/components/calendar/DatePicker'
-import { TimeSlotPicker } from '@/components/calendar/TimeSlotPicker'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { format } from 'date-fns'
-import type { TimeSlot } from '@/types'
+import { useState } from "react";
+import { DatePicker } from "@/components/calendar/DatePicker";
+import { TimeSlotPicker } from "@/components/calendar/TimeSlotPicker";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
+import type { TimeSlot } from "@/types";
 
 export default function TestCalendarPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>()
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot>()
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot>();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -21,10 +21,7 @@ export default function TestCalendarPage() {
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <h2 className="text-lg font-semibold mb-4">Select Date</h2>
-          <DatePicker 
-            onSelectDate={setSelectedDate}
-            selectedDate={selectedDate}
-          />
+          <DatePicker onSelectDate={setSelectedDate} selectedDate={selectedDate} />
         </div>
 
         <div>
@@ -53,14 +50,15 @@ export default function TestCalendarPage() {
           </CardHeader>
           <CardContent>
             <p>
-              <strong>Date:</strong> {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+              <strong>Date:</strong> {format(selectedDate, "EEEE, MMMM d, yyyy")}
             </p>
             <p>
-              <strong>Time:</strong> {format(selectedSlot.start, 'h:mm a')} - {format(selectedSlot.end, 'h:mm a')}
+              <strong>Time:</strong> {format(selectedSlot.start, "h:mm a")} -{" "}
+              {format(selectedSlot.end, "h:mm a")}
             </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

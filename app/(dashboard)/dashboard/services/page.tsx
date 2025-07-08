@@ -1,132 +1,137 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { AdminSiteHeader } from "@/components/admin-site-header"
-import { getAllServices, createServiceClient, updateServiceClient, deleteServiceClient } from '@/lib/services/client'
-import { ServiceForm } from '@/components/admin/service-form'
-import { formatPrice, formatDuration, type ServiceFormData } from '@/lib/services/schemas'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
+import { useState, useEffect } from "react";
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import {
+  getAllServices,
+  createServiceClient,
+  updateServiceClient,
+  deleteServiceClient,
+} from "@/lib/services/client";
+import { ServiceForm } from "@/components/admin/service-form";
+import { formatPrice, formatDuration, type ServiceFormData } from "@/lib/services/schemas";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { useToast } from '@/hooks/use-toast'
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
-import type { Service } from '@/types'
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import type { Service } from "@/types";
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [selectedService, setSelectedService] = useState<Service | null>(null)
-  const [showForm, setShowForm] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const { toast } = useToast()
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadServices()
-  }, [])
+    loadServices();
+  }, []);
 
   const loadServices = async () => {
-    setLoading(true)
-    const data = await getAllServices(true) // Include inactive services
-    setServices(data)
-    setLoading(false)
-  }
+    setLoading(true);
+    const data = await getAllServices(true); // Include inactive services
+    setServices(data);
+    setLoading(false);
+  };
 
   const handleCreate = async (data: ServiceFormData) => {
-    setSubmitting(true)
-    const result = await createServiceClient(data)
-    
+    setSubmitting(true);
+    const result = await createServiceClient(data);
+
     if (result.error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: result.error,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Success',
-        description: 'Service created successfully',
-      })
-      setShowForm(false)
-      loadServices()
+        title: "Success",
+        description: "Service created successfully",
+      });
+      setShowForm(false);
+      loadServices();
     }
-    
-    setSubmitting(false)
-  }
+
+    setSubmitting(false);
+  };
 
   const handleUpdate = async (data: ServiceFormData) => {
-    if (!selectedService) return
-    
-    setSubmitting(true)
-    const result = await updateServiceClient(selectedService.id, data)
-    
+    if (!selectedService) return;
+
+    setSubmitting(true);
+    const result = await updateServiceClient(selectedService.id, data);
+
     if (result.error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: result.error,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Success',
-        description: 'Service updated successfully',
-      })
-      setShowForm(false)
-      setSelectedService(null)
-      loadServices()
+        title: "Success",
+        description: "Service updated successfully",
+      });
+      setShowForm(false);
+      setSelectedService(null);
+      loadServices();
     }
-    
-    setSubmitting(false)
-  }
+
+    setSubmitting(false);
+  };
 
   const handleDelete = async () => {
-    if (!selectedService) return
-    
-    setSubmitting(true)
-    const result = await deleteServiceClient(selectedService.id)
-    
+    if (!selectedService) return;
+
+    setSubmitting(true);
+    const result = await deleteServiceClient(selectedService.id);
+
     if (result.error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: result.error,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Success',
-        description: 'Service deleted successfully',
-      })
-      setShowDeleteDialog(false)
-      setSelectedService(null)
-      loadServices()
+        title: "Success",
+        description: "Service deleted successfully",
+      });
+      setShowDeleteDialog(false);
+      setSelectedService(null);
+      loadServices();
     }
-    
-    setSubmitting(false)
-  }
+
+    setSubmitting(false);
+  };
 
   const toggleServiceStatus = async (service: Service) => {
     const result = await updateServiceClient(service.id, {
       is_active: !service.is_active,
-    })
-    
+    });
+
     if (result.error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: result.error,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     } else {
-      loadServices()
+      loadServices();
     }
-  }
+  };
 
   return (
     <>
@@ -145,7 +150,7 @@ export default function ServicesPage() {
                   Add Service
                 </Button>
               </div>
-              
+
               {loading ? (
                 <div className="flex items-center justify-center h-64">
                   <Loader2 className="h-8 w-8 animate-spin" />
@@ -153,17 +158,21 @@ export default function ServicesPage() {
               ) : (
                 <div className="grid gap-4">
                   {services.map((service) => (
-                    <Card key={service.id} className={!service.is_active ? 'opacity-60' : ''}>
+                    <Card key={service.id} className={!service.is_active ? "opacity-60" : ""}>
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                           <div className="space-y-2 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <h3 className="text-lg sm:text-xl font-semibold">{service.name}</h3>
                               {!service.is_active && (
-                                <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  Inactive
+                                </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {service.description}
+                            </p>
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm">
                               <span className="font-medium">
                                 Duration: {formatDuration(service.duration_minutes)}
@@ -184,8 +193,8 @@ export default function ServicesPage() {
                               size="icon"
                               className="h-8 w-8"
                               onClick={() => {
-                                setSelectedService(service)
-                                setShowForm(true)
+                                setSelectedService(service);
+                                setShowForm(true);
                               }}
                             >
                               <Pencil className="h-4 w-4" />
@@ -196,8 +205,8 @@ export default function ServicesPage() {
                               size="icon"
                               className="h-8 w-8"
                               onClick={() => {
-                                setSelectedService(service)
-                                setShowDeleteDialog(true)
+                                setSelectedService(service);
+                                setShowDeleteDialog(true);
                               }}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -222,17 +231,17 @@ export default function ServicesPage() {
                   </CardContent>
                 </Card>
               )}
-              
+
               <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="w-full max-w-2xl p-4 sm:p-6">
                   <DialogHeader>
                     <DialogTitle className="text-lg sm:text-xl">
-                      {selectedService ? 'Edit Service' : 'Create New Service'}
+                      {selectedService ? "Edit Service" : "Create New Service"}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                       {selectedService
-                        ? 'Update the service details below'
-                        : 'Fill in the details to create a new service'}
+                        ? "Update the service details below"
+                        : "Fill in the details to create a new service"}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="mt-4">
@@ -240,8 +249,8 @@ export default function ServicesPage() {
                       service={selectedService || undefined}
                       onSubmit={selectedService ? handleUpdate : handleCreate}
                       onCancel={() => {
-                        setShowForm(false)
-                        setSelectedService(null)
+                        setShowForm(false);
+                        setSelectedService(null);
                       }}
                       loading={submitting}
                     />
@@ -254,7 +263,8 @@ export default function ServicesPage() {
                   <DialogHeader>
                     <DialogTitle className="text-base sm:text-lg">Delete Service</DialogTitle>
                     <DialogDescription className="text-sm pt-2">
-                      Are you sure you want to delete "{selectedService?.name}"? This will mark the service as inactive and it will no longer be available for booking.
+                      Are you sure you want to delete "{selectedService?.name}"? This will mark the
+                      service as inactive and it will no longer be available for booking.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 sm:justify-end pt-4">
@@ -278,7 +288,7 @@ export default function ServicesPage() {
                           Deleting...
                         </>
                       ) : (
-                        'Delete'
+                        "Delete"
                       )}
                     </Button>
                   </div>

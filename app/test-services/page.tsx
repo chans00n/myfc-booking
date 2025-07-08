@@ -1,45 +1,45 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { getActiveServices } from '@/lib/services/client'
-import { formatPrice, formatDuration } from '@/lib/services/schemas'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Clock, DollarSign } from 'lucide-react'
-import type { Service } from '@/types'
+import { useState, useEffect } from "react";
+import { getActiveServices } from "@/lib/services/client";
+import { formatPrice, formatDuration } from "@/lib/services/schemas";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Clock, DollarSign } from "lucide-react";
+import type { Service } from "@/types";
 
 export default function TestServicesPage() {
-  const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadServices = async () => {
       try {
-        console.log('Loading services...')
-        const data = await getActiveServices()
-        console.log('Services loaded:', data)
-        setServices(data)
+        console.log("Loading services...");
+        const data = await getActiveServices();
+        console.log("Services loaded:", data);
+        setServices(data);
       } catch (err) {
-        console.error('Error loading services:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error')
+        console.error("Error loading services:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadServices()
-  }, [])
+    loadServices();
+  }, []);
 
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-3xl font-bold">Test Services Page (No Auth)</h1>
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 p-4 rounded">
           <p className="text-red-600">Error: {error}</p>
         </div>
       )}
-      
+
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -57,7 +57,7 @@ export default function TestServicesPage() {
       ) : (
         <>
           <p className="text-gray-600">Found {services.length} services</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
               <Card key={service.id}>
@@ -80,7 +80,7 @@ export default function TestServicesPage() {
               </Card>
             ))}
           </div>
-          
+
           {services.length === 0 && (
             <Card>
               <CardContent className="text-center py-12">
@@ -91,5 +91,5 @@ export default function TestServicesPage() {
         </>
       )}
     </div>
-  )
+  );
 }

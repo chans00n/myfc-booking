@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import { ConsultationWithRelations, IntakeForm, Profile } from '@/types'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { 
-  User, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  MapPin, 
-  Heart, 
+import { ConsultationWithRelations, IntakeForm, Profile } from "@/types";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  User,
+  Phone,
+  Mail,
+  Calendar,
+  MapPin,
+  Heart,
   AlertCircle,
   FileText,
-  Activity
-} from 'lucide-react'
-import { format } from 'date-fns'
+  Activity,
+} from "lucide-react";
+import { format } from "date-fns";
 
 interface ClientInfoProps {
-  client: Profile
-  intakeForm: IntakeForm | null
-  consultation: ConsultationWithRelations
+  client: Profile;
+  intakeForm: IntakeForm | null;
+  consultation: ConsultationWithRelations;
 }
 
 export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps) {
@@ -36,9 +36,15 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
 
       <Tabs defaultValue="overview" className="flex-1 flex flex-col">
         <TabsList className="w-full rounded-none border-b">
-          <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
-          <TabsTrigger value="health" className="flex-1">Health Info</TabsTrigger>
-          <TabsTrigger value="intake" className="flex-1">Intake Form</TabsTrigger>
+          <TabsTrigger value="overview" className="flex-1">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="health" className="flex-1">
+            Health Info
+          </TabsTrigger>
+          <TabsTrigger value="intake" className="flex-1">
+            Intake Form
+          </TabsTrigger>
         </TabsList>
 
         <ScrollArea className="flex-1">
@@ -51,7 +57,9 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span>{client.first_name} {client.last_name}</span>
+                  <span>
+                    {client.first_name} {client.last_name}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
@@ -68,7 +76,7 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                 {client.date_of_birth && (
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Born {format(new Date(client.date_of_birth), 'MMMM d, yyyy')}</span>
+                    <span>Born {format(new Date(client.date_of_birth), "MMMM d, yyyy")}</span>
                   </div>
                 )}
                 {(client.address_line1 || client.city) && (
@@ -79,7 +87,8 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                       {client.address_line2 && <div>{client.address_line2}</div>}
                       {(client.city || client.state || client.zip_code) && (
                         <div>
-                          {client.city}{client.city && client.state && ', '}
+                          {client.city}
+                          {client.city && client.state && ", "}
                           {client.state} {client.zip_code}
                         </div>
                       )}
@@ -102,8 +111,8 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Free Consultation Used:</span>
-                    <Badge variant={client.has_had_free_consultation ? 'default' : 'outline'}>
-                      {client.has_had_free_consultation ? 'Yes' : 'No'}
+                    <Badge variant={client.has_had_free_consultation ? "default" : "outline"}>
+                      {client.has_had_free_consultation ? "Yes" : "No"}
                     </Badge>
                   </div>
                 </div>
@@ -123,13 +132,19 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                   <div>
                     <span className="font-medium">{intakeForm.emergency_contact_name}</span>
                     {intakeForm.emergency_contact_relationship && (
-                      <span className="text-muted-foreground"> ({intakeForm.emergency_contact_relationship})</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        ({intakeForm.emergency_contact_relationship})
+                      </span>
                     )}
                   </div>
                   {intakeForm.emergency_contact_phone && (
                     <div className="flex items-center gap-2">
                       <Phone className="h-3 w-3 text-muted-foreground" />
-                      <a href={`tel:${intakeForm.emergency_contact_phone}`} className="text-primary hover:underline">
+                      <a
+                        href={`tel:${intakeForm.emergency_contact_phone}`}
+                        className="text-primary hover:underline"
+                      >
                         {intakeForm.emergency_contact_phone}
                       </a>
                     </div>
@@ -229,7 +244,7 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                 <CardHeader>
                   <CardTitle className="text-base">Intake Form Details</CardTitle>
                   <CardDescription>
-                    Submitted {format(new Date(intakeForm.created_at), 'MMMM d, yyyy at h:mm a')}
+                    Submitted {format(new Date(intakeForm.created_at), "MMMM d, yyyy at h:mm a")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -238,10 +253,12 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                     {intakeForm.massage_experience && (
                       <div>
                         <span className="font-medium">Massage Experience:</span>
-                        <p className="text-muted-foreground mt-1">{intakeForm.massage_experience}</p>
+                        <p className="text-muted-foreground mt-1">
+                          {intakeForm.massage_experience}
+                        </p>
                       </div>
                     )}
-                    
+
                     {intakeForm.pressure_preference && (
                       <div>
                         <span className="font-medium">Pressure Preference:</span>
@@ -263,7 +280,10 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
                         <span className="font-medium">Areas to Avoid:</span>
                         <ul className="mt-1 space-y-1">
                           {intakeForm.areas_to_avoid.map((area, index) => (
-                            <li key={index} className="text-muted-foreground flex items-start gap-2">
+                            <li
+                              key={index}
+                              className="text-muted-foreground flex items-start gap-2"
+                            >
                               <span>•</span>
                               <span>{area}</span>
                             </li>
@@ -293,5 +313,5 @@ export function ClientInfo({ client, intakeForm, consultation }: ClientInfoProps
         </ScrollArea>
       </Tabs>
     </div>
-  )
+  );
 }

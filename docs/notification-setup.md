@@ -78,11 +78,13 @@ For local testing, you can manually trigger notification processing:
 ### External Cron Services
 
 You can also use services like:
+
 - [Cron-job.org](https://cron-job.org)
 - [EasyCron](https://www.easycron.com)
 - GitHub Actions
 
 Example cron endpoint:
+
 ```
 POST https://yourdomain.com/api/notifications/process
 Authorization: Bearer your-cron-secret
@@ -116,11 +118,13 @@ CRON_SECRET="random-secret-for-cron-jobs"
 ### Email Templates
 
 Email templates are located in `/emails/` directory:
+
 - `booking-confirmation.tsx`
 - `appointment-reminder.tsx`
 - `cancellation-confirmation.tsx`
 
 To customize:
+
 1. Edit the React Email components
 2. Update styles and content
 3. Test with the preview tool
@@ -128,6 +132,7 @@ To customize:
 ### Notification Preferences
 
 Users can manage their preferences at `/dashboard/settings/notifications`:
+
 - Enable/disable email notifications
 - Set reminder times
 - Choose notification types
@@ -157,10 +162,10 @@ Enable debug logging:
 
 ```typescript
 // lib/notifications/email-service.ts
-const DEBUG = process.env.NODE_ENV === 'development'
+const DEBUG = process.env.NODE_ENV === "development";
 
 if (DEBUG) {
-  console.log('Sending email:', { to, subject })
+  console.log("Sending email:", { to, subject });
 }
 ```
 

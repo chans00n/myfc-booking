@@ -1,48 +1,48 @@
-'use client'
+"use client";
 
-import React, { Component, ReactNode } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import React, { Component, ReactNode } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
+  hasError: boolean;
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false, error: null }
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to error reporting service
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
-    
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
     // In production, send to error tracking service like Sentry
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       // sendErrorToService(error, errorInfo)
     }
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: null })
-  }
+    this.setState({ hasError: false, error: null });
+  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return <>{this.props.fallback}</>
+        return <>{this.props.fallback}</>;
       }
 
       return (
@@ -58,14 +58,14 @@ export class ErrorBoundary extends Component<Props, State> {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="mb-4">
                   <summary className="cursor-pointer text-sm text-muted-foreground">
                     Error details
                   </summary>
                   <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
                     {this.state.error.message}
-                    {'\n'}
+                    {"\n"}
                     {this.state.error.stack}
                   </pre>
                 </details>
@@ -77,9 +77,9 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardContent>
           </Card>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

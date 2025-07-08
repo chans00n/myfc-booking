@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { AdminSiteHeader } from '@/components/admin-site-header'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { AppointmentsList } from '@/components/appointments/AppointmentsList'
+import { useState, useEffect } from "react";
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { AppointmentsList } from "@/components/appointments/AppointmentsList";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -22,79 +22,94 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Search, X, Eye, CheckCircle, XCircle, FileText, Save, DollarSign, CreditCard, Video } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { toast } from 'sonner'
-import type { Appointment, AppointmentStatus, PaymentPreference } from '@/types'
-import { Textarea } from '@/components/ui/textarea'
+} from "@/components/ui/dialog";
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Search,
+  X,
+  Eye,
+  CheckCircle,
+  XCircle,
+  FileText,
+  Save,
+  DollarSign,
+  CreditCard,
+  Video,
+} from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import type { Appointment, AppointmentStatus, PaymentPreference } from "@/types";
+import { Textarea } from "@/components/ui/textarea";
 
 interface AppointmentWithRelations extends Appointment {
   client: {
-    id: string
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-    phone: string | null
-  }
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
   service: {
-    id: string
-    name: string
-    duration_minutes: number
-    price_cents: number
-    is_consultation?: boolean
-  }
+    id: string;
+    name: string;
+    duration_minutes: number;
+    price_cents: number;
+    is_consultation?: boolean;
+  };
   consultation?: Array<{
-    id: string
-    consultation_status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
-    daily_room_url: string | null
-  }>
+    id: string;
+    consultation_status: "scheduled" | "in_progress" | "completed" | "cancelled";
+    daily_room_url: string | null;
+  }>;
 }
 
 const statusColors: Record<AppointmentStatus, string> = {
-  scheduled: 'secondary',
-  confirmed: 'default',
-  completed: 'outline',
-  cancelled: 'destructive',
-  no_show: 'destructive',
-}
+  scheduled: "secondary",
+  confirmed: "default",
+  completed: "outline",
+  cancelled: "destructive",
+  no_show: "destructive",
+};
 
 const statusLabels: Record<AppointmentStatus, string> = {
-  scheduled: 'Scheduled',
-  confirmed: 'Confirmed',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-  no_show: 'No Show',
-}
+  scheduled: "Scheduled",
+  confirmed: "Confirmed",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  no_show: "No Show",
+};
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState<AppointmentWithRelations[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all')
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithRelations | null>(null)
-  const [showDetails, setShowDetails] = useState(false)
-  const [updating, setUpdating] = useState(false)
-  const [editingNotes, setEditingNotes] = useState(false)
-  const [notesValue, setNotesValue] = useState('')
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
-  const [paymentAmount, setPaymentAmount] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'check'>('cash')
-  const [paymentReference, setPaymentReference] = useState('')
+  const [appointments, setAppointments] = useState<AppointmentWithRelations[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<AppointmentStatus | "all">("all");
+  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithRelations | null>(
+    null
+  );
+  const [showDetails, setShowDetails] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesValue, setNotesValue] = useState("");
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "check">("cash");
+  const [paymentReference, setPaymentReference] = useState("");
 
-  const supabase = createClient()
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchAppointments()
-  }, [])
+    fetchAppointments();
+  }, []);
 
   const fetchAppointments = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       let query = supabase
-        .from('appointments')
-        .select(`
+        .from("appointments")
+        .select(
+          `
           *,
           client:profiles!appointments_client_id_fkey(
             id,
@@ -111,94 +126,96 @@ export default function AppointmentsPage() {
             is_consultation
           ),
           consultation:consultations(*)
-        `)
-        .order('appointment_date', { ascending: false })
-        .order('start_time', { ascending: false })
+        `
+        )
+        .order("appointment_date", { ascending: false })
+        .order("start_time", { ascending: false });
 
-      const { data, error } = await query
+      const { data, error } = await query;
 
-      if (error) throw error
-      setAppointments(data as AppointmentWithRelations[])
+      if (error) throw error;
+      setAppointments(data as AppointmentWithRelations[]);
     } catch (error) {
-      console.error('Error fetching appointments:', error)
-      toast.error('Failed to load appointments')
+      console.error("Error fetching appointments:", error);
+      toast.error("Failed to load appointments");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
-    setUpdating(true)
+    setUpdating(true);
     try {
       const { error } = await supabase
-        .from('appointments')
+        .from("appointments")
         .update({ status: newStatus })
-        .eq('id', appointmentId)
+        .eq("id", appointmentId);
 
-      if (error) throw error
+      if (error) throw error;
 
-      toast.success('Appointment status updated')
-      await fetchAppointments()
-      setShowDetails(false)
+      toast.success("Appointment status updated");
+      await fetchAppointments();
+      setShowDetails(false);
     } catch (error) {
-      console.error('Error updating appointment:', error)
-      toast.error('Failed to update appointment status')
+      console.error("Error updating appointment:", error);
+      toast.error("Failed to update appointment status");
     } finally {
-      setUpdating(false)
+      setUpdating(false);
     }
-  }
+  };
 
   const updateAppointmentNotes = async () => {
-    if (!selectedAppointment) return
-    
-    setUpdating(true)
+    if (!selectedAppointment) return;
+
+    setUpdating(true);
     try {
       const { error } = await supabase
-        .from('appointments')
+        .from("appointments")
         .update({ notes: notesValue })
-        .eq('id', selectedAppointment.id)
+        .eq("id", selectedAppointment.id);
 
-      if (error) throw error
+      if (error) throw error;
 
-      toast.success('Notes updated successfully')
-      await fetchAppointments()
-      setEditingNotes(false)
-      
+      toast.success("Notes updated successfully");
+      await fetchAppointments();
+      setEditingNotes(false);
+
       // Update the selected appointment with new notes
-      setSelectedAppointment({ ...selectedAppointment, notes: notesValue })
+      setSelectedAppointment({ ...selectedAppointment, notes: notesValue });
     } catch (error) {
-      console.error('Error updating notes:', error)
-      toast.error('Failed to update notes')
+      console.error("Error updating notes:", error);
+      toast.error("Failed to update notes");
     } finally {
-      setUpdating(false)
+      setUpdating(false);
     }
-  }
+  };
 
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = searchTerm === '' || 
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesSearch =
+      searchTerm === "" ||
       appointment.client.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.client.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.service.name.toLowerCase().includes(searchTerm.toLowerCase())
+      appointment.service.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === 'all' || appointment.status === statusFilter
+    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
 
-    return matchesSearch && matchesStatus
-  })
+    return matchesSearch && matchesStatus;
+  });
 
   const formatTime = (time: string) => {
-    const [hour, minute] = time.split(':')
-    const date = new Date()
-    date.setHours(parseInt(hour), parseInt(minute))
-    return format(date, 'h:mm a')
-  }
+    const [hour, minute] = time.split(":");
+    const date = new Date();
+    date.setHours(parseInt(hour), parseInt(minute));
+    return format(date, "h:mm a");
+  };
 
   const formatPrice = (cents: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(cents / 100)
-  }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(cents / 100);
+  };
 
   return (
     <>
@@ -226,7 +243,10 @@ export default function AppointmentsPage() {
                         className="pl-10"
                       />
                     </div>
-                    <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AppointmentStatus | 'all')}>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={(value) => setStatusFilter(value as AppointmentStatus | "all")}
+                    >
                       <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Filter by status" />
                       </SelectTrigger>
@@ -255,10 +275,10 @@ export default function AppointmentsPage() {
                     <AppointmentsList
                       appointments={filteredAppointments}
                       onViewDetails={(appointment) => {
-                        setSelectedAppointment(appointment)
-                        setNotesValue(appointment.notes || '')
-                        setEditingNotes(false)
-                        setShowDetails(true)
+                        setSelectedAppointment(appointment);
+                        setNotesValue(appointment.notes || "");
+                        setEditingNotes(false);
+                        setShowDetails(true);
                       }}
                       statusColors={statusColors}
                       statusLabels={statusLabels}
@@ -276,9 +296,7 @@ export default function AppointmentsPage() {
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Appointment Details</DialogTitle>
-            <DialogDescription>
-              View and manage appointment information
-            </DialogDescription>
+            <DialogDescription>View and manage appointment information</DialogDescription>
           </DialogHeader>
           {selectedAppointment && (
             <div className="space-y-4">
@@ -286,13 +304,14 @@ export default function AppointmentsPage() {
                 <div>
                   <Label>Date</Label>
                   <p className="text-sm">
-                    {format(new Date(selectedAppointment.appointment_date), 'MMMM d, yyyy')}
+                    {format(new Date(selectedAppointment.appointment_date), "MMMM d, yyyy")}
                   </p>
                 </div>
                 <div>
                   <Label>Time</Label>
                   <p className="text-sm">
-                    {formatTime(selectedAppointment.start_time)} - {formatTime(selectedAppointment.end_time)}
+                    {formatTime(selectedAppointment.start_time)} -{" "}
+                    {formatTime(selectedAppointment.end_time)}
                   </p>
                 </div>
               </div>
@@ -303,9 +322,13 @@ export default function AppointmentsPage() {
                   <p className="text-sm">
                     {selectedAppointment.client.first_name} {selectedAppointment.client.last_name}
                   </p>
-                  <p className="text-sm text-muted-foreground break-all">{selectedAppointment.client.email}</p>
+                  <p className="text-sm text-muted-foreground break-all">
+                    {selectedAppointment.client.email}
+                  </p>
                   {selectedAppointment.client.phone && (
-                    <p className="text-sm text-muted-foreground">{selectedAppointment.client.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAppointment.client.phone}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -327,17 +350,20 @@ export default function AppointmentsPage() {
                 </div>
                 <div>
                   <Label>Payment Status</Label>
-                  <Badge 
-                    variant={selectedAppointment.payment_status === 'paid' ? 'outline' : 'secondary'} 
+                  <Badge
+                    variant={
+                      selectedAppointment.payment_status === "paid" ? "outline" : "secondary"
+                    }
                     className="mt-1"
                   >
                     {selectedAppointment.payment_status}
                   </Badge>
                   {selectedAppointment.payment_preference && (
                     <p className="text-sm text-muted-foreground mt-1">
-                      {selectedAppointment.payment_preference === 'pay_now' && 'Paid online'}
-                      {selectedAppointment.payment_preference === 'pay_at_appointment' && 'Pay at appointment'}
-                      {selectedAppointment.payment_preference === 'pay_cash' && 'Cash payment'}
+                      {selectedAppointment.payment_preference === "pay_now" && "Paid online"}
+                      {selectedAppointment.payment_preference === "pay_at_appointment" &&
+                        "Pay at appointment"}
+                      {selectedAppointment.payment_preference === "pay_cash" && "Cash payment"}
                     </p>
                   )}
                 </div>
@@ -347,13 +373,9 @@ export default function AppointmentsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <Label>Notes</Label>
                   {!editingNotes && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingNotes(true)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setEditingNotes(true)}>
                       <FileText className="h-4 w-4 mr-2" />
-                      {selectedAppointment.notes ? 'Edit' : 'Add'} Notes
+                      {selectedAppointment.notes ? "Edit" : "Add"} Notes
                     </Button>
                   )}
                 </div>
@@ -366,11 +388,7 @@ export default function AppointmentsPage() {
                       className="min-h-[100px]"
                     />
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={updateAppointmentNotes}
-                        disabled={updating}
-                      >
+                      <Button size="sm" onClick={updateAppointmentNotes} disabled={updating}>
                         <Save className="h-4 w-4 mr-2" />
                         Save Notes
                       </Button>
@@ -378,8 +396,8 @@ export default function AppointmentsPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          setEditingNotes(false)
-                          setNotesValue(selectedAppointment.notes || '')
+                          setEditingNotes(false);
+                          setNotesValue(selectedAppointment.notes || "");
                         }}
                       >
                         Cancel
@@ -388,39 +406,41 @@ export default function AppointmentsPage() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {selectedAppointment.notes || 'No notes added yet'}
+                    {selectedAppointment.notes || "No notes added yet"}
                   </p>
                 )}
               </div>
 
               {/* Show consultation room link if available */}
-              {selectedAppointment.service?.is_consultation && 
-               selectedAppointment.consultation && 
-               selectedAppointment.consultation.length > 0 &&
-               selectedAppointment.consultation[0].daily_room_url &&
-               (selectedAppointment.consultation[0].consultation_status === 'scheduled' || 
-                selectedAppointment.consultation[0].consultation_status === 'in_progress') && (
-                <div>
-                  <Label>Consultation Room</Label>
-                  <Button 
-                    size="sm" 
-                    className="w-full mt-2"
-                    onClick={() => window.open(selectedAppointment.consultation![0].daily_room_url!, '_blank')}
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Join Consultation Room
-                  </Button>
-                </div>
-              )}
+              {selectedAppointment.service?.is_consultation &&
+                selectedAppointment.consultation &&
+                selectedAppointment.consultation.length > 0 &&
+                selectedAppointment.consultation[0].daily_room_url &&
+                (selectedAppointment.consultation[0].consultation_status === "scheduled" ||
+                  selectedAppointment.consultation[0].consultation_status === "in_progress") && (
+                  <div>
+                    <Label>Consultation Room</Label>
+                    <Button
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() =>
+                        window.open(selectedAppointment.consultation![0].daily_room_url!, "_blank")
+                      }
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Join Consultation Room
+                    </Button>
+                  </div>
+                )}
 
               <div>
                 <Label>Actions</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedAppointment.status === 'scheduled' && (
+                  {selectedAppointment.status === "scheduled" && (
                     <>
                       <Button
                         size="sm"
-                        onClick={() => updateAppointmentStatus(selectedAppointment.id, 'confirmed')}
+                        onClick={() => updateAppointmentStatus(selectedAppointment.id, "confirmed")}
                         disabled={updating}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
@@ -429,7 +449,7 @@ export default function AppointmentsPage() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => updateAppointmentStatus(selectedAppointment.id, 'cancelled')}
+                        onClick={() => updateAppointmentStatus(selectedAppointment.id, "cancelled")}
                         disabled={updating}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
@@ -437,11 +457,11 @@ export default function AppointmentsPage() {
                       </Button>
                     </>
                   )}
-                  {selectedAppointment.status === 'confirmed' && (
+                  {selectedAppointment.status === "confirmed" && (
                     <>
                       <Button
                         size="sm"
-                        onClick={() => updateAppointmentStatus(selectedAppointment.id, 'completed')}
+                        onClick={() => updateAppointmentStatus(selectedAppointment.id, "completed")}
                         disabled={updating}
                       >
                         Mark Completed
@@ -449,7 +469,7 @@ export default function AppointmentsPage() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => updateAppointmentStatus(selectedAppointment.id, 'no_show')}
+                        onClick={() => updateAppointmentStatus(selectedAppointment.id, "no_show")}
                         disabled={updating}
                       >
                         Mark No Show
@@ -457,13 +477,13 @@ export default function AppointmentsPage() {
                     </>
                   )}
                   {/* Add Collect Payment button for unpaid appointments */}
-                  {selectedAppointment.payment_status === 'will_pay_later' && (
+                  {selectedAppointment.payment_status === "will_pay_later" && (
                     <Button
                       size="sm"
                       variant="default"
                       onClick={() => {
-                        setPaymentAmount((selectedAppointment.total_price_cents / 100).toFixed(2))
-                        setShowPaymentDialog(true)
+                        setPaymentAmount((selectedAppointment.total_price_cents / 100).toFixed(2));
+                        setShowPaymentDialog(true);
                       }}
                       disabled={updating}
                     >
@@ -488,23 +508,24 @@ export default function AppointmentsPage() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Collect Payment</DialogTitle>
-            <DialogDescription>
-              Record payment collection for this appointment
-            </DialogDescription>
+            <DialogDescription>Record payment collection for this appointment</DialogDescription>
           </DialogHeader>
           {selectedAppointment && (
             <div className="space-y-4">
               <div>
                 <Label>Service</Label>
                 <p className="text-sm text-muted-foreground">
-                  {selectedAppointment.service.name} - {formatPrice(selectedAppointment.total_price_cents)}
+                  {selectedAppointment.service.name} -{" "}
+                  {formatPrice(selectedAppointment.total_price_cents)}
                 </p>
               </div>
-              
+
               <div>
                 <Label htmlFor="amount">Amount</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    $
+                  </span>
                   <Input
                     id="amount"
                     type="number"
@@ -518,7 +539,10 @@ export default function AppointmentsPage() {
 
               <div>
                 <Label>Payment Method</Label>
-                <Select value={paymentMethod} onValueChange={(value: 'cash' | 'card' | 'check') => setPaymentMethod(value)}>
+                <Select
+                  value={paymentMethod}
+                  onValueChange={(value: "cash" | "card" | "check") => setPaymentMethod(value)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -530,7 +554,7 @@ export default function AppointmentsPage() {
                 </Select>
               </div>
 
-              {paymentMethod === 'check' && (
+              {paymentMethod === "check" && (
                 <div>
                   <Label htmlFor="reference">Check Number</Label>
                   <Input
@@ -547,46 +571,48 @@ export default function AppointmentsPage() {
             <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={async () => {
-                if (!selectedAppointment || !paymentAmount) return
-                
-                setUpdating(true)
+                if (!selectedAppointment || !paymentAmount) return;
+
+                setUpdating(true);
                 try {
                   // Update appointment payment status
                   const { error: appointmentError } = await supabase
-                    .from('appointments')
-                    .update({ 
-                      payment_status: 'paid',
+                    .from("appointments")
+                    .update({
+                      payment_status: "paid",
                       payment_collected_at: new Date().toISOString(),
-                      payment_collection_method: paymentMethod === 'card' ? 'in_person_card' : paymentMethod
+                      payment_collection_method:
+                        paymentMethod === "card" ? "in_person_card" : paymentMethod,
                     })
-                    .eq('id', selectedAppointment.id)
+                    .eq("id", selectedAppointment.id);
 
-                  if (appointmentError) throw appointmentError
+                  if (appointmentError) throw appointmentError;
 
                   // Record payment collection
                   const { error: collectionError } = await supabase
-                    .from('payment_collections')
+                    .from("payment_collections")
                     .insert({
                       appointment_id: selectedAppointment.id,
                       collected_by: (await supabase.auth.getUser()).data.user?.id,
                       amount_cents: Math.round(parseFloat(paymentAmount) * 100),
-                      collection_method: paymentMethod === 'card' ? 'in_person_card' : paymentMethod,
-                      payment_reference: paymentMethod === 'check' ? paymentReference : null
-                    })
+                      collection_method:
+                        paymentMethod === "card" ? "in_person_card" : paymentMethod,
+                      payment_reference: paymentMethod === "check" ? paymentReference : null,
+                    });
 
-                  if (collectionError) throw collectionError
+                  if (collectionError) throw collectionError;
 
-                  toast.success('Payment collected successfully')
-                  await fetchAppointments()
-                  setShowPaymentDialog(false)
-                  setShowDetails(false)
+                  toast.success("Payment collected successfully");
+                  await fetchAppointments();
+                  setShowPaymentDialog(false);
+                  setShowDetails(false);
                 } catch (error) {
-                  console.error('Error collecting payment:', error)
-                  toast.error('Failed to collect payment')
+                  console.error("Error collecting payment:", error);
+                  toast.error("Failed to collect payment");
                 } finally {
-                  setUpdating(false)
+                  setUpdating(false);
                 }
               }}
               disabled={updating || !paymentAmount || parseFloat(paymentAmount) <= 0}
@@ -598,5 +624,5 @@ export default function AppointmentsPage() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

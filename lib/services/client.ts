@@ -1,14 +1,16 @@
-'use client'
+"use client";
 
-import { createClient } from '@/lib/supabase/client'
-import type { Service } from '@/types'
-import type { ServiceFormData } from './schemas'
+import { createClient } from "@/lib/supabase/client";
+import type { Service } from "@/types";
+import type { ServiceFormData } from "./schemas";
 
-export async function createServiceClient(data: ServiceFormData): Promise<{ data?: Service; error?: string }> {
-  const supabase = createClient()
-  
+export async function createServiceClient(
+  data: ServiceFormData
+): Promise<{ data?: Service; error?: string }> {
+  const supabase = createClient();
+
   const { data: service, error } = await supabase
-    .from('services')
+    .from("services")
     .insert({
       name: data.name,
       description: data.description,
@@ -17,132 +19,128 @@ export async function createServiceClient(data: ServiceFormData): Promise<{ data
       is_active: data.is_active,
     })
     .select()
-    .single()
-  
+    .single();
+
   if (error) {
-    return { error: error.message }
+    return { error: error.message };
   }
-  
-  return { data: service }
+
+  return { data: service };
 }
 
 export async function updateServiceClient(
   serviceId: string,
   data: Partial<ServiceFormData>
 ): Promise<{ data?: Service; error?: string }> {
-  const supabase = createClient()
-  
+  const supabase = createClient();
+
   const { data: service, error } = await supabase
-    .from('services')
+    .from("services")
     .update(data)
-    .eq('id', serviceId)
+    .eq("id", serviceId)
     .select()
-    .single()
-  
+    .single();
+
   if (error) {
-    return { error: error.message }
+    return { error: error.message };
   }
-  
-  return { data: service }
+
+  return { data: service };
 }
 
-export async function deleteServiceClient(serviceId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
-  
+export async function deleteServiceClient(
+  serviceId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
   const { error } = await supabase
-    .from('services')
+    .from("services")
     .update({ is_active: false })
-    .eq('id', serviceId)
-  
+    .eq("id", serviceId);
+
   if (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error.message };
   }
-  
-  return { success: true }
+
+  return { success: true };
 }
 
 export async function getAllServices(includeInactive = false): Promise<Service[]> {
-  const supabase = createClient()
-  
-  let query = supabase
-    .from('services')
-    .select('*')
-    .order('name')
-  
+  const supabase = createClient();
+
+  let query = supabase.from("services").select("*").order("name");
+
   if (!includeInactive) {
-    query = query.eq('is_active', true)
+    query = query.eq("is_active", true);
   }
-  
-  const { data, error } = await query
-  
+
+  const { data, error } = await query;
+
   if (error) {
-    console.error('Error fetching services:', error)
-    return []
+    console.error("Error fetching services:", error);
+    return [];
   }
-  
-  return data || []
+
+  return data || [];
 }
 
 export async function getActiveServices(): Promise<Service[]> {
-  const supabase = createClient()
-  
+  const supabase = createClient();
+
   const { data, error } = await supabase
-    .from('services')
-    .select('*')
-    .eq('is_active', true)
-    .order('price_cents', { ascending: true })
-  
+    .from("services")
+    .select("*")
+    .eq("is_active", true)
+    .order("price_cents", { ascending: true });
+
   if (error) {
-    console.error('Error fetching active services:', error)
-    return []
+    console.error("Error fetching active services:", error);
+    return [];
   }
-  
-  return data || []
+
+  return data || [];
 }
 
 export async function searchServices(
   searchTerm: string,
   filters?: {
-    minPrice?: number
-    maxPrice?: number
-    minDuration?: number
-    maxDuration?: number
+    minPrice?: number;
+    maxPrice?: number;
+    minDuration?: number;
+    maxDuration?: number;
   }
 ): Promise<Service[]> {
-  const supabase = createClient()
-  
-  let query = supabase
-    .from('services')
-    .select('*')
-    .eq('is_active', true)
-  
+  const supabase = createClient();
+
+  let query = supabase.from("services").select("*").eq("is_active", true);
+
   // Add search filter
   if (searchTerm) {
-    query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+    query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
   }
-  
+
   // Add price filters
   if (filters?.minPrice !== undefined) {
-    query = query.gte('price_cents', filters.minPrice)
+    query = query.gte("price_cents", filters.minPrice);
   }
   if (filters?.maxPrice !== undefined) {
-    query = query.lte('price_cents', filters.maxPrice)
+    query = query.lte("price_cents", filters.maxPrice);
   }
-  
+
   // Add duration filters
   if (filters?.minDuration !== undefined) {
-    query = query.gte('duration_minutes', filters.minDuration)
+    query = query.gte("duration_minutes", filters.minDuration);
   }
   if (filters?.maxDuration !== undefined) {
-    query = query.lte('duration_minutes', filters.maxDuration)
+    query = query.lte("duration_minutes", filters.maxDuration);
   }
-  
-  const { data, error } = await query.order('name')
-  
+
+  const { data, error } = await query.order("name");
+
   if (error) {
-    console.error('Error searching services:', error)
-    return []
+    console.error("Error searching services:", error);
+    return [];
   }
-  
-  return data || []
+
+  return data || [];
 }

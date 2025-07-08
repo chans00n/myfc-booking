@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 // This client bypasses RLS and should only be used for server-side operations
 // that need elevated privileges (like creating payments)
 export function createServiceClient() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
   }
 
   return createClient<Database>(
@@ -17,5 +17,5 @@ export function createServiceClient() {
         persistSession: false,
       },
     }
-  )
+  );
 }

@@ -1,51 +1,49 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { scheduleConsultationNotifications } from '@/lib/notifications/consultation-notification-service'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { scheduleConsultationNotifications } from "@/lib/notifications/consultation-notification-service";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
-    
+    const supabase = createClient();
+
     // Verify authentication
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { consultationId, appointmentId } = await request.json()
+    const { consultationId, appointmentId } = await request.json();
 
     if (!consultationId || !appointmentId) {
-      return NextResponse.json(
-        { error: 'Missing required parameters' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
     // Fetch consultation details
     const { data: consultation, error: consultationError } = await supabase
-      .from('consultations')
-      .select(`
+      .from("consultations")
+      .select(
+        `
         *,
         appointment:appointments!consultations_appointment_id_fkey(
           *,
           client:profiles!appointments_client_id_fkey(*),
           service:services!appointments_service_id_fkey(*)
         )
-      `)
-      .eq('id', consultationId)
-      .single()
+      `
+      )
+      .eq("id", consultationId)
+      .single();
 
     if (consultationError || !consultation) {
-      return NextResponse.json(
-        { error: 'Consultation not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Consultation not found" }, { status: 404 });
     }
 
     // Get business details
-    const therapistName = process.env.THERAPIST_NAME || 'Your Therapist'
-    const businessName = process.env.BUSINESS_NAME || 'Massage Therapy'
-    const logoUrl = process.env.LOGO_URL
+    const therapistName = process.env.THERAPIST_NAME || "Your Therapist";
+    const businessName = process.env.BUSINESS_NAME || "Massage Therapy";
+    const logoUrl = process.env.LOGO_URL;
 
     // Schedule notifications
     const result = await scheduleConsultationNotifications({
@@ -64,18 +62,15 @@ export async function POST(request: NextRequest) {
       therapistName,
       businessName,
       logoUrl,
-    })
+    });
 
     return NextResponse.json({
       success: true,
       ...result,
-    })
+    });
   } catch (error) {
-    console.error('Error scheduling consultation notifications:', error)
-    return NextResponse.json(
-      { error: 'Failed to schedule notifications' },
-      { status: 500 }
-    )
+    console.error("Error scheduling consultation notifications:", error);
+    return NextResponse.json({ error: "Failed to schedule notifications" }, { status: 500 });
   }
 }
 
@@ -83,62 +78,66 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Verify cron secret for scheduled processing
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
+    const authHeader = request.headers.get("authorization");
+    const cronSecret = process.env.CRON_SECRET;
 
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const supabase = createClient()
+    const supabase = createClient();
 
     // Get pending consultation notifications
     const { data: notifications, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('status', 'pending')
-      .in('type', [
-        'consultation_24h_reminder',
-        'consultation_1h_reminder',
-        'consultation_15min_reminder',
-        'consultation_followup'
+      .from("notifications")
+      .select("*")
+      .eq("status", "pending")
+      .in("type", [
+        "consultation_24h_reminder",
+        "consultation_1h_reminder",
+        "consultation_15min_reminder",
+        "consultation_followup",
       ])
-      .lte('scheduled_for', new Date().toISOString())
-      .limit(10)
+      .lte("scheduled_for", new Date().toISOString())
+      .limit(10);
 
     if (error) {
-      throw error
+      throw error;
     }
 
-    const results = []
+    const results = [];
 
     for (const notification of notifications || []) {
       try {
         // Get consultation details
         const { data: consultation } = await supabase
-          .from('consultations')
-          .select(`
+          .from("consultations")
+          .select(
+            `
             *,
             appointment:appointments!consultations_appointment_id_fkey(
               *,
               client:profiles!appointments_client_id_fkey(*),
               service:services!appointments_service_id_fkey(*)
             )
-          `)
-          .eq('id', notification.reference_id)
-          .single()
+          `
+          )
+          .eq("id", notification.reference_id)
+          .single();
 
         if (!consultation) {
-          throw new Error('Consultation not found')
+          throw new Error("Consultation not found");
         }
 
-        const therapistName = process.env.THERAPIST_NAME || 'Your Therapist'
-        const businessName = process.env.BUSINESS_NAME || 'Massage Therapy'
-        const logoUrl = process.env.LOGO_URL
+        const therapistName = process.env.THERAPIST_NAME || "Your Therapist";
+        const businessName = process.env.BUSINESS_NAME || "Massage Therapy";
+        const logoUrl = process.env.LOGO_URL;
 
         // Import the service dynamically
-        const { sendConsultationNotification } = await import('@/lib/notifications/consultation-notification-service')
-        
+        const { sendConsultationNotification } = await import(
+          "@/lib/notifications/consultation-notification-service"
+        );
+
         await sendConsultationNotification(notification.type, {
           consultationId: consultation.id,
           appointmentId: consultation.appointment_id,
@@ -155,41 +154,41 @@ export async function GET(request: NextRequest) {
           therapistName,
           businessName,
           logoUrl,
-        })
+        });
 
         // Update notification status
         await supabase
-          .from('notifications')
+          .from("notifications")
           .update({
-            status: 'sent',
+            status: "sent",
             sent_at: new Date().toISOString(),
           })
-          .eq('id', notification.id)
+          .eq("id", notification.id);
 
         results.push({
           id: notification.id,
           type: notification.type,
-          status: 'sent',
-        })
+          status: "sent",
+        });
       } catch (error) {
-        console.error(`Error processing notification ${notification.id}:`, error)
+        console.error(`Error processing notification ${notification.id}:`, error);
 
         // Update notification as failed
         await supabase
-          .from('notifications')
+          .from("notifications")
           .update({
-            status: 'failed',
-            error_message: error instanceof Error ? error.message : 'Unknown error',
+            status: "failed",
+            error_message: error instanceof Error ? error.message : "Unknown error",
             retry_count: (notification.retry_count || 0) + 1,
           })
-          .eq('id', notification.id)
+          .eq("id", notification.id);
 
         results.push({
           id: notification.id,
           type: notification.type,
-          status: 'failed',
-          error: error instanceof Error ? error.message : 'Unknown error',
-        })
+          status: "failed",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
     }
 
@@ -197,12 +196,9 @@ export async function GET(request: NextRequest) {
       success: true,
       processed: results.length,
       results,
-    })
+    });
   } catch (error) {
-    console.error('Error processing consultation notifications:', error)
-    return NextResponse.json(
-      { error: 'Failed to process notifications' },
-      { status: 500 }
-    )
+    console.error("Error processing consultation notifications:", error);
+    return NextResponse.json({ error: "Failed to process notifications" }, { status: 500 });
   }
 }

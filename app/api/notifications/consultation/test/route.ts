@@ -1,133 +1,125 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { 
+import { NextRequest, NextResponse } from "next/server";
+import {
   sendConsultationConfirmation,
   sendConsultationReminder,
-  sendConsultationFollowup 
-} from '@/lib/notifications/email-service'
-import { format } from 'date-fns'
-import { generateConsultationRoomUrl } from '@/lib/consultations/urls'
+  sendConsultationFollowup,
+} from "@/lib/notifications/email-service";
+import { format } from "date-fns";
+import { generateConsultationRoomUrl } from "@/lib/consultations/urls";
 
 export async function POST(request: NextRequest) {
   try {
-    const { type, email } = await request.json()
+    const { type, email } = await request.json();
 
     if (!type || !email) {
-      return NextResponse.json(
-        { error: 'Missing required parameters' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
     const testData = {
-      clientName: 'Test Client',
-      therapistName: process.env.THERAPIST_NAME || 'Zionna Hanson',
-      businessName: process.env.BUSINESS_NAME || 'MYFC',
+      clientName: "Test Client",
+      therapistName: process.env.THERAPIST_NAME || "Zionna Hanson",
+      businessName: process.env.BUSINESS_NAME || "MYFC",
       logoUrl: process.env.LOGO_URL,
-    }
+    };
 
-    let result
-    const testDate = new Date()
-    testDate.setDate(testDate.getDate() + 1) // Tomorrow
+    let result;
+    const testDate = new Date();
+    testDate.setDate(testDate.getDate() + 1); // Tomorrow
 
     switch (type) {
-      case 'confirmation':
+      case "confirmation":
         result = await sendConsultationConfirmation({
           to: email,
           clientName: testData.clientName,
-          consultationType: 'video',
+          consultationType: "video",
           consultationDate: testDate,
-          consultationTime: '2:00 PM - 2:30 PM',
+          consultationTime: "2:00 PM - 2:30 PM",
           duration: 30,
-          roomUrl: generateConsultationRoomUrl('test'),
-          phoneNumber: '(555) 123-4567',
+          roomUrl: generateConsultationRoomUrl("test"),
+          phoneNumber: "(555) 123-4567",
           therapistName: testData.therapistName,
           businessName: testData.businessName,
           logoUrl: testData.logoUrl,
-        })
-        break
+        });
+        break;
 
-      case '24hour':
+      case "24hour":
         result = await sendConsultationReminder({
           to: email,
           clientName: testData.clientName,
-          consultationType: 'video',
+          consultationType: "video",
           consultationDate: testDate,
-          consultationTime: '2:00 PM - 2:30 PM',
+          consultationTime: "2:00 PM - 2:30 PM",
           duration: 30,
-          reminderType: '24hour',
-          roomUrl: generateConsultationRoomUrl('test'),
-          phoneNumber: '(555) 123-4567',
+          reminderType: "24hour",
+          roomUrl: generateConsultationRoomUrl("test"),
+          phoneNumber: "(555) 123-4567",
           therapistName: testData.therapistName,
           businessName: testData.businessName,
           logoUrl: testData.logoUrl,
-        })
-        break
+        });
+        break;
 
-      case '1hour':
+      case "1hour":
         result = await sendConsultationReminder({
           to: email,
           clientName: testData.clientName,
-          consultationType: 'phone',
+          consultationType: "phone",
           consultationDate: testDate,
-          consultationTime: '2:00 PM - 2:30 PM',
+          consultationTime: "2:00 PM - 2:30 PM",
           duration: 30,
-          reminderType: '1hour',
-          phoneNumber: '(555) 123-4567',
+          reminderType: "1hour",
+          phoneNumber: "(555) 123-4567",
           therapistName: testData.therapistName,
           businessName: testData.businessName,
           logoUrl: testData.logoUrl,
-        })
-        break
+        });
+        break;
 
-      case '15min':
+      case "15min":
         result = await sendConsultationReminder({
           to: email,
           clientName: testData.clientName,
-          consultationType: 'video',
+          consultationType: "video",
           consultationDate: testDate,
-          consultationTime: '2:00 PM - 2:30 PM',
+          consultationTime: "2:00 PM - 2:30 PM",
           duration: 30,
-          reminderType: '15min',
-          roomUrl: generateConsultationRoomUrl('test'),
+          reminderType: "15min",
+          roomUrl: generateConsultationRoomUrl("test"),
           therapistName: testData.therapistName,
           businessName: testData.businessName,
           logoUrl: testData.logoUrl,
-        })
-        break
+        });
+        break;
 
-      case 'followup':
+      case "followup":
         result = await sendConsultationFollowup({
           to: email,
           clientName: testData.clientName,
-          consultationType: 'video',
+          consultationType: "video",
           therapistName: testData.therapistName,
           businessName: testData.businessName,
           bookingUrl: `${process.env.NEXT_PUBLIC_APP_URL}/booking`,
-          specialOfferTitle: 'First Visit Special - 20% Off',
-          specialOfferDescription: 'Save 20% on your first massage appointment when you book within 7 days!',
-          specialOfferCode: 'CONSULT20',
+          specialOfferTitle: "First Visit Special - 20% Off",
+          specialOfferDescription:
+            "Save 20% on your first massage appointment when you book within 7 days!",
+          specialOfferCode: "CONSULT20",
           logoUrl: testData.logoUrl,
-        })
-        break
+        });
+        break;
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid notification type' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: "Invalid notification type" }, { status: 400 });
     }
 
     return NextResponse.json({
       success: true,
       message: `Test ${type} email sent to ${email}`,
       result,
-    })
+    });
   } catch (error) {
-    console.error('Error sending test email:', error)
-    return NextResponse.json(
-      { error: 'Failed to send test email' },
-      { status: 500 }
-    )
+    console.error("Error sending test email:", error);
+    return NextResponse.json({ error: "Failed to send test email" }, { status: 500 });
   }
 }
 
@@ -255,9 +247,9 @@ export async function GET() {
       </script>
     </body>
     </html>
-  `
+  `;
 
   return new Response(html, {
-    headers: { 'Content-Type': 'text/html' },
-  })
+    headers: { "Content-Type": "text/html" },
+  });
 }

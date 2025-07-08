@@ -1,34 +1,35 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { createClient } from '@/lib/supabase/client'
+import * as React from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { createClient } from "@/lib/supabase/client";
 
 interface ServiceData {
-  name: string
-  bookings: number
-  revenue: number
+  name: string;
+  bookings: number;
+  revenue: number;
 }
 
 export function ChartServiceAnalytics() {
-  const [data, setData] = React.useState<ServiceData[]>([])
-  const [loading, setLoading] = React.useState(true)
-  
-  const supabase = createClient()
+  const [data, setData] = React.useState<ServiceData[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const supabase = createClient();
 
   React.useEffect(() => {
-    fetchServiceData()
-  }, [])
+    fetchServiceData();
+  }, []);
 
   const fetchServiceData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Fetch all appointments with service details
       const { data: appointments, error } = await supabase
-        .from('appointments')
-        .select(`
+        .from("appointments")
+        .select(
+          `
           service_id,
           total_price_cents,
           status,
@@ -36,44 +37,45 @@ export function ChartServiceAnalytics() {
             id,
             name
           )
-        `)
-        .in('status', ['completed', 'confirmed', 'scheduled'])
+        `
+        )
+        .in("status", ["completed", "confirmed", "scheduled"]);
 
-      if (error) throw error
+      if (error) throw error;
 
       // Aggregate data by service
-      const serviceMap = new Map<string, { name: string; bookings: number; revenue: number }>()
-      
-      appointments?.forEach(appointment => {
+      const serviceMap = new Map<string, { name: string; bookings: number; revenue: number }>();
+
+      appointments?.forEach((appointment) => {
         if (appointment.service) {
-          const serviceId = appointment.service.id
+          const serviceId = appointment.service.id;
           const existing = serviceMap.get(serviceId) || {
             name: appointment.service.name,
             bookings: 0,
-            revenue: 0
+            revenue: 0,
+          };
+
+          existing.bookings++;
+          if (appointment.status === "completed" && appointment.total_price_cents) {
+            existing.revenue += appointment.total_price_cents / 100;
           }
-          
-          existing.bookings++
-          if (appointment.status === 'completed' && appointment.total_price_cents) {
-            existing.revenue += appointment.total_price_cents / 100
-          }
-          
-          serviceMap.set(serviceId, existing)
+
+          serviceMap.set(serviceId, existing);
         }
-      })
+      });
 
       // Convert to array and sort by bookings
       const chartData = Array.from(serviceMap.values())
         .sort((a, b) => b.bookings - a.bookings)
-        .slice(0, 5) // Top 5 services
+        .slice(0, 5); // Top 5 services
 
-      setData(chartData)
+      setData(chartData);
     } catch (error) {
-      console.error('Error fetching service data:', error)
+      console.error("Error fetching service data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const chartConfig = {
     bookings: {
@@ -84,15 +86,13 @@ export function ChartServiceAnalytics() {
       label: "Revenue",
       color: "hsl(var(--chart-2))",
     },
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Popular Services</CardTitle>
-        <CardDescription>
-          Top services by number of bookings
-        </CardDescription>
+        <CardDescription>Top services by number of bookings</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         {loading ? (
@@ -119,30 +119,21 @@ export function ChartServiceAnalytics() {
                   interval={0}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tick={{ fontSize: 12 }}
-                />
+                <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
                 <ChartTooltip
                   cursor={false}
                   content={
                     <ChartTooltipContent
                       formatter={(value, name) => {
-                        if (name === 'bookings') {
-                          return [`${value} bookings`, 'Total Bookings']
+                        if (name === "bookings") {
+                          return [`${value} bookings`, "Total Bookings"];
                         }
-                        return [value, name]
+                        return [value, name];
                       }}
                     />
                   }
                 />
-                <Bar
-                  dataKey="bookings"
-                  fill="var(--color-bookings)"
-                  radius={[8, 8, 0, 0]}
-                />
+                <Bar dataKey="bookings" fill="var(--color-bookings)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -153,7 +144,9 @@ export function ChartServiceAnalytics() {
               <div key={service.name} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full bg-primary`} />
-                  <span className="font-medium">{index + 1}. {service.name}</span>
+                  <span className="font-medium">
+                    {index + 1}. {service.name}
+                  </span>
                 </div>
                 <div className="flex items-center gap-4 text-muted-foreground">
                   <span>{service.bookings} bookings</span>
@@ -165,5 +158,5 @@ export function ChartServiceAnalytics() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

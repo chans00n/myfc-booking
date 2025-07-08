@@ -9,7 +9,7 @@ The SOZA Massage consultation room provides a secure, HIPAA-compliant video cons
 - **Video & Phone Consultations**: Support for both video calls and phone consultations
 - **Waiting Room**: Pre-call waiting area with appointment details and preparation checklist
 - **Real-time Timer**: Tracks consultation duration with warnings for time limits
-- **Admin Tools**: 
+- **Admin Tools**:
   - Live note-taking with auto-save
   - Client information panel with intake form details
   - Health history and medication information
@@ -31,6 +31,7 @@ The SOZA Massage consultation room provides a secure, HIPAA-compliant video cons
 ### Database Schema
 
 The consultation feature requires the following database tables:
+
 - `consultations`: Stores consultation records
 - `appointments`: Links consultations to scheduled appointments
 - `intake_forms`: Contains client health information
@@ -96,6 +97,7 @@ The consultation feature requires the following database tables:
 ### Branding
 
 The consultation room can be customized with:
+
 - Custom logo and colors
 - Branded waiting room
 - Themed UI components
@@ -111,8 +113,8 @@ export const consultationConfig = {
   lateJoinWindow: 15, // minutes after start
   enableChat: true,
   enableScreenShare: true,
-  maxParticipants: 2
-}
+  maxParticipants: 2,
+};
 ```
 
 ## Troubleshooting
@@ -127,9 +129,10 @@ export const consultationConfig = {
 ### Debug Mode
 
 Enable debug logging:
+
 ```typescript
 // In development
-process.env.CONSULTATION_DEBUG = 'true'
+process.env.CONSULTATION_DEBUG = "true";
 ```
 
 ## Integration Points
@@ -137,6 +140,7 @@ process.env.CONSULTATION_DEBUG = 'true'
 ### Intake Forms
 
 Consultation rooms automatically load relevant intake form data:
+
 - Health conditions
 - Medications
 - Allergies
@@ -145,6 +149,7 @@ Consultation rooms automatically load relevant intake form data:
 ### Appointment System
 
 Consultations are fully integrated with the appointment system:
+
 - Automatic status updates
 - Calendar synchronization
 - Payment processing (for paid consultations)
@@ -153,6 +158,7 @@ Consultations are fully integrated with the appointment system:
 ### Analytics
 
 Track consultation metrics:
+
 - Average duration
 - Completion rates
 - Technical issues

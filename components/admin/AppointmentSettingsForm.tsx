@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { getAppointmentSettings, updateAppointmentSettings } from '@/lib/availability'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { useToast } from '@/hooks/use-toast'
-import { Loader2 } from 'lucide-react'
-import type { AppointmentSettings } from '@/types'
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { getAppointmentSettings, updateAppointmentSettings } from "@/lib/availability";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import type { AppointmentSettings } from "@/types";
 
 const settingsSchema = z.object({
   buffer_time_minutes: z.number().min(0).max(60),
@@ -19,24 +19,21 @@ const settingsSchema = z.object({
   minimum_notice_hours: z.number().min(0).max(168),
   cancellation_cutoff_hours: z.number().min(0).max(168),
   timezone: z.string(),
-})
+});
 
-type SettingsFormData = z.infer<typeof settingsSchema>
+type SettingsFormData = z.infer<typeof settingsSchema>;
 
 interface AppointmentSettingsFormProps {
-  onSuccess: () => void
-  onCancel: () => void
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export function AppointmentSettingsForm({
-  onSuccess,
-  onCancel,
-}: AppointmentSettingsFormProps) {
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [settings, setSettings] = useState<AppointmentSettings | null>(null)
-  const { toast } = useToast()
-  
+export function AppointmentSettingsForm({ onSuccess, onCancel }: AppointmentSettingsFormProps) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState<AppointmentSettings | null>(null);
+  const { toast } = useToast();
+
   const {
     register,
     handleSubmit,
@@ -44,53 +41,53 @@ export function AppointmentSettingsForm({
     formState: { errors },
   } = useForm<SettingsFormData>({
     resolver: zodResolver(settingsSchema),
-  })
+  });
 
   useEffect(() => {
-    loadSettings()
-  }, [])
+    loadSettings();
+  }, []);
 
   const loadSettings = async () => {
-    const data = await getAppointmentSettings()
+    const data = await getAppointmentSettings();
     if (data) {
-      setSettings(data)
-      setValue('buffer_time_minutes', data.buffer_time_minutes)
-      setValue('advance_booking_days', data.advance_booking_days)
-      setValue('minimum_notice_hours', data.minimum_notice_hours)
-      setValue('cancellation_cutoff_hours', data.cancellation_cutoff_hours)
-      setValue('timezone', data.timezone)
+      setSettings(data);
+      setValue("buffer_time_minutes", data.buffer_time_minutes);
+      setValue("advance_booking_days", data.advance_booking_days);
+      setValue("minimum_notice_hours", data.minimum_notice_hours);
+      setValue("cancellation_cutoff_hours", data.cancellation_cutoff_hours);
+      setValue("timezone", data.timezone);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const onSubmit = async (data: SettingsFormData) => {
-    setSaving(true)
-    
-    const result = await updateAppointmentSettings(data)
-    
+    setSaving(true);
+
+    const result = await updateAppointmentSettings(data);
+
     if (result) {
       toast({
-        title: 'Success',
-        description: 'Settings updated successfully',
-      })
-      onSuccess()
+        title: "Success",
+        description: "Settings updated successfully",
+      });
+      onSuccess();
     } else {
       toast({
-        title: 'Error',
-        description: 'Failed to update settings',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "Failed to update settings",
+        variant: "destructive",
+      });
     }
-    
-    setSaving(false)
-  }
+
+    setSaving(false);
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
-    )
+    );
   }
 
   return (
@@ -99,16 +96,16 @@ export function AppointmentSettingsForm({
         <h3 className="text-lg font-medium">Booking Rules</h3>
         <p className="text-sm text-gray-500">Configure how clients can book appointments</p>
       </div>
-      
+
       <Separator />
-      
+
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="minimum_notice_hours">Minimum Notice (hours)</Label>
           <Input
             id="minimum_notice_hours"
             type="number"
-            {...register('minimum_notice_hours', { valueAsNumber: true })}
+            {...register("minimum_notice_hours", { valueAsNumber: true })}
           />
           <p className="text-sm text-gray-500">
             How many hours in advance must appointments be booked
@@ -123,11 +120,9 @@ export function AppointmentSettingsForm({
           <Input
             id="advance_booking_days"
             type="number"
-            {...register('advance_booking_days', { valueAsNumber: true })}
+            {...register("advance_booking_days", { valueAsNumber: true })}
           />
-          <p className="text-sm text-gray-500">
-            How far in advance can appointments be booked
-          </p>
+          <p className="text-sm text-gray-500">How far in advance can appointments be booked</p>
           {errors.advance_booking_days && (
             <p className="text-sm text-red-500">{errors.advance_booking_days.message}</p>
           )}
@@ -138,7 +133,7 @@ export function AppointmentSettingsForm({
           <Input
             id="cancellation_cutoff_hours"
             type="number"
-            {...register('cancellation_cutoff_hours', { valueAsNumber: true })}
+            {...register("cancellation_cutoff_hours", { valueAsNumber: true })}
           />
           <p className="text-sm text-gray-500">
             How many hours before appointment can it be cancelled
@@ -162,7 +157,7 @@ export function AppointmentSettingsForm({
           <Input
             id="buffer_time_minutes"
             type="number"
-            {...register('buffer_time_minutes', { valueAsNumber: true })}
+            {...register("buffer_time_minutes", { valueAsNumber: true })}
           />
           <p className="text-sm text-gray-500">
             Time to add between appointments for cleanup and preparation
@@ -174,17 +169,9 @@ export function AppointmentSettingsForm({
 
         <div className="space-y-2">
           <Label htmlFor="timezone">Timezone</Label>
-          <Input
-            id="timezone"
-            {...register('timezone')}
-            placeholder="America/Los_Angeles"
-          />
-          <p className="text-sm text-gray-500">
-            Your business timezone for appointment scheduling
-          </p>
-          {errors.timezone && (
-            <p className="text-sm text-red-500">{errors.timezone.message}</p>
-          )}
+          <Input id="timezone" {...register("timezone")} placeholder="America/Los_Angeles" />
+          <p className="text-sm text-gray-500">Your business timezone for appointment scheduling</p>
+          {errors.timezone && <p className="text-sm text-red-500">{errors.timezone.message}</p>}
         </div>
       </div>
 
@@ -198,5 +185,5 @@ export function AppointmentSettingsForm({
         </Button>
       </div>
     </form>
-  )
+  );
 }

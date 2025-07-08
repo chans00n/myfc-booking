@@ -1,43 +1,45 @@
-import { createClient } from '@/lib/supabase/client'
-import type { Payment } from '@/types/payments'
+import { createClient } from "@/lib/supabase/client";
+import type { Payment } from "@/types/payments";
 
 export interface ReceiptData {
-  receiptNumber: string
-  paymentDate: string
-  clientName: string
-  clientEmail: string
-  serviceName: string
-  serviceDate: string
-  amount: number
-  paymentMethod: string
-  paymentStatus: string
-  refundedAmount?: number
+  receiptNumber: string;
+  paymentDate: string;
+  clientName: string;
+  clientEmail: string;
+  serviceName: string;
+  serviceDate: string;
+  amount: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  refundedAmount?: number;
 }
 
 export async function generateReceiptData(
   paymentId: string
 ): Promise<{ data?: ReceiptData; error?: string }> {
   try {
-    const supabase = createClient()
-    
+    const supabase = createClient();
+
     // Get payment with related data
     const { data: payment, error } = await supabase
-      .from('payments')
-      .select(`
+      .from("payments")
+      .select(
+        `
         *,
         appointment:appointments!payments_appointment_id_fkey(
           *,
           service:services(*),
           client:profiles(*)
         )
-      `)
-      .eq('id', paymentId)
-      .single()
-    
+      `
+      )
+      .eq("id", paymentId)
+      .single();
+
     if (error || !payment) {
-      return { error: 'Payment not found' }
+      return { error: "Payment not found" };
     }
-    
+
     const receiptData: ReceiptData = {
       receiptNumber: payment.receipt_number || `TEMP-${payment.id.slice(0, 8)}`,
       paymentDate: payment.paid_at || payment.created_at,
@@ -48,23 +50,24 @@ export async function generateReceiptData(
       amount: payment.amount_cents / 100,
       paymentMethod: payment.payment_method_type,
       paymentStatus: payment.status,
-      refundedAmount: payment.refunded_amount_cents > 0 ? payment.refunded_amount_cents / 100 : undefined
-    }
-    
-    return { data: receiptData }
+      refundedAmount:
+        payment.refunded_amount_cents > 0 ? payment.refunded_amount_cents / 100 : undefined,
+    };
+
+    return { data: receiptData };
   } catch (error) {
-    console.error('Error generating receipt data:', error)
-    return { error: 'Failed to generate receipt' }
+    console.error("Error generating receipt data:", error);
+    return { error: "Failed to generate receipt" };
   }
 }
 
 // HTML receipt template
 export function generateReceiptHTML(receipt: ReceiptData): string {
-  const businessName = 'SOZA Massage Therapy'
-  const businessAddress = '123 Wellness Street, Health City, HC 12345'
-  const businessPhone = '(555) 123-4567'
-  const businessEmail = 'info@sozamassage.com'
-  
+  const businessName = "SOZA Massage Therapy";
+  const businessAddress = "123 Wellness Street, Health City, HC 12345";
+  const businessPhone = "(555) 123-4567";
+  const businessEmail = "info@sozamassage.com";
+
   return `
     <!DOCTYPE html>
     <html>
@@ -190,18 +193,20 @@ export function generateReceiptHTML(receipt: ReceiptData): string {
         </div>
         <div class="detail-row">
           <span class="detail-label">Payment Date:</span>
-          <span>${new Date(receipt.paymentDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          <span>${new Date(receipt.paymentDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
           })}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Payment Status:</span>
           <span class="status-badge ${
-            receipt.paymentStatus === 'succeeded' ? 'status-paid' : 
-            receipt.paymentStatus === 'refunded' ? 'status-refunded' : 
-            'status-partial'
+            receipt.paymentStatus === "succeeded"
+              ? "status-paid"
+              : receipt.paymentStatus === "refunded"
+                ? "status-refunded"
+                : "status-partial"
           }">
             ${receipt.paymentStatus.toUpperCase()}
           </span>
@@ -232,12 +237,14 @@ export function generateReceiptHTML(receipt: ReceiptData): string {
         <tbody>
           <tr>
             <td>${receipt.serviceName}</td>
-            <td>${new Date(receipt.serviceDate).toLocaleDateString('en-US')}</td>
+            <td>${new Date(receipt.serviceDate).toLocaleDateString("en-US")}</td>
             <td>$${receipt.amount.toFixed(2)}</td>
           </tr>
         </tbody>
         <tfoot>
-          ${receipt.refundedAmount ? `
+          ${
+            receipt.refundedAmount
+              ? `
             <tr>
               <td colspan="2" style="text-align: right;">Subtotal:</td>
               <td>$${receipt.amount.toFixed(2)}</td>
@@ -250,12 +257,14 @@ export function generateReceiptHTML(receipt: ReceiptData): string {
               <td colspan="2" style="text-align: right;">Net Amount:</td>
               <td>$${(receipt.amount - receipt.refundedAmount).toFixed(2)}</td>
             </tr>
-          ` : `
+          `
+              : `
             <tr class="total-row">
               <td colspan="2" style="text-align: right;">Total Paid:</td>
               <td>$${receipt.amount.toFixed(2)}</td>
             </tr>
-          `}
+          `
+          }
         </tfoot>
       </table>
 
@@ -275,7 +284,7 @@ export function generateReceiptHTML(receipt: ReceiptData): string {
       </div>
     </body>
     </html>
-  `
+  `;
 }
 
 // Generate PDF receipt (requires additional package like puppeteer or jsPDF)
@@ -283,23 +292,23 @@ export async function generateReceiptPDF(
   paymentId: string
 ): Promise<{ data?: Blob; error?: string }> {
   try {
-    const { data: receiptData, error } = await generateReceiptData(paymentId)
-    
+    const { data: receiptData, error } = await generateReceiptData(paymentId);
+
     if (error || !receiptData) {
-      return { error: error || 'Failed to generate receipt data' }
+      return { error: error || "Failed to generate receipt data" };
     }
-    
-    const html = generateReceiptHTML(receiptData)
-    
+
+    const html = generateReceiptHTML(receiptData);
+
     // In a production environment, you would use a service like Puppeteer
     // or a PDF generation API to convert HTML to PDF
     // For now, we'll return the HTML as a blob
-    const blob = new Blob([html], { type: 'text/html' })
-    
-    return { data: blob }
+    const blob = new Blob([html], { type: "text/html" });
+
+    return { data: blob };
   } catch (error) {
-    console.error('Error generating receipt PDF:', error)
-    return { error: 'Failed to generate receipt PDF' }
+    console.error("Error generating receipt PDF:", error);
+    return { error: "Failed to generate receipt PDF" };
   }
 }
 
@@ -309,36 +318,34 @@ export async function emailReceipt(
   recipientEmail?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: receiptData, error } = await generateReceiptData(paymentId)
-    
+    const { data: receiptData, error } = await generateReceiptData(paymentId);
+
     if (error || !receiptData) {
-      return { success: false, error: error || 'Failed to generate receipt data' }
+      return { success: false, error: error || "Failed to generate receipt data" };
     }
-    
-    const html = generateReceiptHTML(receiptData)
-    const recipient = recipientEmail || receiptData.clientEmail
-    
+
+    const html = generateReceiptHTML(receiptData);
+    const recipient = recipientEmail || receiptData.clientEmail;
+
     // In production, integrate with your email service (SendGrid, AWS SES, etc.)
     // For now, we'll just log it
-    console.log('Sending receipt to:', recipient)
-    console.log('Receipt HTML length:', html.length)
-    
+    console.log("Sending receipt to:", recipient);
+    console.log("Receipt HTML length:", html.length);
+
     // Store that we sent the receipt
-    const supabase = createClient()
-    await supabase
-      .from('payment_events')
-      .insert({
-        payment_id: paymentId,
-        event_type: 'receipt.sent',
-        event_data: {
-          recipient,
-          sent_at: new Date().toISOString()
-        }
-      })
-    
-    return { success: true }
+    const supabase = createClient();
+    await supabase.from("payment_events").insert({
+      payment_id: paymentId,
+      event_type: "receipt.sent",
+      event_data: {
+        recipient,
+        sent_at: new Date().toISOString(),
+      },
+    });
+
+    return { success: true };
   } catch (error) {
-    console.error('Error emailing receipt:', error)
-    return { success: false, error: 'Failed to email receipt' }
+    console.error("Error emailing receipt:", error);
+    return { success: false, error: "Failed to email receipt" };
   }
 }

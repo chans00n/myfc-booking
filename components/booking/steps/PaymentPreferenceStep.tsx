@@ -1,42 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useBooking } from '@/contexts/BookingContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CreditCard, DollarSign, Clock, Info } from 'lucide-react'
-import type { PaymentPreference } from '@/types'
+import { useState, useEffect } from "react";
+import { useBooking } from "@/contexts/BookingContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CreditCard, DollarSign, Clock, Info } from "lucide-react";
+import type { PaymentPreference } from "@/types";
 
 interface PaymentPreferenceStepProps {
-  onValidate: (isValid: boolean) => void
+  onValidate: (isValid: boolean) => void;
 }
 
 export function PaymentPreferenceStep({ onValidate }: PaymentPreferenceStepProps) {
-  const { bookingData, updateBookingData } = useBooking()
+  const { bookingData, updateBookingData } = useBooking();
   const [preference, setPreference] = useState<PaymentPreference>(
-    bookingData.paymentPreference || 'pay_at_appointment'
-  )
+    bookingData.paymentPreference || "pay_at_appointment"
+  );
 
   useEffect(() => {
-    updateBookingData({ paymentPreference: preference })
-    onValidate(true) // Payment preference is always valid once selected
-  }, [preference, updateBookingData, onValidate])
+    updateBookingData({ paymentPreference: preference });
+    onValidate(true); // Payment preference is always valid once selected
+  }, [preference, updateBookingData, onValidate]);
 
   const handlePreferenceChange = (value: string) => {
-    setPreference(value as PaymentPreference)
-  }
+    setPreference(value as PaymentPreference);
+  };
 
-  const servicePrice = bookingData.service ? `$${(bookingData.service.price_cents / 100).toFixed(2)}` : ''
+  const servicePrice = bookingData.service
+    ? `$${(bookingData.service.price_cents / 100).toFixed(2)}`
+    : "";
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Payment Method</h2>
-        <p className="text-muted-foreground">
-          Choose how you'd like to pay for your appointment
-        </p>
+        <p className="text-muted-foreground">Choose how you'd like to pay for your appointment</p>
       </div>
 
       <Card>
@@ -50,15 +50,22 @@ export function PaymentPreferenceStep({ onValidate }: PaymentPreferenceStepProps
           <RadioGroup value={preference} onValueChange={handlePreferenceChange}>
             <div className="space-y-4">
               {/* Pay at Appointment - Default Option */}
-              <label 
+              <label
                 htmlFor="pay_at_appointment"
                 className="flex items-start space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
               >
-                <RadioGroupItem value="pay_at_appointment" id="pay_at_appointment" className="mt-1" />
+                <RadioGroupItem
+                  value="pay_at_appointment"
+                  id="pay_at_appointment"
+                  className="mt-1"
+                />
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-primary" />
-                    <Label htmlFor="pay_at_appointment" className="text-base font-medium cursor-pointer">
+                    <Label
+                      htmlFor="pay_at_appointment"
+                      className="text-base font-medium cursor-pointer"
+                    >
                       Pay at Appointment (Recommended)
                     </Label>
                   </div>
@@ -69,7 +76,7 @@ export function PaymentPreferenceStep({ onValidate }: PaymentPreferenceStepProps
               </label>
 
               {/* Pay Cash */}
-              <label 
+              <label
                 htmlFor="pay_cash"
                 className="flex items-start space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
               >
@@ -88,7 +95,7 @@ export function PaymentPreferenceStep({ onValidate }: PaymentPreferenceStepProps
               </label>
 
               {/* Pay Now Online */}
-              <label 
+              <label
                 htmlFor="pay_now"
                 className="flex items-start space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
               >
@@ -108,37 +115,37 @@ export function PaymentPreferenceStep({ onValidate }: PaymentPreferenceStepProps
             </div>
           </RadioGroup>
 
-          {preference === 'pay_now' && (
+          {preference === "pay_now" && (
             <Alert>
               <CreditCard className="h-4 w-4" />
               <AlertDescription>
-                You'll be redirected to secure payment on the next step. 
-                Your appointment will be confirmed immediately after payment.
+                You'll be redirected to secure payment on the next step. Your appointment will be
+                confirmed immediately after payment.
               </AlertDescription>
             </Alert>
           )}
 
-          {preference === 'pay_cash' && (
+          {preference === "pay_cash" && (
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Please bring {servicePrice} in cash to your appointment. 
-                We appreciate exact change when possible.
+                Please bring {servicePrice} in cash to your appointment. We appreciate exact change
+                when possible.
               </AlertDescription>
             </Alert>
           )}
 
-          {preference === 'pay_at_appointment' && (
+          {preference === "pay_at_appointment" && (
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Payment of {servicePrice} will be collected when you arrive. 
-                We accept cash, credit card, or check.
+                Payment of {servicePrice} will be collected when you arrive. We accept cash, credit
+                card, or check.
               </AlertDescription>
             </Alert>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

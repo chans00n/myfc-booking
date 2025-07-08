@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { PaymentManager } from '@/components/admin/PaymentManager'
+import { PaymentManager } from "@/components/admin/PaymentManager";
 
 export default function PaymentsPage() {
-  return <PaymentManager />
+  return <PaymentManager />;
 }

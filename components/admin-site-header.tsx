@@ -1,6 +1,6 @@
-import { usePathname } from "next/navigation"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { usePathname } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,19 +8,19 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { AdminSearchCommand } from "@/components/admin-search-command"
+} from "@/components/ui/breadcrumb";
+import { AdminSearchCommand } from "@/components/admin-search-command";
 
 export function AdminSiteHeader() {
-  const pathname = usePathname()
-  
+  const pathname = usePathname();
+
   // Generate breadcrumbs from pathname
-  const pathSegments = pathname.split('/').filter(Boolean)
+  const pathSegments = pathname.split("/").filter(Boolean);
   const breadcrumbs = pathSegments.map((segment, index) => {
-    const href = '/' + pathSegments.slice(0, index + 1).join('/')
-    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
-    return { label, href, isLast: index === pathSegments.length - 1 }
-  })
+    const href = "/" + pathSegments.slice(0, index + 1).join("/");
+    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+    return { label, href, isLast: index === pathSegments.length - 1 };
+  });
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
@@ -35,9 +35,7 @@ export function AdminSiteHeader() {
                   <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
                 ) : (
                   <>
-                    <BreadcrumbLink href={breadcrumb.href}>
-                      {breadcrumb.label}
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href={breadcrumb.href}>{breadcrumb.label}</BreadcrumbLink>
                     {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
                   </>
                 )}
@@ -48,5 +46,5 @@ export function AdminSiteHeader() {
         <AdminSearchCommand />
       </div>
     </header>
-  )
+  );
 }

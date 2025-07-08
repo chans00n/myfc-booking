@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { AdminSiteHeader } from '@/components/admin-site-header'
-import { ConsultationAnalytics } from '@/components/admin/consultations/ConsultationAnalytics'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import { ConsultationAnalytics } from "@/components/admin/consultations/ConsultationAnalytics";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function ConsultationAnalyticsPage() {
   return (
@@ -15,18 +15,16 @@ export default function ConsultationAnalyticsPage() {
           <div className="px-4 lg:px-6">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              <Button
-                variant="ghost"
-                size="icon"
-                asChild
-              >
+              <Button variant="ghost" size="icon" asChild>
                 <Link href="/dashboard/consultations">
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
               </Button>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Consultation Analytics</h1>
-                <p className="text-muted-foreground">Detailed insights into your consultation performance</p>
+                <p className="text-muted-foreground">
+                  Detailed insights into your consultation performance
+                </p>
               </div>
             </div>
 
@@ -36,5 +34,5 @@ export default function ConsultationAnalyticsPage() {
         </div>
       </div>
     </>
-  )
+  );
 }

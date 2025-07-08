@@ -1,71 +1,71 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useBooking } from '@/contexts/BookingContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Phone, Video, MapPin, Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useEffect } from "react";
+import { useBooking } from "@/contexts/BookingContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Phone, Video, MapPin, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ConsultationTypeSelectionProps {
-  onValidate: (isValid: boolean) => void
+  onValidate: (isValid: boolean) => void;
 }
 
 const consultationTypes = [
   {
-    id: 'phone',
-    name: 'Phone Consultation',
-    description: 'A 30-minute phone call to discuss your needs',
+    id: "phone",
+    name: "Phone Consultation",
+    description: "A 30-minute phone call to discuss your needs",
     icon: Phone,
     features: [
-      'Convenient from anywhere',
-      'No travel required',
-      'Perfect for initial discussion',
-      'Flexible scheduling'
-    ]
+      "Convenient from anywhere",
+      "No travel required",
+      "Perfect for initial discussion",
+      "Flexible scheduling",
+    ],
   },
   {
-    id: 'video',
-    name: 'Video Consultation',
-    description: 'Face-to-face consultation via video call',
+    id: "video",
+    name: "Video Consultation",
+    description: "Face-to-face consultation via video call",
     icon: Video,
     features: [
-      'Visual assessment possible',
-      'More personal connection',
-      'Screen sharing for exercises',
-      'Recorded for your reference'
+      "Visual assessment possible",
+      "More personal connection",
+      "Screen sharing for exercises",
+      "Recorded for your reference",
     ],
-    recommended: true
+    recommended: true,
   },
   {
-    id: 'in_person',
-    name: 'In-Person Consultation',
-    description: 'Meet at our clinic for a hands-on assessment',
+    id: "in_person",
+    name: "In-Person Consultation",
+    description: "Meet at our clinic for a hands-on assessment",
     icon: MapPin,
     features: [
-      'Physical assessment',
-      'Tour of facilities',
-      'Meet your therapist',
-      'Most comprehensive option'
-    ]
-  }
-]
+      "Physical assessment",
+      "Tour of facilities",
+      "Meet your therapist",
+      "Most comprehensive option",
+    ],
+  },
+];
 
 export function ConsultationTypeSelection({ onValidate }: ConsultationTypeSelectionProps) {
-  const { bookingData, updateBookingData } = useBooking()
-  const [selectedType, setSelectedType] = useState<string>(bookingData.consultationType || '')
+  const { bookingData, updateBookingData } = useBooking();
+  const [selectedType, setSelectedType] = useState<string>(bookingData.consultationType || "");
 
   useEffect(() => {
     // Validate on mount and when selection changes
-    onValidate(!!selectedType)
-  }, [selectedType, onValidate])
+    onValidate(!!selectedType);
+  }, [selectedType, onValidate]);
 
   const handleSelection = (typeId: string) => {
-    setSelectedType(typeId)
-    updateBookingData({ 
-      consultationType: typeId as 'phone' | 'video' | 'in_person'
-    })
-  }
+    setSelectedType(typeId);
+    updateBookingData({
+      consultationType: typeId as "phone" | "video" | "in_person",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -78,9 +78,9 @@ export function ConsultationTypeSelection({ onValidate }: ConsultationTypeSelect
 
       <div className="grid gap-4 md:grid-cols-3">
         {consultationTypes.map((type) => {
-          const Icon = type.icon
-          const isSelected = selectedType === type.id
-          
+          const Icon = type.icon;
+          const isSelected = selectedType === type.id;
+
           return (
             <Card
               key={type.id}
@@ -98,18 +98,20 @@ export function ConsultationTypeSelection({ onValidate }: ConsultationTypeSelect
                   </span>
                 </div>
               )}
-              
+
               <CardHeader className="text-center pb-4">
-                <div className={cn(
-                  "mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3",
-                  isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
-                )}>
+                <div
+                  className={cn(
+                    "mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3",
+                    isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
+                  )}
+                >
                   <Icon className="h-6 w-6" />
                 </div>
                 <CardTitle className="text-lg">{type.name}</CardTitle>
                 <CardDescription>{type.description}</CardDescription>
               </CardHeader>
-              
+
               <CardContent>
                 <ul className="space-y-2">
                   {type.features.map((feature, index) => (
@@ -119,24 +121,22 @@ export function ConsultationTypeSelection({ onValidate }: ConsultationTypeSelect
                     </li>
                   ))}
                 </ul>
-                
+
                 {isSelected && (
                   <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm font-medium text-primary text-center">
-                      Selected
-                    </p>
+                    <p className="text-sm font-medium text-primary text-center">Selected</p>
                   </div>
                 )}
               </CardContent>
             </Card>
-          )
+          );
         })}
       </div>
 
       <div className="bg-muted/50 rounded-lg p-4 mt-6">
         <p className="text-sm text-center text-muted-foreground">
-          <strong>Note:</strong> All consultation types are completely free and last 30 minutes. 
-          You can change your preference later if needed.
+          <strong>Note:</strong> All consultation types are completely free and last 30 minutes. You
+          can change your preference later if needed.
         </p>
       </div>
 
@@ -146,5 +146,5 @@ export function ConsultationTypeSelection({ onValidate }: ConsultationTypeSelect
         </div>
       )}
     </div>
-  )
+  );
 }

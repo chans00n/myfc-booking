@@ -1,16 +1,16 @@
 // Learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
-process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
-process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_test_123'
-process.env.STRIPE_SECRET_KEY = 'sk_test_123'
-process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_123'
+process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
+process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
+process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_123";
+process.env.STRIPE_SECRET_KEY = "sk_test_123";
+process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_123";
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
@@ -19,18 +19,18 @@ jest.mock('next/navigation', () => ({
       back: jest.fn(),
       forward: jest.fn(),
       prefetch: jest.fn(),
-    }
+    };
   },
   usePathname() {
-    return '/'
+    return "/";
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
-}))
+}));
 
 // Mock Supabase client
-jest.mock('@/lib/supabase/client', () => ({
+jest.mock("@/lib/supabase/client", () => ({
   createClient: jest.fn(() => ({
     auth: {
       getSession: jest.fn(),
@@ -51,4 +51,4 @@ jest.mock('@/lib/supabase/client', () => ({
       delete: jest.fn(),
     })),
   })),
-}))
+}));

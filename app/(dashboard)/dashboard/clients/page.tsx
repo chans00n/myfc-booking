@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { AdminSiteHeader } from '@/components/admin-site-header'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { useState, useEffect } from "react";
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -22,98 +22,102 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { format } from 'date-fns'
-import { Users, Search, Eye, Phone, Mail, Calendar, CreditCard, FileText } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { toast } from 'sonner'
-import type { Profile } from '@/types/database'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from "@/components/ui/dialog";
+import { format } from "date-fns";
+import { Users, Search, Eye, Phone, Mail, Calendar, CreditCard, FileText } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import type { Profile } from "@/types/database";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ClientWithStats extends Profile {
-  appointmentCount?: number
-  lastAppointment?: string
-  totalSpent?: number
+  appointmentCount?: number;
+  lastAppointment?: string;
+  totalSpent?: number;
 }
 
 interface IntakeForm {
-  id: string
-  form_type: string
-  status: string
-  created_at: string
-  data: any
+  id: string;
+  form_type: string;
+  status: string;
+  created_at: string;
+  data: any;
 }
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<ClientWithStats[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedClient, setSelectedClient] = useState<ClientWithStats | null>(null)
-  const [clientAppointments, setClientAppointments] = useState<any[]>([])
-  const [clientIntakeForms, setClientIntakeForms] = useState<IntakeForm[]>([])
-  const [showDetails, setShowDetails] = useState(false)
-  const [loadingDetails, setLoadingDetails] = useState(false)
+  const [clients, setClients] = useState<ClientWithStats[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedClient, setSelectedClient] = useState<ClientWithStats | null>(null);
+  const [clientAppointments, setClientAppointments] = useState<any[]>([]);
+  const [clientIntakeForms, setClientIntakeForms] = useState<IntakeForm[]>([]);
+  const [showDetails, setShowDetails] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const supabase = createClient()
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchClients()
-  }, [])
+    fetchClients();
+  }, []);
 
   const fetchClients = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Fetch all clients directly using client-side Supabase
       const { data: clientsData, error: clientsError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'client')
-        .order('created_at', { ascending: false })
+        .from("profiles")
+        .select("*")
+        .eq("role", "client")
+        .order("created_at", { ascending: false });
 
-      if (clientsError) throw clientsError
-      
+      if (clientsError) throw clientsError;
+
       // Fetch additional stats for each client
       const clientsWithStats = await Promise.all(
         clientsData.map(async (client) => {
           const { data: appointments, error } = await supabase
-            .from('appointments')
-            .select('appointment_date, total_price_cents, status')
-            .eq('client_id', client.id)
-            .order('appointment_date', { ascending: false })
+            .from("appointments")
+            .select("appointment_date, total_price_cents, status")
+            .eq("client_id", client.id)
+            .order("appointment_date", { ascending: false });
 
           if (error) {
-            console.error('Error fetching appointments:', error)
-            return client
+            console.error("Error fetching appointments:", error);
+            return client;
           }
 
-          const completedAppointments = appointments.filter(apt => apt.status === 'completed')
-          const totalSpent = completedAppointments.reduce((sum, apt) => sum + (apt.total_price_cents || 0), 0)
+          const completedAppointments = appointments.filter((apt) => apt.status === "completed");
+          const totalSpent = completedAppointments.reduce(
+            (sum, apt) => sum + (apt.total_price_cents || 0),
+            0
+          );
 
           return {
             ...client,
             appointmentCount: appointments.length,
             lastAppointment: appointments[0]?.appointment_date,
             totalSpent,
-          }
+          };
         })
-      )
+      );
 
-      setClients(clientsWithStats)
+      setClients(clientsWithStats);
     } catch (error) {
-      console.error('Error fetching clients:', error)
-      toast.error('Failed to load clients')
+      console.error("Error fetching clients:", error);
+      toast.error("Failed to load clients");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchClientDetails = async (clientId: string) => {
-    setLoadingDetails(true)
+    setLoadingDetails(true);
     try {
       // Fetch appointments
       const { data: appointments, error: appointmentsError } = await supabase
-        .from('appointments')
-        .select(`
+        .from("appointments")
+        .select(
+          `
           *,
           service:services!appointments_service_id_fkey(
             id,
@@ -121,52 +125,54 @@ export default function ClientsPage() {
             duration_minutes,
             price_cents
           )
-        `)
-        .eq('client_id', clientId)
-        .order('appointment_date', { ascending: false })
+        `
+        )
+        .eq("client_id", clientId)
+        .order("appointment_date", { ascending: false });
 
-      if (appointmentsError) throw appointmentsError
-      setClientAppointments(appointments || [])
+      if (appointmentsError) throw appointmentsError;
+      setClientAppointments(appointments || []);
 
       // Fetch intake forms
       const { data: intakeForms, error: formsError } = await supabase
-        .from('intake_forms')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false })
+        .from("intake_forms")
+        .select("*")
+        .eq("client_id", clientId)
+        .order("created_at", { ascending: false });
 
-      if (formsError) throw formsError
-      setClientIntakeForms(intakeForms || [])
+      if (formsError) throw formsError;
+      setClientIntakeForms(intakeForms || []);
     } catch (error) {
-      console.error('Error fetching client details:', error)
-      toast.error('Failed to load client details')
+      console.error("Error fetching client details:", error);
+      toast.error("Failed to load client details");
     } finally {
-      setLoadingDetails(false)
+      setLoadingDetails(false);
     }
-  }
+  };
 
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = searchTerm === '' || 
+  const filteredClients = clients.filter((client) => {
+    const matchesSearch =
+      searchTerm === "" ||
       client.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.phone?.toLowerCase().includes(searchTerm.toLowerCase())
+      client.phone?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesSearch
-  })
+    return matchesSearch;
+  });
 
   const formatPrice = (cents: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(cents / 100)
-  }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(cents / 100);
+  };
 
   const handleViewDetails = async (client: ClientWithStats) => {
-    setSelectedClient(client)
-    setShowDetails(true)
-    await fetchClientDetails(client.id)
-  }
+    setSelectedClient(client);
+    setShowDetails(true);
+    await fetchClientDetails(client.id);
+  };
 
   return (
     <>
@@ -200,13 +206,17 @@ export default function ClientsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {clients.filter(c => {
-                        if (!c.lastAppointment) return false
-                        const lastDate = new Date(c.lastAppointment)
-                        const now = new Date()
-                        return lastDate.getMonth() === now.getMonth() && 
-                               lastDate.getFullYear() === now.getFullYear()
-                      }).length}
+                      {
+                        clients.filter((c) => {
+                          if (!c.lastAppointment) return false;
+                          const lastDate = new Date(c.lastAppointment);
+                          const now = new Date();
+                          return (
+                            lastDate.getMonth() === now.getMonth() &&
+                            lastDate.getFullYear() === now.getFullYear()
+                          );
+                        }).length
+                      }
                     </div>
                   </CardContent>
                 </Card>
@@ -271,27 +281,25 @@ export default function ClientsPage() {
                                 <div className="space-y-1">
                                   <div className="text-sm">{client.email}</div>
                                   {client.phone && (
-                                    <div className="text-sm text-muted-foreground">{client.phone}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                      {client.phone}
+                                    </div>
                                   )}
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge variant="secondary">
-                                  {client.appointmentCount || 0}
-                                </Badge>
+                                <Badge variant="secondary">{client.appointmentCount || 0}</Badge>
                               </TableCell>
                               <TableCell>
                                 {client.lastAppointment ? (
                                   <div className="text-sm">
-                                    {format(new Date(client.lastAppointment), 'MMM d, yyyy')}
+                                    {format(new Date(client.lastAppointment), "MMM d, yyyy")}
                                   </div>
                                 ) : (
                                   <span className="text-sm text-muted-foreground">Never</span>
                                 )}
                               </TableCell>
-                              <TableCell>
-                                {formatPrice(client.totalSpent || 0)}
-                              </TableCell>
+                              <TableCell>{formatPrice(client.totalSpent || 0)}</TableCell>
                               <TableCell className="text-right">
                                 <Button
                                   variant="ghost"
@@ -319,9 +327,7 @@ export default function ClientsPage() {
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Client Details</DialogTitle>
-            <DialogDescription>
-              View client information and appointment history
-            </DialogDescription>
+            <DialogDescription>View client information and appointment history</DialogDescription>
           </DialogHeader>
           {selectedClient && (
             <div className="space-y-6">
@@ -336,7 +342,7 @@ export default function ClientsPage() {
                 <div>
                   <Label>Member Since</Label>
                   <p className="text-sm">
-                    {format(new Date(selectedClient.created_at), 'MMMM d, yyyy')}
+                    {format(new Date(selectedClient.created_at), "MMMM d, yyyy")}
                   </p>
                 </div>
               </div>
@@ -353,7 +359,7 @@ export default function ClientsPage() {
                   <Label>Phone</Label>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <p className="text-sm">{selectedClient.phone || 'Not provided'}</p>
+                    <p className="text-sm">{selectedClient.phone || "Not provided"}</p>
                   </div>
                 </div>
               </div>
@@ -365,14 +371,18 @@ export default function ClientsPage() {
                 </div>
                 <div>
                   <Label>Total Spent</Label>
-                  <p className="text-2xl font-bold">{formatPrice(selectedClient.totalSpent || 0)}</p>
+                  <p className="text-2xl font-bold">
+                    {formatPrice(selectedClient.totalSpent || 0)}
+                  </p>
                 </div>
                 <div>
                   <Label>Average Spent</Label>
                   <p className="text-2xl font-bold">
                     {selectedClient.appointmentCount && selectedClient.appointmentCount > 0
-                      ? formatPrice((selectedClient.totalSpent || 0) / selectedClient.appointmentCount)
-                      : '$0.00'}
+                      ? formatPrice(
+                          (selectedClient.totalSpent || 0) / selectedClient.appointmentCount
+                        )
+                      : "$0.00"}
                   </p>
                 </div>
               </div>
@@ -389,7 +399,7 @@ export default function ClientsPage() {
                     Intake Forms ({clientIntakeForms.length})
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="appointments" className="mt-4">
                   <div>
                     <h3 className="font-semibold mb-3">Appointment History</h3>
@@ -411,35 +421,39 @@ export default function ClientsPage() {
                               <TableHead>Status</TableHead>
                               <TableHead>Amount</TableHead>
                             </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {clientAppointments.map((appointment) => (
-                          <TableRow key={appointment.id}>
-                            <TableCell>
-                              {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
-                            </TableCell>
-                            <TableCell>{appointment.service?.name}</TableCell>
-                            <TableCell>
-                              <Badge variant={
-                                appointment.status === 'completed' ? 'outline' :
-                                appointment.status === 'cancelled' ? 'destructive' :
-                                'secondary'
-                              }>
-                                {appointment.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {formatPrice(appointment.total_price_cents || 0)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
+                          </TableHeader>
+                          <TableBody>
+                            {clientAppointments.map((appointment) => (
+                              <TableRow key={appointment.id}>
+                                <TableCell>
+                                  {format(new Date(appointment.appointment_date), "MMM d, yyyy")}
+                                </TableCell>
+                                <TableCell>{appointment.service?.name}</TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant={
+                                      appointment.status === "completed"
+                                        ? "outline"
+                                        : appointment.status === "cancelled"
+                                          ? "destructive"
+                                          : "secondary"
+                                    }
+                                  >
+                                    {appointment.status}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  {formatPrice(appointment.total_price_cents || 0)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="intake-forms" className="mt-4">
                   <div>
                     <h3 className="font-semibold mb-3">Submitted Intake Forms</h3>
@@ -458,34 +472,41 @@ export default function ClientsPage() {
                             <div className="flex items-start justify-between mb-3">
                               <div>
                                 <h4 className="font-medium capitalize">
-                                  {form.form_type.replace('_', ' ')} Form
+                                  {form.form_type.replace("_", " ")} Form
                                 </h4>
                                 <p className="text-sm text-muted-foreground">
-                                  Submitted on {format(new Date(form.created_at), 'MMM d, yyyy')}
+                                  Submitted on {format(new Date(form.created_at), "MMM d, yyyy")}
                                 </p>
                               </div>
-                              <Badge variant={
-                                form.status === 'submitted' ? 'default' :
-                                form.status === 'reviewed' ? 'secondary' :
-                                'outline'
-                              }>
+                              <Badge
+                                variant={
+                                  form.status === "submitted"
+                                    ? "default"
+                                    : form.status === "reviewed"
+                                      ? "secondary"
+                                      : "outline"
+                                }
+                              >
                                 {form.status}
                               </Badge>
                             </div>
-                            
+
                             {/* Display key form data */}
-                            {form.form_type === 'health' && form.data && (
+                            {form.form_type === "health" && form.data && (
                               <div className="text-sm space-y-2">
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                                   <div>
                                     <span className="font-medium">Emergency Contact:</span>
                                     <p className="text-muted-foreground">
-                                      {form.data.emergency_contact_name} ({form.data.emergency_contact_phone})
+                                      {form.data.emergency_contact_name} (
+                                      {form.data.emergency_contact_phone})
                                     </p>
                                   </div>
                                   <div>
                                     <span className="font-medium">Primary Concern:</span>
-                                    <p className="text-muted-foreground">{form.data.primary_concern || 'Not specified'}</p>
+                                    <p className="text-muted-foreground">
+                                      {form.data.primary_concern || "Not specified"}
+                                    </p>
                                   </div>
                                 </div>
                                 {form.data.medications && (
@@ -502,13 +523,13 @@ export default function ClientsPage() {
                                 )}
                               </div>
                             )}
-                            
-                            {form.form_type === 'consent' && form.data && (
+
+                            {form.form_type === "consent" && form.data && (
                               <div className="text-sm space-y-2">
                                 <div>
                                   <span className="font-medium">Consent Given:</span>
                                   <p className="text-muted-foreground">
-                                    {form.data.consent_to_treatment ? 'Yes' : 'No'}
+                                    {form.data.consent_to_treatment ? "Yes" : "No"}
                                   </p>
                                 </div>
                                 <div>
@@ -534,5 +555,5 @@ export default function ClientsPage() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

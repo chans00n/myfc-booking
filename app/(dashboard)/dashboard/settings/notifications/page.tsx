@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { AdminSiteHeader } from '@/components/admin-site-header'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { createClient } from '@/lib/supabase/client'
-import { toast } from 'sonner'
-import { Bell, Mail, MessageSquare, Clock, Save } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from "react";
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { Bell, Mail, MessageSquare, Clock, Save } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface NotificationPreferences {
-  email_enabled: boolean
-  sms_enabled: boolean
-  booking_confirmation: boolean
-  appointment_reminder_24h: boolean
-  appointment_reminder_2h: boolean
-  cancellation_notification: boolean
-  rescheduling_notification: boolean
-  intake_form_reminder: boolean
-  follow_up_emails: boolean
-  marketing_emails: boolean
-  reminder_time_24h: string
-  reminder_time_2h: string | null
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  booking_confirmation: boolean;
+  appointment_reminder_24h: boolean;
+  appointment_reminder_2h: boolean;
+  cancellation_notification: boolean;
+  rescheduling_notification: boolean;
+  intake_form_reminder: boolean;
+  follow_up_emails: boolean;
+  marketing_emails: boolean;
+  reminder_time_24h: string;
+  reminder_time_2h: string | null;
 }
 
 export default function NotificationSettingsPage() {
@@ -39,106 +39,111 @@ export default function NotificationSettingsPage() {
     intake_form_reminder: true,
     follow_up_emails: true,
     marketing_emails: false,
-    reminder_time_24h: '09:00',
+    reminder_time_24h: "09:00",
     reminder_time_2h: null,
-  })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const supabase = createClient()
-  const router = useRouter()
+  const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
-    fetchUserAndPreferences()
-  }, [])
+    fetchUserAndPreferences();
+  }, []);
 
   const fetchUserAndPreferences = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
       if (userError || !user) {
-        toast.error('Please log in to manage notification preferences')
-        router.push('/auth/signin')
-        return
+        toast.error("Please log in to manage notification preferences");
+        router.push("/auth/signin");
+        return;
       }
 
-      setUserId(user.id)
+      setUserId(user.id);
 
       // Fetch existing preferences
       const { data: existingPrefs, error: prefsError } = await supabase
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
+        .from("notification_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
 
-      if (prefsError && prefsError.code !== 'PGRST116') { // PGRST116 = no rows returned
-        throw prefsError
+      if (prefsError && prefsError.code !== "PGRST116") {
+        // PGRST116 = no rows returned
+        throw prefsError;
       }
 
       if (existingPrefs) {
         setPreferences({
           ...preferences,
           ...existingPrefs,
-          reminder_time_24h: existingPrefs.reminder_time_24h?.slice(0, 5) || '09:00', // Format HH:MM
-        })
+          reminder_time_24h: existingPrefs.reminder_time_24h?.slice(0, 5) || "09:00", // Format HH:MM
+        });
       }
     } catch (error) {
-      console.error('Error fetching preferences:', error)
-      toast.error('Failed to load notification preferences')
+      console.error("Error fetching preferences:", error);
+      toast.error("Failed to load notification preferences");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const savePreferences = async () => {
     if (!userId) {
-      toast.error('Please log in to save preferences')
-      return
+      toast.error("Please log in to save preferences");
+      return;
     }
 
-    setSaving(true)
+    setSaving(true);
     try {
       const prefsToSave = {
         ...preferences,
         user_id: userId,
         reminder_time_24h: `${preferences.reminder_time_24h}:00`, // Convert to HH:MM:SS
-      }
+      };
 
       // Try to update first, then insert if doesn't exist
       const { error: updateError } = await supabase
-        .from('notification_preferences')
+        .from("notification_preferences")
         .update(prefsToSave)
-        .eq('user_id', userId)
+        .eq("user_id", userId);
 
       if (updateError) {
         // If update failed, try to insert
         const { error: insertError } = await supabase
-          .from('notification_preferences')
-          .insert([prefsToSave])
+          .from("notification_preferences")
+          .insert([prefsToSave]);
 
-        if (insertError && insertError.code !== '23505') { // 23505 = unique violation
-          throw insertError
+        if (insertError && insertError.code !== "23505") {
+          // 23505 = unique violation
+          throw insertError;
         }
       }
 
-      toast.success('Notification preferences saved successfully')
+      toast.success("Notification preferences saved successfully");
     } catch (error) {
-      console.error('Error saving preferences:', error)
-      toast.error('Failed to save notification preferences')
+      console.error("Error saving preferences:", error);
+      toast.error("Failed to save notification preferences");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const togglePreference = (key: keyof NotificationPreferences) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
-      [key]: !prev[key]
-    }))
-  }
+      [key]: !prev[key],
+    }));
+  };
 
   return (
     <>
@@ -185,7 +190,7 @@ export default function NotificationSettingsPage() {
                         <Switch
                           id="email-enabled"
                           checked={preferences.email_enabled}
-                          onCheckedChange={() => togglePreference('email_enabled')}
+                          onCheckedChange={() => togglePreference("email_enabled")}
                         />
                       </div>
 
@@ -202,7 +207,7 @@ export default function NotificationSettingsPage() {
                         <Switch
                           id="sms-enabled"
                           checked={preferences.sms_enabled}
-                          onCheckedChange={() => togglePreference('sms_enabled')}
+                          onCheckedChange={() => togglePreference("sms_enabled")}
                           disabled
                         />
                       </div>
@@ -219,61 +224,51 @@ export default function NotificationSettingsPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="booking-confirmation">
-                          Booking Confirmations
-                        </Label>
+                        <Label htmlFor="booking-confirmation">Booking Confirmations</Label>
                         <Switch
                           id="booking-confirmation"
                           checked={preferences.booking_confirmation}
-                          onCheckedChange={() => togglePreference('booking_confirmation')}
+                          onCheckedChange={() => togglePreference("booking_confirmation")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="reminder-24h">
-                          24-Hour Reminders
-                        </Label>
+                        <Label htmlFor="reminder-24h">24-Hour Reminders</Label>
                         <Switch
                           id="reminder-24h"
                           checked={preferences.appointment_reminder_24h}
-                          onCheckedChange={() => togglePreference('appointment_reminder_24h')}
+                          onCheckedChange={() => togglePreference("appointment_reminder_24h")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="reminder-2h">
-                          2-Hour Reminders
-                        </Label>
+                        <Label htmlFor="reminder-2h">2-Hour Reminders</Label>
                         <Switch
                           id="reminder-2h"
                           checked={preferences.appointment_reminder_2h}
-                          onCheckedChange={() => togglePreference('appointment_reminder_2h')}
+                          onCheckedChange={() => togglePreference("appointment_reminder_2h")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="cancellation">
-                          Cancellation Confirmations
-                        </Label>
+                        <Label htmlFor="cancellation">Cancellation Confirmations</Label>
                         <Switch
                           id="cancellation"
                           checked={preferences.cancellation_notification}
-                          onCheckedChange={() => togglePreference('cancellation_notification')}
+                          onCheckedChange={() => togglePreference("cancellation_notification")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="rescheduling">
-                          Rescheduling Notifications
-                        </Label>
+                        <Label htmlFor="rescheduling">Rescheduling Notifications</Label>
                         <Switch
                           id="rescheduling"
                           checked={preferences.rescheduling_notification}
-                          onCheckedChange={() => togglePreference('rescheduling_notification')}
+                          onCheckedChange={() => togglePreference("rescheduling_notification")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
@@ -293,17 +288,17 @@ export default function NotificationSettingsPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="reminder-time">
-                          24-Hour Reminder Time
-                        </Label>
+                        <Label htmlFor="reminder-time">24-Hour Reminder Time</Label>
                         <Input
                           id="reminder-time"
                           type="time"
                           value={preferences.reminder_time_24h}
-                          onChange={(e) => setPreferences(prev => ({
-                            ...prev,
-                            reminder_time_24h: e.target.value
-                          }))}
+                          onChange={(e) =>
+                            setPreferences((prev) => ({
+                              ...prev,
+                              reminder_time_24h: e.target.value,
+                            }))
+                          }
                           disabled={!preferences.appointment_reminder_24h}
                         />
                         <p className="text-sm text-muted-foreground">
@@ -317,43 +312,35 @@ export default function NotificationSettingsPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Other Notifications</CardTitle>
-                      <CardDescription>
-                        Additional notification preferences
-                      </CardDescription>
+                      <CardDescription>Additional notification preferences</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="intake-reminder">
-                          Intake Form Reminders
-                        </Label>
+                        <Label htmlFor="intake-reminder">Intake Form Reminders</Label>
                         <Switch
                           id="intake-reminder"
                           checked={preferences.intake_form_reminder}
-                          onCheckedChange={() => togglePreference('intake_form_reminder')}
+                          onCheckedChange={() => togglePreference("intake_form_reminder")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="follow-up">
-                          Follow-up Emails
-                        </Label>
+                        <Label htmlFor="follow-up">Follow-up Emails</Label>
                         <Switch
                           id="follow-up"
                           checked={preferences.follow_up_emails}
-                          onCheckedChange={() => togglePreference('follow_up_emails')}
+                          onCheckedChange={() => togglePreference("follow_up_emails")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="marketing">
-                          Marketing & Promotions
-                        </Label>
+                        <Label htmlFor="marketing">Marketing & Promotions</Label>
                         <Switch
                           id="marketing"
                           checked={preferences.marketing_emails}
-                          onCheckedChange={() => togglePreference('marketing_emails')}
+                          onCheckedChange={() => togglePreference("marketing_emails")}
                           disabled={!preferences.email_enabled}
                         />
                       </div>
@@ -361,13 +348,9 @@ export default function NotificationSettingsPage() {
                   </Card>
 
                   {/* Save Button */}
-                  <Button 
-                    onClick={savePreferences} 
-                    disabled={saving}
-                    className="w-full sm:w-auto"
-                  >
+                  <Button onClick={savePreferences} disabled={saving} className="w-full sm:w-auto">
                     <Save className="h-4 w-4 mr-2" />
-                    {saving ? 'Saving...' : 'Save Preferences'}
+                    {saving ? "Saving..." : "Save Preferences"}
                   </Button>
                 </div>
               )}
@@ -376,5 +359,5 @@ export default function NotificationSettingsPage() {
         </div>
       </div>
     </>
-  )
+  );
 }

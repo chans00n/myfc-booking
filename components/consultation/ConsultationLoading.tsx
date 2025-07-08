@@ -1,5 +1,5 @@
-import { Loader2 } from 'lucide-react'
-import Image from 'next/image'
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export function ConsultationLoading() {
   return (
@@ -21,5 +21,5 @@ export function ConsultationLoading() {
         <p className="text-sm text-muted-foreground">This may take a few moments</p>
       </div>
     </div>
-  )
+  );
 }

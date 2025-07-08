@@ -1,44 +1,47 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Menu, Calendar, Package, Home, User as UserIcon, LogOut, Settings, CreditCard } from 'lucide-react'
+  Menu,
+  Calendar,
+  Package,
+  Home,
+  User as UserIcon,
+  LogOut,
+  Settings,
+  CreditCard,
+} from "lucide-react";
 
 export function MobileNav() {
-  const [open, setOpen] = useState(false)
-  const pathname = usePathname()
-  const { user, profile, signOut } = useAuth()
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const { user, profile, signOut } = useAuth();
 
   const handleLinkClick = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   const handleSignOut = async () => {
-    await signOut()
-    setOpen(false)
-  }
+    await signOut();
+    setOpen(false);
+  };
 
   const mainNavItems = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/services', label: 'Services', icon: Package },
-    { href: '/booking', label: 'Book Appointment', icon: Calendar },
-    ...(user ? [{ href: '/booking/my-appointments', label: 'My Appointments', icon: Calendar }] : []),
-  ]
+    { href: "/", label: "Home", icon: Home },
+    { href: "/services", label: "Services", icon: Package },
+    { href: "/booking", label: "Book Appointment", icon: Calendar },
+    ...(user
+      ? [{ href: "/booking/my-appointments", label: "My Appointments", icon: Calendar }]
+      : []),
+  ];
 
-  const accountNavItems = user ? [
-    { href: '/profile', label: 'My Profile', icon: UserIcon },
-  ] : []
+  const accountNavItems = user ? [{ href: "/profile", label: "My Profile", icon: UserIcon }] : [];
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -52,32 +55,24 @@ export function MobileNav() {
         <div className="flex h-full flex-col">
           <SheetHeader className="px-6 py-4">
             <SheetTitle className="text-left">
-              <img 
-                src="/MYFC_logo.png" 
-                alt="MYFC Logo" 
-                className="h-6 w-auto dark:hidden"
-              />
-              <img 
-                src="/MYFC_logo_white.png" 
-                alt="MYFC Logo" 
+              <img src="/MYFC_logo.png" alt="MYFC Logo" className="h-6 w-auto dark:hidden" />
+              <img
+                src="/MYFC_logo_white.png"
+                alt="MYFC Logo"
                 className="h-6 w-auto hidden dark:block"
               />
             </SheetTitle>
           </SheetHeader>
-          
+
           <ScrollArea className="flex-1 px-2">
             <div className="flex flex-col gap-1 py-2">
               {/* Main Navigation */}
               <div className="px-3 py-2">
                 <nav className="grid gap-1">
                   {mainNavItems.map((item) => {
-                    const isActive = pathname === item.href
+                    const isActive = pathname === item.href;
                     return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={handleLinkClick}
-                      >
+                      <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                         <Button
                           variant={isActive ? "secondary" : "ghost"}
                           className="w-full justify-start h-auto"
@@ -85,7 +80,7 @@ export function MobileNav() {
                           <span className="text-xl font-medium">{item.label}</span>
                         </Button>
                       </Link>
-                    )
+                    );
                   })}
                 </nav>
               </div>
@@ -98,14 +93,10 @@ export function MobileNav() {
                     <h2 className="mb-2 text-xs font-medium text-muted-foreground">Account</h2>
                     <nav className="grid gap-1">
                       {accountNavItems.map((item) => {
-                        const Icon = item.icon
-                        const isActive = pathname === item.href
+                        const Icon = item.icon;
+                        const isActive = pathname === item.href;
                         return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={handleLinkClick}
-                          >
+                          <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                             <Button
                               variant={isActive ? "secondary" : "ghost"}
                               className="w-full justify-start"
@@ -114,7 +105,7 @@ export function MobileNav() {
                               {item.label}
                             </Button>
                           </Link>
-                        )
+                        );
                       })}
                     </nav>
                   </div>
@@ -132,20 +123,12 @@ export function MobileNav() {
                     <UserIcon className="h-4 w-4" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      {profile?.first_name || 'User'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {profile?.email || user.email}
-                    </p>
+                    <p className="text-sm font-medium">{profile?.first_name || "User"}</p>
+                    <p className="text-xs text-muted-foreground">{profile?.email || user.email}</p>
                   </div>
                 </div>
-                
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleSignOut}
-                >
+
+                <Button variant="outline" className="w-full" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
@@ -168,5 +151,5 @@ export function MobileNav() {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

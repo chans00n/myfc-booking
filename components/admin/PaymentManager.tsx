@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -20,156 +20,155 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
-import { format } from 'date-fns'
-import { 
-  DollarSign, 
-  RefreshCw, 
-  Receipt, 
-  Mail, 
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import {
+  DollarSign,
+  RefreshCw,
+  Receipt,
+  Mail,
   Eye,
   Download,
   AlertCircle,
   CheckCircle,
   XCircle,
   Clock,
-  CreditCard
-} from 'lucide-react'
-import { refundPayment } from '@/lib/payments/client-refunds'
-import { emailReceipt } from '@/lib/payments/client-receipts'
-import type { Payment, PaymentStatus } from '@/types/payments'
+  CreditCard,
+} from "lucide-react";
+import { refundPayment } from "@/lib/payments/client-refunds";
+import { emailReceipt } from "@/lib/payments/client-receipts";
+import type { Payment, PaymentStatus } from "@/types/payments";
 
 export function PaymentManager() {
-  const [payments, setPayments] = useState<Payment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
-  const [refundDialogOpen, setRefundDialogOpen] = useState(false)
-  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false)
-  const [statusFilter, setStatusFilter] = useState<PaymentStatus | 'all'>('all')
-  const [refundAmount, setRefundAmount] = useState('')
-  const [refundReason, setRefundReason] = useState('requested_by_customer')
-  const [refundNote, setRefundNote] = useState('')
-  const { toast } = useToast()
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">("all");
+  const [refundAmount, setRefundAmount] = useState("");
+  const [refundReason, setRefundReason] = useState("requested_by_customer");
+  const [refundNote, setRefundNote] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadPayments()
-  }, [statusFilter])
+    loadPayments();
+  }, [statusFilter]);
 
   const loadPayments = async () => {
-    setLoading(true)
-    
+    setLoading(true);
+
     try {
-      const url = `/api/admin/payments${statusFilter !== 'all' ? `?status=${statusFilter}` : ''}`
-      const response = await fetch(url)
-      
+      const url = `/api/admin/payments${statusFilter !== "all" ? `?status=${statusFilter}` : ""}`;
+      const response = await fetch(url);
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to load payments')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to load payments");
       }
-      
-      const data = await response.json()
-      setPayments(data)
+
+      const data = await response.json();
+      setPayments(data);
     } catch (error) {
       toast({
-        title: 'Error loading payments',
-        description: error instanceof Error ? error.message : 'Failed to load payments',
-        variant: 'destructive'
-      })
+        title: "Error loading payments",
+        description: error instanceof Error ? error.message : "Failed to load payments",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleRefund = async () => {
-    if (!selectedPayment) return
-    
-    const amountCents = refundAmount ? Math.round(parseFloat(refundAmount) * 100) : undefined
-    
+    if (!selectedPayment) return;
+
+    const amountCents = refundAmount ? Math.round(parseFloat(refundAmount) * 100) : undefined;
+
     const { success, error } = await refundPayment({
       payment_id: selectedPayment.id,
       amount_cents: amountCents,
-      reason: refundReason
-    })
-    
+      reason: refundReason,
+    });
+
     if (success) {
       toast({
-        title: 'Refund processed',
-        description: 'The refund has been initiated successfully'
-      })
-      setRefundDialogOpen(false)
-      loadPayments()
+        title: "Refund processed",
+        description: "The refund has been initiated successfully",
+      });
+      setRefundDialogOpen(false);
+      loadPayments();
     } else {
       toast({
-        title: 'Refund failed',
-        description: error || 'Failed to process refund',
-        variant: 'destructive'
-      })
+        title: "Refund failed",
+        description: error || "Failed to process refund",
+        variant: "destructive",
+      });
     }
-  }
-
+  };
 
   const handleSendReceipt = async (payment: Payment) => {
-    const { success, error } = await emailReceipt(payment.id)
-    
+    const { success, error } = await emailReceipt(payment.id);
+
     if (success) {
       toast({
-        title: 'Receipt sent',
-        description: 'Receipt has been emailed to the client'
-      })
+        title: "Receipt sent",
+        description: "Receipt has been emailed to the client",
+      });
     } else {
       toast({
-        title: 'Failed to send receipt',
-        description: error || 'Error sending receipt',
-        variant: 'destructive'
-      })
+        title: "Failed to send receipt",
+        description: error || "Error sending receipt",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   const getStatusIcon = (status: PaymentStatus) => {
     switch (status) {
-      case 'succeeded':
-        return <CheckCircle className="h-4 w-4 text-primary-foreground" />
-      case 'failed':
-        return <XCircle className="h-4 w-4 text-red-600" />
-      case 'processing':
-        return <Clock className="h-4 w-4 text-blue-600" />
-      case 'refunded':
-      case 'partially_refunded':
-        return <RefreshCw className="h-4 w-4 text-orange-600" />
+      case "succeeded":
+        return <CheckCircle className="h-4 w-4 text-primary-foreground" />;
+      case "failed":
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      case "processing":
+        return <Clock className="h-4 w-4 text-blue-600" />;
+      case "refunded":
+      case "partially_refunded":
+        return <RefreshCw className="h-4 w-4 text-orange-600" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-600" />
+        return <AlertCircle className="h-4 w-4 text-gray-600" />;
     }
-  }
+  };
 
   const getStatusBadge = (status: PaymentStatus) => {
-    const variants: Record<PaymentStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      succeeded: 'default',
-      processing: 'secondary',
-      failed: 'destructive',
-      canceled: 'outline',
-      pending: 'outline',
-      refunded: 'secondary',
-      partially_refunded: 'secondary'
-    }
-    
+    const variants: Record<PaymentStatus, "default" | "secondary" | "destructive" | "outline"> = {
+      succeeded: "default",
+      processing: "secondary",
+      failed: "destructive",
+      canceled: "outline",
+      pending: "outline",
+      refunded: "secondary",
+      partially_refunded: "secondary",
+    };
+
     return (
       <Badge variant={variants[status]} className="flex items-center gap-1">
         {getStatusIcon(status)}
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -186,22 +185,22 @@ export function PaymentManager() {
           variant="outline"
           size="sm"
           onClick={async () => {
-            const response = await fetch('/api/payments/fix-status', {
-              method: 'POST'
-            })
-            const result = await response.json()
+            const response = await fetch("/api/payments/fix-status", {
+              method: "POST",
+            });
+            const result = await response.json();
             if (response.ok) {
               toast({
-                title: 'Status fix complete',
-                description: `Processed ${result.processed} payments`
-              })
-              loadPayments()
+                title: "Status fix complete",
+                description: `Processed ${result.processed} payments`,
+              });
+              loadPayments();
             } else {
               toast({
-                title: 'Fix failed',
+                title: "Fix failed",
                 description: result.error,
-                variant: 'destructive'
-              })
+                variant: "destructive",
+              });
             }
           }}
         >
@@ -209,45 +208,44 @@ export function PaymentManager() {
           Fix Payment Statuses
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Total Revenue</CardDescription>
             <CardTitle className="text-2xl">
-              ${payments
-                .filter(p => p.status === 'succeeded')
+              $
+              {payments
+                .filter((p) => p.status === "succeeded")
                 .reduce((sum, p) => sum + (p.amount_cents - p.refunded_amount_cents) / 100, 0)
                 .toFixed(2)}
             </CardTitle>
           </CardHeader>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Successful Payments</CardDescription>
             <CardTitle className="text-2xl">
-              {payments.filter(p => p.status === 'succeeded').length}
+              {payments.filter((p) => p.status === "succeeded").length}
             </CardTitle>
           </CardHeader>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Pending</CardDescription>
             <CardTitle className="text-2xl">
-              {payments.filter(p => p.status === 'pending' || p.status === 'processing').length}
+              {payments.filter((p) => p.status === "pending" || p.status === "processing").length}
             </CardTitle>
           </CardHeader>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Total Refunded</CardDescription>
             <CardTitle className="text-2xl">
-              ${payments
-                .reduce((sum, p) => sum + p.refunded_amount_cents / 100, 0)
-                .toFixed(2)}
+              ${payments.reduce((sum, p) => sum + p.refunded_amount_cents / 100, 0).toFixed(2)}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -261,7 +259,7 @@ export function PaymentManager() {
           <TabsTrigger value="failed">Failed</TabsTrigger>
           <TabsTrigger value="refunded">Refunded</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value={statusFilter} className="mt-4">
           <Card>
             <CardContent className="p-0">
@@ -293,13 +291,12 @@ export function PaymentManager() {
                   ) : (
                     payments.map((payment) => (
                       <TableRow key={payment.id}>
-                        <TableCell>
-                          {format(new Date(payment.created_at), 'MMM d, yyyy')}
-                        </TableCell>
+                        <TableCell>{format(new Date(payment.created_at), "MMM d, yyyy")}</TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">
-                              {payment.appointment?.client?.first_name} {payment.appointment?.client?.last_name}
+                              {payment.appointment?.client?.first_name}{" "}
+                              {payment.appointment?.client?.last_name}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               {payment.appointment?.client?.email}
@@ -309,7 +306,9 @@ export function PaymentManager() {
                         <TableCell>{payment.appointment?.service?.name}</TableCell>
                         <TableCell>
                           <div>
-                            <p className="font-medium">${(payment.amount_cents / 100).toFixed(2)}</p>
+                            <p className="font-medium">
+                              ${(payment.amount_cents / 100).toFixed(2)}
+                            </p>
                             {payment.refunded_amount_cents > 0 && (
                               <p className="text-sm text-orange-600">
                                 Refunded: ${(payment.refunded_amount_cents / 100).toFixed(2)}
@@ -318,23 +317,21 @@ export function PaymentManager() {
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                        <TableCell>
-                          {payment.receipt_number || '-'}
-                        </TableCell>
+                        <TableCell>{payment.receipt_number || "-"}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => {
-                                setSelectedPayment(payment)
-                                setReceiptDialogOpen(true)
+                                setSelectedPayment(payment);
+                                setReceiptDialogOpen(true);
                               }}
                               title="View details"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            {payment.status === 'succeeded' && (
+                            {payment.status === "succeeded" && (
                               <>
                                 <Button
                                   size="sm"
@@ -348,11 +345,11 @@ export function PaymentManager() {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => {
-                                      setSelectedPayment(payment)
-                                      setRefundAmount('')
-                                      setRefundReason('requested_by_customer')
-                                      setRefundNote('')
-                                      setRefundDialogOpen(true)
+                                      setSelectedPayment(payment);
+                                      setRefundAmount("");
+                                      setRefundReason("requested_by_customer");
+                                      setRefundNote("");
+                                      setRefundDialogOpen(true);
                                     }}
                                   >
                                     <RefreshCw className="h-4 w-4" />
@@ -377,11 +374,9 @@ export function PaymentManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Process Refund</DialogTitle>
-            <DialogDescription>
-              Issue a full or partial refund for this payment
-            </DialogDescription>
+            <DialogDescription>Issue a full or partial refund for this payment</DialogDescription>
           </DialogHeader>
-          
+
           {selectedPayment && (
             <div className="space-y-4">
               <div>
@@ -395,7 +390,7 @@ export function PaymentManager() {
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <Label htmlFor="refund-amount">Refund Amount (leave empty for full refund)</Label>
                 <Input
@@ -407,7 +402,7 @@ export function PaymentManager() {
                   onChange={(e) => setRefundAmount(e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="refund-reason">Refund Reason (Stripe)</Label>
                 <Select value={refundReason} onValueChange={setRefundReason}>
@@ -424,7 +419,7 @@ export function PaymentManager() {
                   This reason will be sent to Stripe
                 </p>
               </div>
-              
+
               <div>
                 <Label htmlFor="refund-note">Internal Notes (Optional)</Label>
                 <Textarea
@@ -436,14 +431,12 @@ export function PaymentManager() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleRefund}>
-              Process Refund
-            </Button>
+            <Button onClick={handleRefund}>Process Refund</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -457,12 +450,14 @@ export function PaymentManager() {
               Complete payment information and transaction history
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedPayment && (
             <div className="space-y-6">
               {/* Payment Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm uppercase text-muted-foreground">Payment Information</h3>
+                <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                  Payment Information
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-muted-foreground">Payment ID</Label>
@@ -470,11 +465,15 @@ export function PaymentManager() {
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Stripe Payment Intent</Label>
-                    <p className="font-mono text-sm">{selectedPayment.stripe_payment_intent_id || 'N/A'}</p>
+                    <p className="font-mono text-sm">
+                      {selectedPayment.stripe_payment_intent_id || "N/A"}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Receipt Number</Label>
-                    <p className="font-medium">{selectedPayment.receipt_number || 'Not generated'}</p>
+                    <p className="font-medium">
+                      {selectedPayment.receipt_number || "Not generated"}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Status</Label>
@@ -485,11 +484,15 @@ export function PaymentManager() {
 
               {/* Financial Details */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm uppercase text-muted-foreground">Financial Details</h3>
+                <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                  Financial Details
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-muted-foreground">Amount</Label>
-                    <p className="text-2xl font-bold">${(selectedPayment.amount_cents / 100).toFixed(2)}</p>
+                    <p className="text-2xl font-bold">
+                      ${(selectedPayment.amount_cents / 100).toFixed(2)}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Currency</Label>
@@ -499,11 +502,19 @@ export function PaymentManager() {
                     <>
                       <div>
                         <Label className="text-muted-foreground">Refunded Amount</Label>
-                        <p className="text-lg text-orange-600">${(selectedPayment.refunded_amount_cents / 100).toFixed(2)}</p>
+                        <p className="text-lg text-orange-600">
+                          ${(selectedPayment.refunded_amount_cents / 100).toFixed(2)}
+                        </p>
                       </div>
                       <div>
                         <Label className="text-muted-foreground">Net Amount</Label>
-                        <p className="text-lg font-semibold">${((selectedPayment.amount_cents - selectedPayment.refunded_amount_cents) / 100).toFixed(2)}</p>
+                        <p className="text-lg font-semibold">
+                          $
+                          {(
+                            (selectedPayment.amount_cents - selectedPayment.refunded_amount_cents) /
+                            100
+                          ).toFixed(2)}
+                        </p>
                       </div>
                     </>
                   )}
@@ -512,12 +523,15 @@ export function PaymentManager() {
 
               {/* Client & Appointment Details */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm uppercase text-muted-foreground">Client & Appointment</h3>
+                <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                  Client & Appointment
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-muted-foreground">Client Name</Label>
                     <p className="font-medium">
-                      {selectedPayment.appointment?.client?.first_name} {selectedPayment.appointment?.client?.last_name}
+                      {selectedPayment.appointment?.client?.first_name}{" "}
+                      {selectedPayment.appointment?.client?.last_name}
                     </p>
                   </div>
                   <div>
@@ -531,8 +545,11 @@ export function PaymentManager() {
                   <div>
                     <Label className="text-muted-foreground">Appointment Date</Label>
                     <p>
-                      {selectedPayment.appointment?.appointment_date && 
-                        format(new Date(selectedPayment.appointment.appointment_date), 'MMM d, yyyy')}
+                      {selectedPayment.appointment?.appointment_date &&
+                        format(
+                          new Date(selectedPayment.appointment.appointment_date),
+                          "MMM d, yyyy"
+                        )}
                     </p>
                   </div>
                 </div>
@@ -541,7 +558,9 @@ export function PaymentManager() {
               {/* Payment Method */}
               {selectedPayment.payment_method_type && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">Payment Method</h3>
+                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                    Payment Method
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-muted-foreground">Type</Label>
@@ -563,23 +582,23 @@ export function PaymentManager() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-muted-foreground">Created</Label>
-                    <p>{format(new Date(selectedPayment.created_at), 'MMM d, yyyy h:mm a')}</p>
+                    <p>{format(new Date(selectedPayment.created_at), "MMM d, yyyy h:mm a")}</p>
                   </div>
                   {selectedPayment.paid_at && (
                     <div>
                       <Label className="text-muted-foreground">Paid</Label>
-                      <p>{format(new Date(selectedPayment.paid_at), 'MMM d, yyyy h:mm a')}</p>
+                      <p>{format(new Date(selectedPayment.paid_at), "MMM d, yyyy h:mm a")}</p>
                     </div>
                   )}
                   {selectedPayment.refunded_at && (
                     <div>
                       <Label className="text-muted-foreground">Refunded</Label>
-                      <p>{format(new Date(selectedPayment.refunded_at), 'MMM d, yyyy h:mm a')}</p>
+                      <p>{format(new Date(selectedPayment.refunded_at), "MMM d, yyyy h:mm a")}</p>
                     </div>
                   )}
                   <div>
                     <Label className="text-muted-foreground">Last Updated</Label>
-                    <p>{format(new Date(selectedPayment.updated_at), 'MMM d, yyyy h:mm a')}</p>
+                    <p>{format(new Date(selectedPayment.updated_at), "MMM d, yyyy h:mm a")}</p>
                   </div>
                 </div>
               </div>
@@ -587,24 +606,40 @@ export function PaymentManager() {
               {/* Payment Events Timeline */}
               {selectedPayment.payment_events && selectedPayment.payment_events.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">Event History</h3>
+                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                    Event History
+                  </h3>
                   <div className="space-y-2">
                     {selectedPayment.payment_events
-                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .sort(
+                        (a, b) =>
+                          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                      )
                       .map((event) => (
-                        <div key={event.id} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                        <div
+                          key={event.id}
+                          className="flex items-start gap-3 p-3 bg-muted rounded-lg"
+                        >
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
-                              <p className="font-medium text-sm">{event.event_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                              <p className="font-medium text-sm">
+                                {event.event_type
+                                  .replace(/_/g, " ")
+                                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+                              </p>
                               <p className="text-xs text-muted-foreground">
-                                {format(new Date(event.created_at), 'MMM d, yyyy h:mm:ss a')}
+                                {format(new Date(event.created_at), "MMM d, yyyy h:mm:ss a")}
                               </p>
                             </div>
                             {event.error_message && (
-                              <p className="text-xs text-red-600 mt-1">Error: {event.error_message}</p>
+                              <p className="text-xs text-red-600 mt-1">
+                                Error: {event.error_message}
+                              </p>
                             )}
                             {event.stripe_event_id && (
-                              <p className="text-xs text-muted-foreground mt-1">Stripe Event: {event.stripe_event_id}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Stripe Event: {event.stripe_event_id}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -614,9 +649,13 @@ export function PaymentManager() {
               )}
 
               {/* Additional Information */}
-              {(selectedPayment.description || selectedPayment.metadata || selectedPayment.error_message) && (
+              {(selectedPayment.description ||
+                selectedPayment.metadata ||
+                selectedPayment.error_message) && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">Additional Information</h3>
+                  <h3 className="font-semibold text-sm uppercase text-muted-foreground">
+                    Additional Information
+                  </h3>
                   {selectedPayment.description && (
                     <div>
                       <Label className="text-muted-foreground">Description</Label>
@@ -647,9 +686,9 @@ export function PaymentManager() {
                     <Receipt className="h-4 w-4" />
                     <span className="text-sm font-medium">Stripe Receipt Available</span>
                   </div>
-                  <a 
-                    href={selectedPayment.receipt_url} 
-                    target="_blank" 
+                  <a
+                    href={selectedPayment.receipt_url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:underline font-medium"
                   >
@@ -659,17 +698,14 @@ export function PaymentManager() {
               )}
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setReceiptDialogOpen(false)}>
               Close
             </Button>
-            {selectedPayment?.status === 'succeeded' && (
+            {selectedPayment?.status === "succeeded" && (
               <>
-                <Button
-                  variant="outline"
-                  onClick={() => handleSendReceipt(selectedPayment)}
-                >
+                <Button variant="outline" onClick={() => handleSendReceipt(selectedPayment)}>
                   <Mail className="mr-2 h-4 w-4" />
                   Email Receipt
                 </Button>
@@ -677,11 +713,11 @@ export function PaymentManager() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setReceiptDialogOpen(false)
-                      setRefundAmount('')
-                      setRefundReason('requested_by_customer')
-                      setRefundNote('')
-                      setRefundDialogOpen(true)
+                      setReceiptDialogOpen(false);
+                      setRefundAmount("");
+                      setRefundReason("requested_by_customer");
+                      setRefundNote("");
+                      setRefundDialogOpen(true);
                     }}
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
@@ -694,5 +730,5 @@ export function PaymentManager() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -1,27 +1,28 @@
-import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { ConsultationRoom } from '@/components/consultation/ConsultationRoom'
-import { ConsultationWithRelations } from '@/types'
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { ConsultationRoom } from "@/components/consultation/ConsultationRoom";
+import { ConsultationWithRelations } from "@/types";
 
 interface ConsultationPageProps {
   params: Promise<{
-    id: string
-  }>
+    id: string;
+  }>;
   searchParams: Promise<{
-    token?: string
-    role?: string
-  }>
+    token?: string;
+    role?: string;
+  }>;
 }
 
 export default async function ConsultationPage({ params, searchParams }: ConsultationPageProps) {
-  const { id } = await params
-  const { token, role } = await searchParams
-  const supabase = await createClient()
-  
+  const { id } = await params;
+  const { token, role } = await searchParams;
+  const supabase = await createClient();
+
   // Get consultation details
   const { data: consultation, error } = await supabase
-    .from('consultations')
-    .select(`
+    .from("consultations")
+    .select(
+      `
       *,
       appointment:appointments!consultations_appointment_id_fkey (
         *,
@@ -29,32 +30,35 @@ export default async function ConsultationPage({ params, searchParams }: Consult
         client:profiles!appointments_client_id_fkey (*)
       ),
       client:profiles!consultations_client_id_fkey (*)
-    `)
-    .eq('id', id)
-    .single()
+    `
+    )
+    .eq("id", id)
+    .single();
 
   if (error || !consultation) {
-    console.error('Error fetching consultation:', error)
-    notFound()
+    console.error("Error fetching consultation:", error);
+    notFound();
   }
 
   // Check if user has access to this consultation
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
-    notFound()
+    notFound();
   }
 
   // Check if user is the client or admin
-  const isClient = user.id === consultation.client_id
-  const isAdmin = user.user_metadata?.role === 'admin'
-  
+  const isClient = user.id === consultation.client_id;
+  const isAdmin = user.user_metadata?.role === "admin";
+
   if (!isClient && !isAdmin) {
-    notFound()
+    notFound();
   }
 
   // Check consultation status
-  if (consultation.consultation_status === 'cancelled') {
+  if (consultation.consultation_status === "cancelled") {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
@@ -62,11 +66,11 @@ export default async function ConsultationPage({ params, searchParams }: Consult
           <p className="text-muted-foreground">This consultation has been cancelled.</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Check if consultation has already been completed
-  if (consultation.consultation_status === 'completed') {
+  if (consultation.consultation_status === "completed") {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
@@ -74,19 +78,19 @@ export default async function ConsultationPage({ params, searchParams }: Consult
           <p className="text-muted-foreground">This consultation has already been completed.</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Get intake form if available
   const { data: intakeForm } = await supabase
-    .from('intake_forms')
-    .select('*')
-    .eq('appointment_id', consultation.appointment_id)
-    .single()
+    .from("intake_forms")
+    .select("*")
+    .eq("appointment_id", consultation.appointment_id)
+    .single();
 
   // Override isAdmin if role=admin is passed in searchParams
-  const effectiveIsAdmin = role === 'admin' || isAdmin
-  
+  const effectiveIsAdmin = role === "admin" || isAdmin;
+
   return (
     <ConsultationRoom
       consultation={consultation as ConsultationWithRelations}
@@ -94,5 +98,5 @@ export default async function ConsultationPage({ params, searchParams }: Consult
       isAdmin={effectiveIsAdmin}
       userToken={token}
     />
-  )
+  );
 }

@@ -1,43 +1,40 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 export default function AdminSetupPage() {
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const router = useRouter();
 
   const handleMakeAdmin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage(null)
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
 
-    const supabase = createClient()
+    const supabase = createClient();
 
     // Update the user's role to admin
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: 'admin' })
-      .eq('email', email)
+    const { error } = await supabase.from("profiles").update({ role: "admin" }).eq("email", email);
 
     if (error) {
-      setMessage({ type: 'error', text: error.message })
+      setMessage({ type: "error", text: error.message });
     } else {
-      setMessage({ type: 'success', text: `Successfully made ${email} an admin` })
-      setEmail('')
+      setMessage({ type: "success", text: `Successfully made ${email} an admin` });
+      setEmail("");
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -50,7 +47,7 @@ export default function AdminSetupPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {message && (
-            <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
+            <Alert variant={message.type === "error" ? "destructive" : "default"}>
               <AlertDescription>{message.text}</AlertDescription>
             </Alert>
           )}
@@ -76,7 +73,7 @@ export default function AdminSetupPage() {
                   Updating...
                 </>
               ) : (
-                'Make Admin'
+                "Make Admin"
               )}
             </Button>
           </form>
@@ -84,11 +81,7 @@ export default function AdminSetupPage() {
           <div className="text-center text-sm text-gray-600">
             <p>Note: The user must have an existing account.</p>
             <p className="mt-2">
-              <Button
-                variant="link"
-                onClick={() => router.push('/')}
-                className="text-blue-600"
-              >
+              <Button variant="link" onClick={() => router.push("/")} className="text-blue-600">
                 Back to Home
               </Button>
             </p>
@@ -96,5 +89,5 @@ export default function AdminSetupPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

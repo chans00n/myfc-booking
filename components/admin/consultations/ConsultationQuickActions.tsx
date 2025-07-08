@@ -1,16 +1,16 @@
-import { Button } from '@/components/ui/button'
-import { Play, X, CheckCircle, RefreshCw } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+import { Play, X, CheckCircle, RefreshCw } from "lucide-react";
 
 interface ConsultationQuickActionsProps {
-  consultationId: string
-  status: string
-  consultationType: 'phone' | 'video' | 'in_person'
-  roomUrl?: string | null
-  onStart: () => void
-  onComplete: () => void
-  onCancel: () => void
-  onReschedule: () => void
-  size?: 'sm' | 'default'
+  consultationId: string;
+  status: string;
+  consultationType: "phone" | "video" | "in_person";
+  roomUrl?: string | null;
+  onStart: () => void;
+  onComplete: () => void;
+  onCancel: () => void;
+  onReschedule: () => void;
+  size?: "sm" | "default";
 }
 
 export function ConsultationQuickActions({
@@ -22,9 +22,9 @@ export function ConsultationQuickActions({
   onComplete,
   onCancel,
   onReschedule,
-  size = 'default'
+  size = "default",
 }: ConsultationQuickActionsProps) {
-  if (status === 'scheduled') {
+  if (status === "scheduled") {
     return (
       <div className="flex items-center gap-2">
         <Button size={size} onClick={onStart}>
@@ -40,18 +40,14 @@ export function ConsultationQuickActions({
           Cancel
         </Button>
       </div>
-    )
+    );
   }
 
-  if (status === 'in_progress') {
+  if (status === "in_progress") {
     return (
       <div className="flex items-center gap-2">
-        {consultationType === 'video' && roomUrl && (
-          <Button
-            size={size}
-            variant="outline"
-            onClick={() => window.open(roomUrl, '_blank')}
-          >
+        {consultationType === "video" && roomUrl && (
+          <Button size={size} variant="outline" onClick={() => window.open(roomUrl, "_blank")}>
             Rejoin Room
           </Button>
         )}
@@ -60,8 +56,8 @@ export function ConsultationQuickActions({
           Complete
         </Button>
       </div>
-    )
+    );
   }
 
-  return null
+  return null;
 }

@@ -1,83 +1,83 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { Save, FileText } from 'lucide-react'
-import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
-import { debounce } from 'lodash'
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Save, FileText } from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { debounce } from "lodash";
 
 interface ConsultationNotesProps {
-  consultationId: string
-  initialNotes?: string | null
+  consultationId: string;
+  initialNotes?: string | null;
 }
 
 export function ConsultationNotes({ consultationId, initialNotes }: ConsultationNotesProps) {
-  const [notes, setNotes] = useState(initialNotes || '')
-  const [isSaving, setIsSaving] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
-  const supabase = createClient()
+  const [notes, setNotes] = useState(initialNotes || "");
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const supabase = createClient();
 
   // Auto-save notes with debounce
   const debouncedSave = useCallback(
     debounce(async (notesContent: string) => {
-      setIsSaving(true)
+      setIsSaving(true);
       try {
         const { error } = await supabase
-          .from('consultations')
+          .from("consultations")
           .update({ consultation_notes: notesContent })
-          .eq('id', consultationId)
+          .eq("id", consultationId);
 
-        if (error) throw error
-        
-        setHasChanges(false)
-        toast.success('Notes saved automatically')
+        if (error) throw error;
+
+        setHasChanges(false);
+        toast.success("Notes saved automatically");
       } catch (error) {
-        console.error('Error saving notes:', error)
-        toast.error('Failed to save notes')
+        console.error("Error saving notes:", error);
+        toast.error("Failed to save notes");
       } finally {
-        setIsSaving(false)
+        setIsSaving(false);
       }
     }, 2000),
     [consultationId]
-  )
+  );
 
   const handleNotesChange = (value: string) => {
-    setNotes(value)
-    setHasChanges(true)
-    debouncedSave(value)
-  }
+    setNotes(value);
+    setHasChanges(true);
+    debouncedSave(value);
+  };
 
   const handleManualSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       const { error } = await supabase
-        .from('consultations')
+        .from("consultations")
         .update({ consultation_notes: notes })
-        .eq('id', consultationId)
+        .eq("id", consultationId);
 
-      if (error) throw error
-      
-      setHasChanges(false)
-      toast.success('Notes saved successfully')
+      if (error) throw error;
+
+      setHasChanges(false);
+      toast.success("Notes saved successfully");
     } catch (error) {
-      console.error('Error saving notes:', error)
-      toast.error('Failed to save notes')
+      console.error("Error saving notes:", error);
+      toast.error("Failed to save notes");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   // Save notes before unmounting
   useEffect(() => {
     return () => {
       if (hasChanges) {
-        debouncedSave.flush()
+        debouncedSave.flush();
       }
-    }
-  }, [hasChanges, debouncedSave])
+    };
+  }, [hasChanges, debouncedSave]);
 
   return (
     <Card className="h-full border-0 rounded-none">
@@ -88,9 +88,7 @@ export function ConsultationNotes({ consultationId, initialNotes }: Consultation
               <FileText className="h-5 w-5" />
               Consultation Notes
             </CardTitle>
-            <CardDescription>
-              Notes are auto-saved as you type
-            </CardDescription>
+            <CardDescription>Notes are auto-saved as you type</CardDescription>
           </div>
           <Button
             size="sm"
@@ -128,12 +126,12 @@ export function ConsultationNotes({ consultationId, initialNotes }: Consultation
           {/* Status indicator */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>
-              {isSaving ? 'Saving...' : hasChanges ? 'Unsaved changes' : 'All changes saved'}
+              {isSaving ? "Saving..." : hasChanges ? "Unsaved changes" : "All changes saved"}
             </span>
             <span>{notes.length} characters</span>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

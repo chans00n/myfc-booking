@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, DollarSign, Users, Activity } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, DollarSign, Users, Activity } from "lucide-react";
 
 export default function DashboardPage() {
   // These would be fetched from the database in a real implementation
@@ -11,30 +11,30 @@ export default function DashboardPage() {
       value: "8",
       icon: Calendar,
       description: "3 confirmed, 5 scheduled",
-      color: "text-blue-600"
+      color: "text-blue-600",
     },
     {
       title: "Weekly Revenue",
       value: "$2,450",
       icon: DollarSign,
       description: "+12% from last week",
-      color: "text-green-600"
+      color: "text-green-600",
     },
     {
       title: "Active Clients",
       value: "124",
       icon: Users,
       description: "15 new this month",
-      color: "text-purple-600"
+      color: "text-purple-600",
     },
     {
       title: "Completion Rate",
       value: "94%",
       icon: Activity,
       description: "Last 30 days",
-      color: "text-orange-600"
-    }
-  ]
+      color: "text-orange-600",
+    },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -44,26 +44,22 @@ export default function DashboardPage() {
           Welcome back! Here's what's happening today.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
-          const Icon = stat.icon
+          const Icon = stat.icon;
           return (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                 <Icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {stat.description}
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
               </CardContent>
             </Card>
-          )
+          );
         })}
       </div>
 

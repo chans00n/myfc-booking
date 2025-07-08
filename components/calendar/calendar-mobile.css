@@ -7,7 +7,7 @@
     gap: 0.5rem;
     padding: 0.5rem 0;
   }
-  
+
   .rbc-toolbar-label {
     font-size: 0.875rem;
     margin: 0.25rem 0;
@@ -15,12 +15,12 @@
     text-align: center;
     order: -1;
   }
-  
+
   .rbc-btn-group {
     display: flex;
     gap: 0.25rem;
   }
-  
+
   .rbc-btn-group button {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -28,71 +28,71 @@
     min-height: 2rem;
     touch-action: manipulation;
   }
-  
+
   /* Calendar cells */
   .rbc-calendar {
     font-size: 0.75rem;
   }
-  
+
   .rbc-header {
     padding: 0.25rem;
     font-size: 0.75rem;
   }
-  
+
   .rbc-date-cell {
     padding: 0.25rem;
   }
-  
+
   .rbc-event {
     padding: 0.125rem 0.25rem;
     font-size: 0.625rem;
   }
-  
+
   .rbc-event-label {
     display: none;
   }
-  
+
   /* Time grid view */
   .rbc-time-header-cell {
     min-height: 2rem;
   }
-  
+
   .rbc-time-content {
     padding: 0;
   }
-  
+
   .rbc-timeslot-group {
     min-height: 2rem;
   }
-  
+
   .rbc-time-slot {
     min-height: 1rem;
   }
-  
+
   .rbc-label {
     font-size: 0.625rem;
     padding: 0 0.25rem;
   }
-  
+
   /* Month view */
   .rbc-month-view .rbc-date-cell {
     min-height: 3rem;
   }
-  
+
   .rbc-month-row {
     min-height: 3rem;
   }
-  
+
   /* Day/Week view adjustments */
   .rbc-day-view .rbc-time-column,
   .rbc-week-view .rbc-time-column {
     width: 3rem;
   }
-  
+
   .rbc-allday-cell {
     display: none;
   }
-  
+
   /* Selected cell */
   .rbc-selected-cell {
     background-color: rgba(59, 130, 246, 0.1);
@@ -136,7 +136,7 @@
 /* Horizontal scroll indicator */
 @media (max-width: 768px) {
   .rbc-calendar::after {
-    content: '';
+    content: "";
     position: absolute;
     right: 0;
     top: 0;

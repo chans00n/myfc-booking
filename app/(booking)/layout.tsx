@@ -16,11 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function BookingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function BookingLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, signOut } = useAuth();
 
   return (
@@ -28,36 +24,32 @@ export default function BookingLayout({
       <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
-            <img 
-              src="/MYFC_logo.png" 
-              alt="MYFC Logo" 
-              className="h-6 sm:h-6 w-auto dark:hidden"
-            />
-            <img 
-              src="/MYFC_logo_white.png" 
-              alt="MYFC Logo" 
+            <img src="/MYFC_logo.png" alt="MYFC Logo" className="h-6 sm:h-6 w-auto dark:hidden" />
+            <img
+              src="/MYFC_logo_white.png"
+              alt="MYFC Logo"
               className="h-6 sm:h-6 w-auto hidden dark:block"
             />
           </Link>
-          
+
           {/* Center Navigation */}
           <div className="hidden md:flex md:flex-1 md:justify-center">
             <div className="flex items-center space-x-8">
-              <Link 
-                href="/services" 
+              <Link
+                href="/services"
                 className="text-sm font-medium transition-colors hover:text-primary"
               >
                 Services
               </Link>
-              <Link 
-                href="/booking" 
+              <Link
+                href="/booking"
                 className="text-sm font-medium transition-colors hover:text-primary"
               >
                 Book Appointment
               </Link>
               {user && (
-                <Link 
-                  href="/booking/my-appointments" 
+                <Link
+                  href="/booking/my-appointments"
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   My Appointments
@@ -65,7 +57,7 @@ export default function BookingLayout({
               )}
             </div>
           </div>
-          
+
           {/* Right Side Actions */}
           <div className="hidden md:flex md:items-center md:gap-4">
             <ThemeToggle />
@@ -74,7 +66,7 @@ export default function BookingLayout({
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    <span>{profile?.first_name || 'Account'}</span>
+                    <span>{profile?.first_name || "Account"}</span>
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -82,9 +74,9 @@ export default function BookingLayout({
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {profile?.first_name && profile?.last_name 
+                        {profile?.first_name && profile?.last_name
                           ? `${profile.first_name} ${profile.last_name}`
-                          : 'User'}
+                          : "User"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {profile?.email || user.email}
@@ -126,7 +118,7 @@ export default function BookingLayout({
               </div>
             )}
           </div>
-          
+
           {/* Mobile Navigation */}
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
@@ -134,10 +126,8 @@ export default function BookingLayout({
           </div>
         </div>
       </nav>
-      
-      <main className="flex-1">
-        {children}
-      </main>
+
+      <main className="flex-1">{children}</main>
     </div>
   );
 }

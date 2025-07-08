@@ -1,15 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LucideIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
 
 interface ConsultationStatsCardProps {
-  title: string
-  value: string | number
-  description?: string
-  icon: LucideIcon
+  title: string;
+  value: string | number;
+  description?: string;
+  icon: LucideIcon;
   trend?: {
-    value: number
-    isPositive: boolean
-  }
+    value: number;
+    isPositive: boolean;
+  };
 }
 
 export function ConsultationStatsCard({
@@ -17,7 +17,7 @@ export function ConsultationStatsCard({
   value,
   description,
   icon: Icon,
-  trend
+  trend,
 }: ConsultationStatsCardProps) {
   return (
     <Card>
@@ -27,15 +27,13 @@ export function ConsultationStatsCard({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
         {trend && (
-          <p className={`text-xs mt-1 ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}% from last period
+          <p className={`text-xs mt-1 ${trend.isPositive ? "text-green-600" : "text-red-600"}`}>
+            {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}% from last period
           </p>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

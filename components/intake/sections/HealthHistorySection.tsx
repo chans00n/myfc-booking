@@ -1,84 +1,93 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Textarea } from '@/components/ui/textarea'
-import { Plus, X } from 'lucide-react'
-import type { IntakeFormData, MedicalCondition, Surgery, Injury } from '@/types/intake-forms'
+import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, X } from "lucide-react";
+import type { IntakeFormData, MedicalCondition, Surgery, Injury } from "@/types/intake-forms";
 
 interface HealthHistorySectionProps {
-  form: UseFormReturn<IntakeFormData>
+  form: UseFormReturn<IntakeFormData>;
 }
 
 export function HealthHistorySection({ form }: HealthHistorySectionProps) {
-  const { watch, setValue } = form
-  const medicalConditions = watch('medicalConditions')
-  const surgeries = watch('surgeries')
-  const injuries = watch('injuries')
+  const { watch, setValue } = form;
+  const medicalConditions = watch("medicalConditions");
+  const surgeries = watch("surgeries");
+  const injuries = watch("injuries");
 
   const addMedicalCondition = () => {
     const newCondition: MedicalCondition = {
-      condition: '',
-      yearDiagnosed: '',
+      condition: "",
+      yearDiagnosed: "",
       currentlyTreated: false,
-      notes: ''
-    }
-    setValue('medicalConditions', [...medicalConditions, newCondition])
-  }
+      notes: "",
+    };
+    setValue("medicalConditions", [...medicalConditions, newCondition]);
+  };
 
   const removeMedicalCondition = (index: number) => {
-    setValue('medicalConditions', medicalConditions.filter((_, i) => i !== index))
-  }
+    setValue(
+      "medicalConditions",
+      medicalConditions.filter((_, i) => i !== index)
+    );
+  };
 
   const updateMedicalCondition = (index: number, field: keyof MedicalCondition, value: any) => {
-    const updated = [...medicalConditions]
-    updated[index] = { ...updated[index], [field]: value }
-    setValue('medicalConditions', updated)
-  }
+    const updated = [...medicalConditions];
+    updated[index] = { ...updated[index], [field]: value };
+    setValue("medicalConditions", updated);
+  };
 
   const addSurgery = () => {
     const newSurgery: Surgery = {
-      procedure: '',
-      year: '',
-      complications: ''
-    }
-    setValue('surgeries', [...surgeries, newSurgery])
-  }
+      procedure: "",
+      year: "",
+      complications: "",
+    };
+    setValue("surgeries", [...surgeries, newSurgery]);
+  };
 
   const removeSurgery = (index: number) => {
-    setValue('surgeries', surgeries.filter((_, i) => i !== index))
-  }
+    setValue(
+      "surgeries",
+      surgeries.filter((_, i) => i !== index)
+    );
+  };
 
   const updateSurgery = (index: number, field: keyof Surgery, value: string) => {
-    const updated = [...surgeries]
-    updated[index] = { ...updated[index], [field]: value }
-    setValue('surgeries', updated)
-  }
+    const updated = [...surgeries];
+    updated[index] = { ...updated[index], [field]: value };
+    setValue("surgeries", updated);
+  };
 
   const addInjury = () => {
     const newInjury: Injury = {
-      description: '',
-      date: '',
+      description: "",
+      date: "",
       currentlyAffects: false,
-      notes: ''
-    }
-    setValue('injuries', [...injuries, newInjury])
-  }
+      notes: "",
+    };
+    setValue("injuries", [...injuries, newInjury]);
+  };
 
   const removeInjury = (index: number) => {
-    setValue('injuries', injuries.filter((_, i) => i !== index))
-  }
+    setValue(
+      "injuries",
+      injuries.filter((_, i) => i !== index)
+    );
+  };
 
   const updateInjury = (index: number, field: keyof Injury, value: any) => {
-    const updated = [...injuries]
-    updated[index] = { ...updated[index], [field]: value }
-    setValue('injuries', updated)
-  }
+    const updated = [...injuries];
+    updated[index] = { ...updated[index], [field]: value };
+    setValue("injuries", updated);
+  };
 
   return (
     <div className="space-y-6">
@@ -100,15 +109,17 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                       <Label>Condition</Label>
                       <Input
                         value={condition.condition}
-                        onChange={(e) => updateMedicalCondition(index, 'condition', e.target.value)}
+                        onChange={(e) => updateMedicalCondition(index, "condition", e.target.value)}
                         placeholder="e.g., High blood pressure"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Year Diagnosed</Label>
                       <Input
-                        value={condition.yearDiagnosed || ''}
-                        onChange={(e) => updateMedicalCondition(index, 'yearDiagnosed', e.target.value)}
+                        value={condition.yearDiagnosed || ""}
+                        onChange={(e) =>
+                          updateMedicalCondition(index, "yearDiagnosed", e.target.value)
+                        }
                         placeholder="e.g., 2020"
                       />
                     </div>
@@ -116,8 +127,8 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       checked={condition.currentlyTreated}
-                      onCheckedChange={(checked) => 
-                        updateMedicalCondition(index, 'currentlyTreated', checked)
+                      onCheckedChange={(checked) =>
+                        updateMedicalCondition(index, "currentlyTreated", checked)
                       }
                     />
                     <Label>Currently being treated</Label>
@@ -125,8 +136,8 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                   <div className="space-y-2">
                     <Label>Additional Notes</Label>
                     <Textarea
-                      value={condition.notes || ''}
-                      onChange={(e) => updateMedicalCondition(index, 'notes', e.target.value)}
+                      value={condition.notes || ""}
+                      onChange={(e) => updateMedicalCondition(index, "notes", e.target.value)}
                       placeholder="Any additional information..."
                       rows={2}
                     />
@@ -143,12 +154,7 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
               </div>
             </div>
           ))}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addMedicalCondition}
-            className="w-full"
-          >
+          <Button type="button" variant="outline" onClick={addMedicalCondition} className="w-full">
             <Plus className="mr-2 h-4 w-4" />
             Add Medical Condition
           </Button>
@@ -159,9 +165,7 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
       <Card>
         <CardHeader>
           <CardTitle>Previous Surgeries</CardTitle>
-          <CardDescription>
-            Please list any surgeries you have had
-          </CardDescription>
+          <CardDescription>Please list any surgeries you have had</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {surgeries.map((surgery, index) => (
@@ -173,15 +177,15 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                       <Label>Procedure</Label>
                       <Input
                         value={surgery.procedure}
-                        onChange={(e) => updateSurgery(index, 'procedure', e.target.value)}
+                        onChange={(e) => updateSurgery(index, "procedure", e.target.value)}
                         placeholder="e.g., Knee replacement"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Year</Label>
                       <Input
-                        value={surgery.year || ''}
-                        onChange={(e) => updateSurgery(index, 'year', e.target.value)}
+                        value={surgery.year || ""}
+                        onChange={(e) => updateSurgery(index, "year", e.target.value)}
                         placeholder="e.g., 2019"
                       />
                     </div>
@@ -189,8 +193,8 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                   <div className="space-y-2">
                     <Label>Complications or ongoing issues</Label>
                     <Textarea
-                      value={surgery.complications || ''}
-                      onChange={(e) => updateSurgery(index, 'complications', e.target.value)}
+                      value={surgery.complications || ""}
+                      onChange={(e) => updateSurgery(index, "complications", e.target.value)}
                       placeholder="Any complications or ongoing issues..."
                       rows={2}
                     />
@@ -207,12 +211,7 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
               </div>
             </div>
           ))}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addSurgery}
-            className="w-full"
-          >
+          <Button type="button" variant="outline" onClick={addSurgery} className="w-full">
             <Plus className="mr-2 h-4 w-4" />
             Add Surgery
           </Button>
@@ -237,15 +236,15 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                       <Label>Injury Description</Label>
                       <Input
                         value={injury.description}
-                        onChange={(e) => updateInjury(index, 'description', e.target.value)}
+                        onChange={(e) => updateInjury(index, "description", e.target.value)}
                         placeholder="e.g., Whiplash from car accident"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Date of Injury</Label>
                       <Input
-                        value={injury.date || ''}
-                        onChange={(e) => updateInjury(index, 'date', e.target.value)}
+                        value={injury.date || ""}
+                        onChange={(e) => updateInjury(index, "date", e.target.value)}
                         placeholder="e.g., 2018"
                       />
                     </div>
@@ -253,8 +252,8 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       checked={injury.currentlyAffects}
-                      onCheckedChange={(checked) => 
-                        updateInjury(index, 'currentlyAffects', checked)
+                      onCheckedChange={(checked) =>
+                        updateInjury(index, "currentlyAffects", checked)
                       }
                     />
                     <Label>Still affects me today</Label>
@@ -262,35 +261,25 @@ export function HealthHistorySection({ form }: HealthHistorySectionProps) {
                   <div className="space-y-2">
                     <Label>How it affects you</Label>
                     <Textarea
-                      value={injury.notes || ''}
-                      onChange={(e) => updateInjury(index, 'notes', e.target.value)}
+                      value={injury.notes || ""}
+                      onChange={(e) => updateInjury(index, "notes", e.target.value)}
                       placeholder="Describe any ongoing pain or limitations..."
                       rows={2}
                     />
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeInjury(index)}
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeInjury(index)}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           ))}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addInjury}
-            className="w-full"
-          >
+          <Button type="button" variant="outline" onClick={addInjury} className="w-full">
             <Plus className="mr-2 h-4 w-4" />
             Add Injury
           </Button>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

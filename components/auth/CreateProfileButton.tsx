@@ -1,52 +1,52 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function CreateProfileButton() {
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const { toast } = useToast()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleCreateProfile = async () => {
-    setLoading(true)
-    
+    setLoading(true);
+
     try {
-      const response = await fetch('/api/profile/create', {
-        method: 'POST',
-      })
-      
-      const data = await response.json()
-      
+      const response = await fetch("/api/profile/create", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
       if (response.ok) {
         toast({
-          title: 'Success',
-          description: 'Profile created successfully!',
-        })
-        
+          title: "Success",
+          description: "Profile created successfully!",
+        });
+
         // Refresh the page to reload auth context
-        router.refresh()
-        window.location.reload()
+        router.refresh();
+        window.location.reload();
       } else {
         toast({
-          title: 'Error',
-          description: data.error || 'Failed to create profile',
-          variant: 'destructive',
-        })
+          title: "Error",
+          description: data.error || "Failed to create profile",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Button onClick={handleCreateProfile} disabled={loading}>
@@ -56,8 +56,8 @@ export function CreateProfileButton() {
           Creating Profile...
         </>
       ) : (
-        'Create Profile'
+        "Create Profile"
       )}
     </Button>
-  )
+  );
 }

@@ -36,7 +36,7 @@
   .rdp {
     --rdp-cell-size: calc((100vw - 48px) / 7) !important;
   }
-  
+
   /* Ensure cells are properly sized */
   .rdp-day {
     min-height: 40px;

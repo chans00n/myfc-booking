@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle, Home, RefreshCw, Phone } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, Home, RefreshCw, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ConsultationErrorProps {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }
 
 export function ConsultationError({ error, reset }: ConsultationErrorProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Consultation room error:', error)
-  }, [error])
+    console.error("Consultation room error:", error);
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-destructive/5 to-background">
@@ -31,18 +31,16 @@ export function ConsultationError({ error, reset }: ConsultationErrorProps) {
             We encountered an issue setting up your consultation room
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           {/* Error Details */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <p className="text-sm font-medium">What happened?</p>
             <p className="text-sm text-muted-foreground">
-              {error.message || 'An unexpected error occurred while loading the consultation room.'}
+              {error.message || "An unexpected error occurred while loading the consultation room."}
             </p>
             {error.digest && (
-              <p className="text-xs text-muted-foreground">
-                Error ID: {error.digest}
-              </p>
+              <p className="text-xs text-muted-foreground">Error ID: {error.digest}</p>
             )}
           </div>
 
@@ -71,16 +69,12 @@ export function ConsultationError({ error, reset }: ConsultationErrorProps) {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              onClick={reset}
-              className="flex-1"
-              variant="default"
-            >
+            <Button onClick={reset} className="flex-1" variant="default">
               <RefreshCw className="mr-2 h-4 w-4" />
               Try Again
             </Button>
             <Button
-              onClick={() => router.push('/booking/my-appointments')}
+              onClick={() => router.push("/booking/my-appointments")}
               className="flex-1"
               variant="outline"
             >
@@ -104,5 +98,5 @@ export function ConsultationError({ error, reset }: ConsultationErrorProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

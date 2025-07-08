@@ -1,6 +1,7 @@
 # Claude Code Implementation Tickets - Massage Booking MVP
 
 ## Project Overview
+
 Build a massage therapy booking system MVP with 5-day timeline for therapist review. Tech stack: Next.js, Supabase, Tailwind CSS, Shadcn UI, Stripe, Google Calendar API.
 
 ---
@@ -8,10 +9,12 @@ Build a massage therapy booking system MVP with 5-day timeline for therapist rev
 ## Phase 1: Project Setup & Foundation (Day 1)
 
 ### Ticket 1.1: Project Initialization
+
 **Priority: Critical**
 **Estimated Time: 2 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Create a new Next.js 14 project for a massage therapy booking system with the following requirements:
 
@@ -36,6 +39,7 @@ Please create the initial project structure and basic configuration files.
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Next.js 14 project with TypeScript initialized
 - ✅ Tailwind CSS configured and working
 - ✅ Shadcn UI installed with basic components
@@ -46,10 +50,12 @@ Please create the initial project structure and basic configuration files.
 ---
 
 ### Ticket 1.2: Supabase Setup & Database Schema
+
 **Priority: Critical**
 **Estimated Time: 3 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Set up Supabase integration and create the database schema for the massage booking system:
 
@@ -117,6 +123,7 @@ Please create the SQL schema, RLS policies, and TypeScript configuration.
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Supabase client configured
 - ✅ Database tables created with proper relationships
 - ✅ RLS policies implemented
@@ -126,10 +133,12 @@ Please create the SQL schema, RLS policies, and TypeScript configuration.
 ---
 
 ### Ticket 1.3: Authentication System
+
 **Priority: Critical**
 **Estimated Time: 2 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Implement authentication system using Supabase Auth with the following requirements:
 
@@ -160,6 +169,7 @@ Please create the complete authentication system with proper error handling and 
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Sign in/up pages with Shadcn UI
 - ✅ Password reset functionality
 - ✅ Protected routes middleware
@@ -172,10 +182,12 @@ Please create the complete authentication system with proper error handling and 
 ## Phase 2: Core Booking System (Day 2)
 
 ### Ticket 2.1: Service Management & Display
+
 **Priority: High**
 **Estimated Time: 2 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Create the service management system for massage types:
 
@@ -207,6 +219,7 @@ Please create the complete service management system with both admin and client 
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Admin service management interface
 - ✅ Client service selection page
 - ✅ CRUD operations for services
@@ -216,10 +229,12 @@ Please create the complete service management system with both admin and client 
 ---
 
 ### Ticket 2.2: Calendar Integration & Availability
+
 **Priority: Critical**
 **Estimated Time: 4 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Implement Google Calendar integration and availability system:
 
@@ -258,6 +273,7 @@ Please create the complete calendar integration system with real-time availabili
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Google Calendar API integration
 - ✅ Real-time availability checking
 - ✅ Calendar UI components
@@ -268,10 +284,12 @@ Please create the complete calendar integration system with real-time availabili
 ---
 
 ### Ticket 2.3: Booking Flow Implementation
+
 **Priority: Critical**
 **Estimated Time: 3 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Create the complete client booking flow:
 
@@ -312,6 +330,7 @@ Please create the complete booking flow with proper validation and user experien
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Multi-step booking wizard
 - ✅ Form validation and error handling
 - ✅ Guest booking functionality
@@ -323,10 +342,12 @@ Please create the complete booking flow with proper validation and user experien
 ## Phase 3: Intake Forms & Payment (Day 3)
 
 ### Ticket 3.1: Digital Intake Form System
+
 **Priority: High**
 **Estimated Time: 4 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Create a comprehensive digital intake form system for massage therapy:
 
@@ -369,6 +390,7 @@ Please create the complete intake form system with proper validation and user ex
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Comprehensive intake form with all health sections
 - ✅ Digital signature capture
 - ✅ Conditional form logic
@@ -379,10 +401,12 @@ Please create the complete intake form system with proper validation and user ex
 ---
 
 ### Ticket 3.2: Stripe Payment Integration
+
 **Priority: Critical**
 **Estimated Time: 3 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Implement Stripe payment processing for appointment bookings:
 
@@ -421,6 +445,7 @@ Please create the complete Stripe payment integration with proper error handling
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Stripe payment processing
 - ✅ Payment form with validation
 - ✅ Webhook handling
@@ -432,10 +457,12 @@ Please create the complete Stripe payment integration with proper error handling
 ## Phase 4: Admin Dashboard & Notifications (Day 4)
 
 ### Ticket 4.1: Admin Dashboard
+
 **Priority: High**
 **Estimated Time: 4 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Create a comprehensive admin dashboard for the massage therapist:
 
@@ -479,6 +506,7 @@ Please create the complete admin dashboard with all management features.
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Dashboard overview with key metrics
 - ✅ Appointment management interface
 - ✅ Client database and profiles
@@ -488,10 +516,12 @@ Please create the complete admin dashboard with all management features.
 ---
 
 ### Ticket 4.2: Notification System
+
 **Priority: High**
 **Estimated Time: 3 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Implement a comprehensive notification system for appointments:
 
@@ -532,6 +562,7 @@ Please create the complete notification system with email and optional SMS capab
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Email notification system
 - ✅ Automated reminder scheduling
 - ✅ Template customization
@@ -543,10 +574,12 @@ Please create the complete notification system with email and optional SMS capab
 ## Phase 5: Testing & Polish (Day 5)
 
 ### Ticket 5.1: Testing & Bug Fixes
+
 **Priority: Critical**
 **Estimated Time: 3 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Implement comprehensive testing and bug fixes:
 
@@ -585,6 +618,7 @@ Please create comprehensive tests and optimize the application for production.
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Test suite with good coverage
 - ✅ Error handling improvements
 - ✅ Performance optimization
@@ -594,10 +628,12 @@ Please create comprehensive tests and optimize the application for production.
 ---
 
 ### Ticket 5.2: Deployment & Documentation
+
 **Priority: High**
 **Estimated Time: 2 hours**
 
 **Prompt for Claude Code:**
+
 ```
 Prepare the application for deployment and create documentation:
 
@@ -630,6 +666,7 @@ Please prepare the application for production deployment with complete documenta
 ```
 
 **Acceptance Criteria:**
+
 - ✅ Production deployment ready
 - ✅ Complete user documentation
 - ✅ Security measures validated
@@ -640,6 +677,7 @@ Please prepare the application for production deployment with complete documenta
 ## Development Guidelines for Claude Code
 
 ### Code Quality Standards
+
 - Use TypeScript for all components and functions
 - Follow React best practices and hooks patterns
 - Use Tailwind CSS utility classes consistently
@@ -647,6 +685,7 @@ Please prepare the application for production deployment with complete documenta
 - Add loading states for all async operations
 
 ### UI/UX Guidelines
+
 - Use Shadcn UI components consistently
 - Maintain design system consistency
 - Ensure mobile-first responsive design
@@ -654,6 +693,7 @@ Please prepare the application for production deployment with complete documenta
 - Add proper form validation feedback
 
 ### Security Requirements
+
 - Implement proper authentication checks
 - Use RLS policies for database access
 - Validate all inputs server-side
@@ -661,6 +701,7 @@ Please prepare the application for production deployment with complete documenta
 - Follow OWASP security guidelines
 
 ### Performance Requirements
+
 - Optimize bundle size and loading times
 - Implement proper caching strategies
 - Use database indexing appropriately
@@ -684,6 +725,7 @@ Please prepare the application for production deployment with complete documenta
 ## Post-Review Iteration Plan
 
 After the 5-day review with your wife:
+
 1. Collect feedback on user experience
 2. Identify priority improvements
 3. Plan additional features for next iteration

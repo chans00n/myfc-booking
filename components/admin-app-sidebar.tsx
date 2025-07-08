@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { usePathname } from "next/navigation"
-import { useAuth } from "@/contexts/AuthContext"
+import * as React from "react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Calendar,
@@ -16,11 +16,11 @@ import {
   HelpCircleIcon,
   Bell,
   MessageSquare,
-} from "lucide-react"
+} from "lucide-react";
 
-import { AdminNavGrouped } from "@/components/admin-nav-grouped"
-import { AdminNavSecondary } from "@/components/admin-nav-secondary"
-import { AdminNavUser } from "@/components/admin-nav-user"
+import { AdminNavGrouped } from "@/components/admin-nav-grouped";
+import { AdminNavSecondary } from "@/components/admin-nav-secondary";
+import { AdminNavUser } from "@/components/admin-nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -29,12 +29,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
+} from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
-  const { signOut, profile } = useAuth()
+  const pathname = usePathname();
+  const { signOut, profile } = useAuth();
 
   const navGroups = [
     {
@@ -46,20 +46,20 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
           icon: LayoutDashboard,
           isActive: pathname === "/dashboard",
         },
-      ]
+      ],
     },
     {
       label: "Scheduling",
       items: [
         {
-          title: "Calendar", 
+          title: "Calendar",
           url: "/dashboard/calendar",
           icon: Calendar,
           isActive: pathname === "/dashboard/calendar",
         },
         {
           title: "Appointments",
-          url: "/dashboard/appointments", 
+          url: "/dashboard/appointments",
           icon: CalendarCheck,
           isActive: pathname === "/dashboard/appointments",
         },
@@ -69,7 +69,7 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
           icon: MessageSquare,
           isActive: pathname === "/dashboard/consultations",
         },
-      ]
+      ],
     },
     {
       label: "Client Management",
@@ -86,7 +86,7 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
           icon: FileText,
           isActive: pathname === "/dashboard/intake-forms",
         },
-      ]
+      ],
     },
     {
       label: "Business",
@@ -103,9 +103,9 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
           icon: DollarSign,
           isActive: pathname === "/dashboard/payments",
         },
-      ]
+      ],
     },
-  ]
+  ];
 
   const navSecondaryItems = [
     {
@@ -123,15 +123,16 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
       url: "#",
       icon: HelpCircleIcon,
     },
-  ]
+  ];
 
   const userData = {
-    name: profile?.first_name && profile?.last_name 
-      ? `${profile.first_name} ${profile.last_name}`
-      : "Admin",
+    name:
+      profile?.first_name && profile?.last_name
+        ? `${profile.first_name} ${profile.last_name}`
+        : "Admin",
     email: profile?.email || "",
     avatar: "/avatars/default.svg",
-  }
+  };
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -139,14 +140,10 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center justify-between px-2 py-2">
-              <img 
-                src="/MYFC_logo.png" 
-                alt="MYFC Logo" 
-                className="h-6 w-auto dark:hidden"
-              />
-              <img 
-                src="/MYFC_logo_white.png" 
-                alt="MYFC Logo" 
+              <img src="/MYFC_logo.png" alt="MYFC Logo" className="h-6 w-auto dark:hidden" />
+              <img
+                src="/MYFC_logo_white.png"
+                alt="MYFC Logo"
                 className="h-6 w-auto hidden dark:block"
               />
               <ThemeToggle />
@@ -162,5 +159,5 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
         <AdminNavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

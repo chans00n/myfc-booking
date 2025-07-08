@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -15,154 +15,154 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useToast } from '@/hooks/use-toast'
-import { 
-  FileText, 
-  Clock, 
-  CheckCircle, 
-  Eye, 
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import {
+  FileText,
+  Clock,
+  CheckCircle,
+  Eye,
   Download,
   Search,
   Filter,
   AlertCircle,
   User,
-  Calendar
-} from 'lucide-react'
-import { getFormsForReview, markFormAsReviewed, getIntakeForm } from '@/lib/intake-forms'
-import type { IntakeForm, FormStatus } from '@/types/intake-forms'
-import { format } from 'date-fns'
-import { IntakeFormViewer } from './IntakeFormViewer'
+  Calendar,
+} from "lucide-react";
+import { getFormsForReview, markFormAsReviewed, getIntakeForm } from "@/lib/intake-forms";
+import type { IntakeForm, FormStatus } from "@/types/intake-forms";
+import { format } from "date-fns";
+import { IntakeFormViewer } from "./IntakeFormViewer";
 
 export function IntakeFormManager() {
-  const [forms, setForms] = useState<IntakeForm[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedForm, setSelectedForm] = useState<IntakeForm | null>(null)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
-  const [statusFilter, setStatusFilter] = useState<FormStatus | 'all'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const { toast } = useToast()
-  const { user } = useAuth()
+  const [forms, setForms] = useState<IntakeForm[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedForm, setSelectedForm] = useState<IntakeForm | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<FormStatus | "all">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
-    loadForms()
-  }, [statusFilter])
+    loadForms();
+  }, [statusFilter]);
 
   const loadForms = async () => {
-    setLoading(true)
+    setLoading(true);
     const { data, error } = await getFormsForReview(
-      statusFilter === 'all' ? undefined : statusFilter
-    )
-    
+      statusFilter === "all" ? undefined : statusFilter
+    );
+
     if (error) {
       toast({
-        title: 'Error loading forms',
+        title: "Error loading forms",
         description: error,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     } else {
-      setForms(data)
+      setForms(data);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleViewForm = async (form: IntakeForm) => {
-    const { data, error } = await getIntakeForm(form.id)
+    const { data, error } = await getIntakeForm(form.id);
     if (error) {
       toast({
-        title: 'Error loading form',
+        title: "Error loading form",
         description: error,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     } else if (data) {
-      setSelectedForm(data)
-      setViewDialogOpen(true)
+      setSelectedForm(data);
+      setViewDialogOpen(true);
     }
-  }
+  };
 
   const handleMarkReviewed = async (formId: string) => {
     if (!user?.id) {
       toast({
-        title: 'Error',
-        description: 'You must be logged in to review forms',
-        variant: 'destructive'
-      })
-      return
+        title: "Error",
+        description: "You must be logged in to review forms",
+        variant: "destructive",
+      });
+      return;
     }
-    
-    const { error } = await markFormAsReviewed(formId, user.id)
-    
+
+    const { error } = await markFormAsReviewed(formId, user.id);
+
     if (error) {
       toast({
-        title: 'Error marking form as reviewed',
+        title: "Error marking form as reviewed",
         description: error,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Form marked as reviewed',
-        description: 'The form has been successfully reviewed'
-      })
-      loadForms()
-      setViewDialogOpen(false)
+        title: "Form marked as reviewed",
+        description: "The form has been successfully reviewed",
+      });
+      loadForms();
+      setViewDialogOpen(false);
     }
-  }
+  };
 
   const getStatusBadge = (status: FormStatus) => {
     const variants = {
-      draft: { label: 'Draft', variant: 'outline' as const },
-      completed: { label: 'Completed', variant: 'secondary' as const },
-      submitted: { label: 'Submitted', variant: 'default' as const },
-      reviewed: { label: 'Reviewed', variant: 'success' as const }
-    }
-    
-    const config = variants[status]
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
+      draft: { label: "Draft", variant: "outline" as const },
+      completed: { label: "Completed", variant: "secondary" as const },
+      submitted: { label: "Submitted", variant: "default" as const },
+      reviewed: { label: "Reviewed", variant: "success" as const },
+    };
+
+    const config = variants[status];
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
 
   const getFormTypeBadge = (formType: string) => {
     const types = {
-      new_client: { label: 'New Client', icon: User },
-      returning_client: { label: 'Returning', icon: FileText },
-      quick_update: { label: 'Quick Update', icon: Clock }
-    }
-    
-    const config = types[formType as keyof typeof types] || { label: formType, icon: FileText }
-    const Icon = config.icon
-    
+      new_client: { label: "New Client", icon: User },
+      returning_client: { label: "Returning", icon: FileText },
+      quick_update: { label: "Quick Update", icon: Clock },
+    };
+
+    const config = types[formType as keyof typeof types] || { label: formType, icon: FileText };
+    const Icon = config.icon;
+
     return (
       <div className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
         <span className="text-sm">{config.label}</span>
       </div>
-    )
-  }
+    );
+  };
 
-  const filteredForms = forms.filter(form => {
-    const client = form.client as any
-    const searchLower = searchQuery.toLowerCase()
-    
+  const filteredForms = forms.filter((form) => {
+    const client = form.client as any;
+    const searchLower = searchQuery.toLowerCase();
+
     return (
       client?.first_name?.toLowerCase().includes(searchLower) ||
       client?.last_name?.toLowerCase().includes(searchLower) ||
       client?.email?.toLowerCase().includes(searchLower)
-    )
-  })
+    );
+  });
 
   const stats = {
     total: forms.length,
-    submitted: forms.filter(f => f.status === 'submitted').length,
-    reviewed: forms.filter(f => f.status === 'reviewed').length,
-    needsReview: forms.filter(f => f.status === 'submitted').length
-  }
+    submitted: forms.filter((f) => f.status === "submitted").length,
+    reviewed: forms.filter((f) => f.status === "reviewed").length,
+    needsReview: forms.filter((f) => f.status === "submitted").length,
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -220,7 +220,10 @@ export function IntakeFormManager() {
                 />
               </div>
             </div>
-            <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as FormStatus | 'all')}>
+            <Tabs
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as FormStatus | "all")}
+            >
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="submitted">Submitted</TabsTrigger>
@@ -253,7 +256,7 @@ export function IntakeFormManager() {
                 </TableHeader>
                 <TableBody>
                   {filteredForms.map((form) => {
-                    const client = form.client as any
+                    const client = form.client as any;
                     return (
                       <TableRow key={form.id}>
                         <TableCell>
@@ -261,9 +264,7 @@ export function IntakeFormManager() {
                             <p className="font-medium">
                               {client?.first_name} {client?.last_name}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                              {client?.email}
-                            </p>
+                            <p className="text-sm text-muted-foreground">{client?.email}</p>
                           </div>
                         </TableCell>
                         <TableCell>{getFormTypeBadge(form.form_type)}</TableCell>
@@ -271,9 +272,9 @@ export function IntakeFormManager() {
                         <TableCell>
                           {form.submitted_at ? (
                             <div className="text-sm">
-                              <p>{format(new Date(form.submitted_at), 'MMM d, yyyy')}</p>
+                              <p>{format(new Date(form.submitted_at), "MMM d, yyyy")}</p>
                               <p className="text-muted-foreground">
-                                {format(new Date(form.submitted_at), 'h:mm a')}
+                                {format(new Date(form.submitted_at), "h:mm a")}
                               </p>
                             </div>
                           ) : (
@@ -281,17 +282,13 @@ export function IntakeFormManager() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewForm(form)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleViewForm(form)}>
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
                         </TableCell>
                       </TableRow>
-                    )
+                    );
                   })}
                 </TableBody>
               </Table>
@@ -305,11 +302,9 @@ export function IntakeFormManager() {
         <DialogContent className="max-w-3xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Intake Form Details</DialogTitle>
-            <DialogDescription>
-              Review the complete intake form submission
-            </DialogDescription>
+            <DialogDescription>Review the complete intake form submission</DialogDescription>
           </DialogHeader>
-          
+
           {selectedForm && (
             <ScrollArea className="h-[60vh] pr-4">
               <IntakeFormViewer form={selectedForm} />
@@ -320,7 +315,7 @@ export function IntakeFormManager() {
             <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
               Close
             </Button>
-            {selectedForm?.status === 'submitted' && (
+            {selectedForm?.status === "submitted" && (
               <Button onClick={() => handleMarkReviewed(selectedForm.id)}>
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Mark as Reviewed
@@ -330,5 +325,5 @@ export function IntakeFormManager() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

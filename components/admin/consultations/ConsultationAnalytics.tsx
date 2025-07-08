@@ -1,28 +1,43 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Progress } from '@/components/ui/progress'
-import { createClient } from '@/lib/supabase/client'
-import { format, subDays, startOfDay, endOfDay } from 'date-fns'
-import { TrendingUp, Users, Clock, DollarSign, AlertCircle, MessageSquare, CheckCircle, XCircle } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { createClient } from "@/lib/supabase/client";
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import {
+  TrendingUp,
+  Users,
+  Clock,
+  DollarSign,
+  AlertCircle,
+  MessageSquare,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 interface AnalyticsData {
-  totalConsultations: number
-  completedConsultations: number
-  cancelledConsultations: number
-  noShowConsultations: number
-  averageDuration: number
-  conversionRate: number
-  revenue: number
-  topConcerns: { concern: string; count: number }[]
-  consultationsByType: { type: string; count: number }[]
-  dailyTrend: { date: string; count: number }[]
+  totalConsultations: number;
+  completedConsultations: number;
+  cancelledConsultations: number;
+  noShowConsultations: number;
+  averageDuration: number;
+  conversionRate: number;
+  revenue: number;
+  topConcerns: { concern: string; count: number }[];
+  consultationsByType: { type: string; count: number }[];
+  dailyTrend: { date: string; count: number }[];
 }
 
 export function ConsultationAnalytics() {
-  const [timeframe, setTimeframe] = useState('7')
+  const [timeframe, setTimeframe] = useState("7");
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     totalConsultations: 0,
     completedConsultations: 0,
@@ -33,26 +48,27 @@ export function ConsultationAnalytics() {
     revenue: 0,
     topConcerns: [],
     consultationsByType: [],
-    dailyTrend: []
-  })
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+    dailyTrend: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchAnalytics()
-  }, [timeframe])
+    fetchAnalytics();
+  }, [timeframe]);
 
   const fetchAnalytics = async () => {
     try {
-      setLoading(true)
-      const days = parseInt(timeframe)
-      const startDate = startOfDay(subDays(new Date(), days))
-      const endDate = endOfDay(new Date())
+      setLoading(true);
+      const days = parseInt(timeframe);
+      const startDate = startOfDay(subDays(new Date(), days));
+      const endDate = endOfDay(new Date());
 
       // Fetch consultations within timeframe
       const { data: consultations, error } = await supabase
-        .from('consultations')
-        .select(`
+        .from("consultations")
+        .select(
+          `
           *,
           appointment:appointments!consultations_appointment_id_fkey(
             id,
@@ -60,75 +76,85 @@ export function ConsultationAnalytics() {
             end_time,
             service:services(price)
           )
-        `)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
+        `
+        )
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString());
 
-      if (error) throw error
+      if (error) throw error;
 
       // Calculate metrics
-      const completed = consultations?.filter(c => c.consultation_status === 'completed') || []
-      const cancelled = consultations?.filter(c => c.consultation_status === 'cancelled') || []
-      const noShows = consultations?.filter(c => c.consultation_status === 'no_show') || []
+      const completed = consultations?.filter((c) => c.consultation_status === "completed") || [];
+      const cancelled = consultations?.filter((c) => c.consultation_status === "cancelled") || [];
+      const noShows = consultations?.filter((c) => c.consultation_status === "no_show") || [];
 
       // Calculate average duration
-      let totalDuration = 0
-      let durationCount = 0
-      completed.forEach(c => {
+      let totalDuration = 0;
+      let durationCount = 0;
+      completed.forEach((c) => {
         if (c.started_at && c.completed_at) {
-          const duration = new Date(c.completed_at).getTime() - new Date(c.started_at).getTime()
-          totalDuration += duration
-          durationCount++
+          const duration = new Date(c.completed_at).getTime() - new Date(c.started_at).getTime();
+          totalDuration += duration;
+          durationCount++;
         }
-      })
-      const avgDuration = durationCount > 0 ? totalDuration / durationCount / 60000 : 0
+      });
+      const avgDuration = durationCount > 0 ? totalDuration / durationCount / 60000 : 0;
 
       // Calculate revenue from completed consultations
       const revenue = completed.reduce((sum, c) => {
-        return sum + (c.appointment?.service?.price || 0)
-      }, 0)
+        return sum + (c.appointment?.service?.price || 0);
+      }, 0);
 
       // Count consultations by type
-      const typeCount: Record<string, number> = {}
-      consultations?.forEach(c => {
-        typeCount[c.consultation_type] = (typeCount[c.consultation_type] || 0) + 1
-      })
+      const typeCount: Record<string, number> = {};
+      consultations?.forEach((c) => {
+        typeCount[c.consultation_type] = (typeCount[c.consultation_type] || 0) + 1;
+      });
       const consultationsByType = Object.entries(typeCount).map(([type, count]) => ({
-        type: type.replace('_', ' '),
-        count
-      }))
+        type: type.replace("_", " "),
+        count,
+      }));
 
       // Extract top concerns from client goals
-      const concernsMap: Record<string, number> = {}
-      consultations?.forEach(c => {
+      const concernsMap: Record<string, number> = {};
+      consultations?.forEach((c) => {
         if (c.client_goals) {
           // Simple keyword extraction - in production, you'd want more sophisticated NLP
-          const keywords = ['weight loss', 'muscle gain', 'nutrition', 'stress', 'energy', 'sleep', 'pain', 'flexibility']
-          keywords.forEach(keyword => {
+          const keywords = [
+            "weight loss",
+            "muscle gain",
+            "nutrition",
+            "stress",
+            "energy",
+            "sleep",
+            "pain",
+            "flexibility",
+          ];
+          keywords.forEach((keyword) => {
             if (c.client_goals.toLowerCase().includes(keyword)) {
-              concernsMap[keyword] = (concernsMap[keyword] || 0) + 1
+              concernsMap[keyword] = (concernsMap[keyword] || 0) + 1;
             }
-          })
+          });
         }
-      })
+      });
       const topConcerns = Object.entries(concernsMap)
         .map(([concern, count]) => ({ concern, count }))
         .sort((a, b) => b.count - a.count)
-        .slice(0, 5)
+        .slice(0, 5);
 
       // Calculate daily trend
-      const dailyCount: Record<string, number> = {}
-      consultations?.forEach(c => {
-        const date = format(new Date(c.created_at), 'MMM d')
-        dailyCount[date] = (dailyCount[date] || 0) + 1
-      })
+      const dailyCount: Record<string, number> = {};
+      consultations?.forEach((c) => {
+        const date = format(new Date(c.created_at), "MMM d");
+        dailyCount[date] = (dailyCount[date] || 0) + 1;
+      });
       const dailyTrend = Object.entries(dailyCount)
         .map(([date, count]) => ({ date, count }))
-        .slice(-7) // Last 7 days
+        .slice(-7); // Last 7 days
 
       // Calculate conversion rate (consultations that led to follow-up appointments)
       // For demo purposes, using a mock rate
-      const conversionRate = completed.length > 0 ? 65 : 0 // 65% mock conversion rate
+      const conversionRate = completed.length > 0 ? 65 : 0; // 65% mock conversion rate
 
       setAnalytics({
         totalConsultations: consultations?.length || 0,
@@ -140,18 +166,19 @@ export function ConsultationAnalytics() {
         revenue,
         topConcerns,
         consultationsByType,
-        dailyTrend
-      })
+        dailyTrend,
+      });
     } catch (error) {
-      console.error('Error fetching analytics:', error)
+      console.error("Error fetching analytics:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const completionRate = analytics.totalConsultations > 0
-    ? (analytics.completedConsultations / analytics.totalConsultations) * 100
-    : 0
+  const completionRate =
+    analytics.totalConsultations > 0
+      ? (analytics.completedConsultations / analytics.totalConsultations) * 100
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -233,8 +260,8 @@ export function ConsultationAnalytics() {
                     <span className="capitalize">{item.type}</span>
                     <span className="text-sm text-muted-foreground">({item.count})</span>
                   </div>
-                  <Progress 
-                    value={(item.count / analytics.totalConsultations) * 100} 
+                  <Progress
+                    value={(item.count / analytics.totalConsultations) * 100}
                     className="w-[100px]"
                   />
                 </div>
@@ -332,5 +359,5 @@ export function ConsultationAnalytics() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

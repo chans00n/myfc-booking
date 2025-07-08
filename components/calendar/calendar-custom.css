@@ -229,11 +229,11 @@
   .rbc-toolbar {
     @apply flex-col gap-3;
   }
-  
+
   .rbc-toolbar-label {
     @apply text-base;
   }
-  
+
   .rbc-event {
     @apply text-[10px] px-0.5 py-0;
   }

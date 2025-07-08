@@ -1,137 +1,140 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useBooking } from '@/contexts/BookingContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Loader2, FileText, CheckCircle, AlertCircle } from 'lucide-react'
-import { IntakeForm } from '@/components/intake/IntakeForm'
-import { ReturningClientForm } from '@/components/intake/ReturningClientForm'
-import { checkIntakeFormRequired, createIntakeForm, getIntakeForm } from '@/lib/intake-forms'
-import type { FormType } from '@/types/intake-forms'
+import { useState, useEffect } from "react";
+import { useBooking } from "@/contexts/BookingContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Loader2, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import { IntakeForm } from "@/components/intake/IntakeForm";
+import { ReturningClientForm } from "@/components/intake/ReturningClientForm";
+import { checkIntakeFormRequired, createIntakeForm, getIntakeForm } from "@/lib/intake-forms";
+import type { FormType } from "@/types/intake-forms";
 
 interface IntakeFormStepProps {
-  onValidate: (isValid: boolean) => void
+  onValidate: (isValid: boolean) => void;
 }
 
 export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
-  const { bookingData, updateBookingData } = useBooking()
-  const { user, profile } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const [formRequired, setFormRequired] = useState(false)
-  const [formType, setFormType] = useState<FormType>('new_client')
-  const [formId, setFormId] = useState<string | null>(null)
-  const [lastFormDate, setLastFormDate] = useState<Date | undefined>()
-  const [formCompleted, setFormCompleted] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [isInitialized, setIsInitialized] = useState(false)
+  const { bookingData, updateBookingData } = useBooking();
+  const { user, profile } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [formRequired, setFormRequired] = useState(false);
+  const [formType, setFormType] = useState<FormType>("new_client");
+  const [formId, setFormId] = useState<string | null>(null);
+  const [lastFormDate, setLastFormDate] = useState<Date | undefined>();
+  const [formCompleted, setFormCompleted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (!isInitialized) {
-      checkIntakeRequirement()
+      checkIntakeRequirement();
     }
-  }, [user, bookingData.selectedDate, isInitialized])
+  }, [user, bookingData.selectedDate, isInitialized]);
 
   const createNewForm = async (userId: string, formType: FormType) => {
     const { data: newForm, error: createError } = await createIntakeForm(
       userId,
       formType
       // appointmentId will be linked later when appointment is created
-    )
+    );
 
     if (createError) {
-      setError(createError)
+      setError(createError);
     } else if (newForm) {
-      setFormId(newForm.id)
-      updateBookingData({ intakeFormId: newForm.id })
+      setFormId(newForm.id);
+      updateBookingData({ intakeFormId: newForm.id });
     } else {
-      setError('Failed to create intake form')
+      setError("Failed to create intake form");
     }
-  }
+  };
 
   const checkIntakeRequirement = async () => {
     if (!user || !bookingData.selectedDate) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
       // Check if an intake form is required
       const requirement = await checkIntakeFormRequired(
         user.id,
         new Date(bookingData.selectedDate)
-      )
+      );
 
-      console.log('Intake form requirement check:', {
+      console.log("Intake form requirement check:", {
         userId: user.id,
         appointmentDate: bookingData.selectedDate,
         requirement,
-        daysSinceLastForm: requirement.lastFormDate 
-          ? Math.floor((new Date(bookingData.selectedDate).getTime() - requirement.lastFormDate.getTime()) / (1000 * 60 * 60 * 24))
-          : 'No previous form'
-      })
-      
-      setFormRequired(requirement.required)
-      setFormType(requirement.formType)
-      setLastFormDate(requirement.lastFormDate)
+        daysSinceLastForm: requirement.lastFormDate
+          ? Math.floor(
+              (new Date(bookingData.selectedDate).getTime() - requirement.lastFormDate.getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          : "No previous form",
+      });
+
+      setFormRequired(requirement.required);
+      setFormType(requirement.formType);
+      setLastFormDate(requirement.lastFormDate);
 
       if (requirement.required) {
         // Check if we already have a form ID in booking data
         if (bookingData.intakeFormId) {
-          console.log('Checking existing intake form:', {
+          console.log("Checking existing intake form:", {
             formId: bookingData.intakeFormId,
             userId: user.id,
-            timestamp: new Date().toISOString()
-          })
-          
-          const { data: existingForm } = await getIntakeForm(bookingData.intakeFormId)
-          
+            timestamp: new Date().toISOString(),
+          });
+
+          const { data: existingForm } = await getIntakeForm(bookingData.intakeFormId);
+
           // Verify the form belongs to the current user
           if (existingForm && existingForm.client_id === user.id) {
-            console.log('Form ownership verified for user:', user.id)
-            if (existingForm.status === 'submitted') {
-              setFormCompleted(true)
-              onValidate(true)
+            console.log("Form ownership verified for user:", user.id);
+            if (existingForm.status === "submitted") {
+              setFormCompleted(true);
+              onValidate(true);
             } else {
               // Use existing draft form
-              setFormId(bookingData.intakeFormId)
+              setFormId(bookingData.intakeFormId);
             }
           } else {
             // Form doesn't belong to user or doesn't exist
-            console.warn('Form ownership mismatch or not found:', {
+            console.warn("Form ownership mismatch or not found:", {
               formId: bookingData.intakeFormId,
               formOwnerId: existingForm?.client_id,
-              currentUserId: user.id
-            })
+              currentUserId: user.id,
+            });
             // Clear the invalid ID and create a new form
-            updateBookingData({ intakeFormId: null })
-            await createNewForm(user.id, requirement.formType)
+            updateBookingData({ intakeFormId: null });
+            await createNewForm(user.id, requirement.formType);
           }
         } else {
           // Create a new intake form for this booking
-          await createNewForm(user.id, requirement.formType)
+          await createNewForm(user.id, requirement.formType);
         }
       } else {
         // No form required
-        onValidate(true)
+        onValidate(true);
       }
     } catch (err) {
-      setError('Failed to check intake form requirement')
+      setError("Failed to check intake form requirement");
     } finally {
-      setLoading(false)
-      setIsInitialized(true)
+      setLoading(false);
+      setIsInitialized(true);
     }
-  }
+  };
 
   const handleFormComplete = () => {
-    setFormCompleted(true)
-    onValidate(true)
-  }
+    setFormCompleted(true);
+    onValidate(true);
+  };
 
   if (loading) {
     return (
@@ -141,7 +144,7 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
           <p className="text-muted-foreground">Loading intake form requirements...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -150,7 +153,7 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   if (!formRequired) {
@@ -167,12 +170,12 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            We have your intake form on file from {lastFormDate?.toLocaleDateString()}.
-            If you have any updates to your health information, please inform your therapist at the appointment.
+            We have your intake form on file from {lastFormDate?.toLocaleDateString()}. If you have
+            any updates to your health information, please inform your therapist at the appointment.
           </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (formCompleted) {
@@ -191,13 +194,13 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
           <Alert>
             <FileText className="h-4 w-4" />
             <AlertDescription>
-              Your therapist will review your intake form before your appointment.
-              If you need to make any changes, please contact us.
+              Your therapist will review your intake form before your appointment. If you need to
+              make any changes, please contact us.
             </AlertDescription>
           </Alert>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (!formId) {
@@ -209,24 +212,27 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
           <AlertDescription>
             Unable to create intake form. Please try refreshing the page or contact support.
             <br />
-            <small className="text-xs">Debug: formRequired={String(formRequired)}, formType={formType}</small>
+            <small className="text-xs">
+              Debug: formRequired={String(formRequired)}, formType={formType}
+            </small>
           </AlertDescription>
         </Alert>
-      )
+      );
     }
-    
+
     // Still initializing
-    return null
+    return null;
   }
 
   // Show appropriate form based on client type
-  if (formType === 'new_client') {
+  if (formType === "new_client") {
     return (
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold mb-2">Health Intake Form</h2>
           <p className="text-muted-foreground">
-            As a new client, please complete this comprehensive health form to help us provide you with the best care.
+            As a new client, please complete this comprehensive health form to help us provide you
+            with the best care.
           </p>
         </div>
 
@@ -237,7 +243,7 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
           onComplete={handleFormComplete}
         />
       </div>
-    )
+    );
   }
 
   // Returning client form
@@ -245,11 +251,11 @@ export function IntakeFormStep({ onValidate }: IntakeFormStepProps) {
     <div className="space-y-6">
       <ReturningClientForm
         formId={formId}
-        clientId={user?.id || ''}
+        clientId={user?.id || ""}
         clientProfile={profile}
         lastFormDate={lastFormDate}
         onComplete={handleFormComplete}
       />
     </div>
-  )
+  );
 }

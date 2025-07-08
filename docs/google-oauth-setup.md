@@ -39,6 +39,7 @@ To enable Google authentication in your massage booking system, follow these ste
 ## 3. Update Environment Variables
 
 Add these to your `.env.local` if needed for any custom OAuth flows:
+
 ```env
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret

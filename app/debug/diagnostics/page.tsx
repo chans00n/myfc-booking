@@ -1,4 +1,4 @@
-import { DiagnosticTool } from '@/components/debug/DiagnosticTool'
+import { DiagnosticTool } from "@/components/debug/DiagnosticTool";
 
 export default function DiagnosticsPage() {
   return (
@@ -6,5 +6,5 @@ export default function DiagnosticsPage() {
       <h1 className="text-2xl font-bold mb-6">System Diagnostics</h1>
       <DiagnosticTool />
     </div>
-  )
+  );
 }

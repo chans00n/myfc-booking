@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { type LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -10,16 +10,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 interface NavGroup {
-  label: string
+  label: string;
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    isActive?: boolean
-  }[]
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+    isActive?: boolean;
+  }[];
 }
 
 export function AdminNavGrouped({ groups }: { groups: NavGroup[] }) {
@@ -45,5 +45,5 @@ export function AdminNavGrouped({ groups }: { groups: NavGroup[] }) {
         </SidebarGroup>
       ))}
     </>
-  )
+  );
 }

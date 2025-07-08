@@ -1,124 +1,134 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { createClient } from '@/lib/supabase/client'
-import { format, subDays, startOfDay, endOfDay } from 'date-fns'
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { createClient } from "@/lib/supabase/client";
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
 
 interface RevenueData {
-  date: string
-  revenue: number
-  appointments: number
+  date: string;
+  revenue: number;
+  appointments: number;
 }
 
 export function ChartRevenue() {
-  const [timeRange, setTimeRange] = React.useState("30d")
-  const [data, setData] = React.useState<RevenueData[]>([])
-  const [loading, setLoading] = React.useState(true)
-  
-  const supabase = createClient()
+  const [timeRange, setTimeRange] = React.useState("30d");
+  const [data, setData] = React.useState<RevenueData[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const supabase = createClient();
 
   React.useEffect(() => {
-    fetchRevenueData()
-  }, [timeRange])
+    fetchRevenueData();
+  }, [timeRange]);
 
   const fetchRevenueData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const endDate = new Date()
-      let startDate: Date
-      
+      const endDate = new Date();
+      let startDate: Date;
+
       switch (timeRange) {
         case "7d":
-          startDate = subDays(endDate, 7)
-          break
+          startDate = subDays(endDate, 7);
+          break;
         case "30d":
-          startDate = subDays(endDate, 30)
-          break
+          startDate = subDays(endDate, 30);
+          break;
         case "90d":
-          startDate = subDays(endDate, 90)
-          break
+          startDate = subDays(endDate, 90);
+          break;
         default:
-          startDate = subDays(endDate, 30)
+          startDate = subDays(endDate, 30);
       }
 
       // Fetch payments grouped by date
       const { data: payments, error } = await supabase
-        .from('payments')
-        .select('amount_cents, created_at, appointment_id')
-        .eq('status', 'succeeded')
-        .gte('created_at', startOfDay(startDate).toISOString())
-        .lte('created_at', endOfDay(endDate).toISOString())
-        .order('created_at', { ascending: true })
+        .from("payments")
+        .select("amount_cents, created_at, appointment_id")
+        .eq("status", "succeeded")
+        .gte("created_at", startOfDay(startDate).toISOString())
+        .lte("created_at", endOfDay(endDate).toISOString())
+        .order("created_at", { ascending: true });
 
-      if (error) throw error
+      if (error) throw error;
 
       // Group payments by date
-      const revenueByDate = new Map<string, { revenue: number; appointments: Set<string> }>()
-      
+      const revenueByDate = new Map<string, { revenue: number; appointments: Set<string> }>();
+
       // Initialize all dates with zero values
       for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const dateStr = format(d, 'yyyy-MM-dd')
-        revenueByDate.set(dateStr, { revenue: 0, appointments: new Set() })
+        const dateStr = format(d, "yyyy-MM-dd");
+        revenueByDate.set(dateStr, { revenue: 0, appointments: new Set() });
       }
 
       // Aggregate payment data
-      payments?.forEach(payment => {
-        const dateStr = format(new Date(payment.created_at), 'yyyy-MM-dd')
-        const existing = revenueByDate.get(dateStr) || { revenue: 0, appointments: new Set() }
-        existing.revenue += payment.amount_cents
+      payments?.forEach((payment) => {
+        const dateStr = format(new Date(payment.created_at), "yyyy-MM-dd");
+        const existing = revenueByDate.get(dateStr) || { revenue: 0, appointments: new Set() };
+        existing.revenue += payment.amount_cents;
         if (payment.appointment_id) {
-          existing.appointments.add(payment.appointment_id)
+          existing.appointments.add(payment.appointment_id);
         }
-        revenueByDate.set(dateStr, existing)
-      })
+        revenueByDate.set(dateStr, existing);
+      });
 
       // Convert to array format
       const chartData: RevenueData[] = Array.from(revenueByDate.entries()).map(([date, data]) => ({
         date,
         revenue: data.revenue / 100, // Convert cents to dollars
-        appointments: data.appointments.size
-      }))
+        appointments: data.appointments.size,
+      }));
 
-      setData(chartData)
+      setData(chartData);
     } catch (error) {
-      console.error('Error fetching revenue data:', error)
+      console.error("Error fetching revenue data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const totalRevenue = data.reduce((sum, day) => sum + day.revenue, 0)
-  const totalAppointments = data.reduce((sum, day) => sum + day.appointments, 0)
-  const avgRevenuePerDay = data.length > 0 ? totalRevenue / data.length : 0
+  const totalRevenue = data.reduce((sum, day) => sum + day.revenue, 0);
+  const totalAppointments = data.reduce((sum, day) => sum + day.appointments, 0);
+  const avgRevenuePerDay = data.length > 0 ? totalRevenue / data.length : 0;
 
   const chartConfig = {
     revenue: {
       label: "Revenue",
       color: "hsl(var(--chart-1))",
     },
-  }
+  };
 
   return (
     <Card>
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
         <div>
           <CardTitle>Revenue Overview</CardTitle>
-          <CardDescription>
-            Daily revenue from appointments
-          </CardDescription>
+          <CardDescription>Daily revenue from appointments</CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[140px]" aria-label="Select time range">
             <SelectValue placeholder="Last 30 days" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="7d" className="rounded-lg">Last 7 days</SelectItem>
-            <SelectItem value="30d" className="rounded-lg">Last 30 days</SelectItem>
-            <SelectItem value="90d" className="rounded-lg">Last 90 days</SelectItem>
+            <SelectItem value="7d" className="rounded-lg">
+              Last 7 days
+            </SelectItem>
+            <SelectItem value="30d" className="rounded-lg">
+              Last 30 days
+            </SelectItem>
+            <SelectItem value="90d" className="rounded-lg">
+              Last 90 days
+            </SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
@@ -133,7 +143,11 @@ export function ChartRevenue() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold">
-                  ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {totalRevenue.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
               <div>
@@ -143,7 +157,11 @@ export function ChartRevenue() {
               <div>
                 <p className="text-sm text-muted-foreground">Avg per Day</p>
                 <p className="text-2xl font-bold">
-                  ${avgRevenuePerDay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {avgRevenuePerDay.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
             </div>
@@ -164,8 +182,8 @@ export function ChartRevenue() {
                     tickMargin={8}
                     minTickGap={32}
                     tickFormatter={(value) => {
-                      const date = new Date(value)
-                      return format(date, 'MMM d')
+                      const date = new Date(value);
+                      return format(date, "MMM d");
                     }}
                   />
                   <YAxis
@@ -178,12 +196,12 @@ export function ChartRevenue() {
                     cursor={false}
                     content={
                       <ChartTooltipContent
-                        labelFormatter={(value) => format(new Date(value), 'MMM d, yyyy')}
+                        labelFormatter={(value) => format(new Date(value), "MMM d, yyyy")}
                         formatter={(value, name) => {
-                          if (name === 'revenue') {
-                            return [`$${Number(value).toFixed(2)}`, 'Revenue']
+                          if (name === "revenue") {
+                            return [`$${Number(value).toFixed(2)}`, "Revenue"];
                           }
-                          return [value, name]
+                          return [value, name];
                         }}
                       />
                     }
@@ -202,5 +220,5 @@ export function ChartRevenue() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

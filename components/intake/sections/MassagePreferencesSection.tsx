@@ -1,69 +1,82 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Plus, X } from 'lucide-react'
-import type { IntakeFormData } from '@/types/intake-forms'
+import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Plus, X } from "lucide-react";
+import type { IntakeFormData } from "@/types/intake-forms";
 
 interface MassagePreferencesSectionProps {
-  form: UseFormReturn<IntakeFormData>
+  form: UseFormReturn<IntakeFormData>;
 }
 
 const MASSAGE_TECHNIQUES = [
-  'Swedish Massage',
-  'Deep Tissue',
-  'Trigger Point Therapy',
-  'Myofascial Release',
-  'Sports Massage',
-  'Prenatal Massage',
-  'Hot Stone',
-  'Aromatherapy',
-  'Reflexology',
-  'Lymphatic Drainage'
-]
+  "Swedish Massage",
+  "Deep Tissue",
+  "Trigger Point Therapy",
+  "Myofascial Release",
+  "Sports Massage",
+  "Prenatal Massage",
+  "Hot Stone",
+  "Aromatherapy",
+  "Reflexology",
+  "Lymphatic Drainage",
+];
 
 const BODY_AREAS_TO_AVOID = [
-  'Face', 'Scalp', 'Neck', 'Chest', 'Abdomen', 'Lower Back',
-  'Glutes', 'Inner Thighs', 'Feet'
-]
+  "Face",
+  "Scalp",
+  "Neck",
+  "Chest",
+  "Abdomen",
+  "Lower Back",
+  "Glutes",
+  "Inner Thighs",
+  "Feet",
+];
 
 export function MassagePreferencesSection({ form }: MassagePreferencesSectionProps) {
-  const { watch, setValue, register } = form
-  const previousExperience = watch('previousMassageExperience')
-  const pressurePreference = watch('pressurePreference')
-  const areasToAvoid = watch('areasToAvoid')
-  const preferredTechniques = watch('preferredTechniques')
+  const { watch, setValue, register } = form;
+  const previousExperience = watch("previousMassageExperience");
+  const pressurePreference = watch("pressurePreference");
+  const areasToAvoid = watch("areasToAvoid");
+  const preferredTechniques = watch("preferredTechniques");
 
-  const [customAreaToAvoid, setCustomAreaToAvoid] = useState('')
+  const [customAreaToAvoid, setCustomAreaToAvoid] = useState("");
 
   const toggleAreaToAvoid = (area: string) => {
     if (areasToAvoid.includes(area)) {
-      setValue('areasToAvoid', areasToAvoid.filter(a => a !== area))
+      setValue(
+        "areasToAvoid",
+        areasToAvoid.filter((a) => a !== area)
+      );
     } else {
-      setValue('areasToAvoid', [...areasToAvoid, area])
+      setValue("areasToAvoid", [...areasToAvoid, area]);
     }
-  }
+  };
 
   const addCustomAreaToAvoid = () => {
     if (customAreaToAvoid.trim() && !areasToAvoid.includes(customAreaToAvoid.trim())) {
-      setValue('areasToAvoid', [...areasToAvoid, customAreaToAvoid.trim()])
-      setCustomAreaToAvoid('')
+      setValue("areasToAvoid", [...areasToAvoid, customAreaToAvoid.trim()]);
+      setCustomAreaToAvoid("");
     }
-  }
+  };
 
   const togglePreferredTechnique = (technique: string) => {
     if (preferredTechniques.includes(technique)) {
-      setValue('preferredTechniques', preferredTechniques.filter(t => t !== technique))
+      setValue(
+        "preferredTechniques",
+        preferredTechniques.filter((t) => t !== technique)
+      );
     } else {
-      setValue('preferredTechniques', [...preferredTechniques, technique])
+      setValue("preferredTechniques", [...preferredTechniques, technique]);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,16 +84,14 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
       <Card>
         <CardHeader>
           <CardTitle>Massage Experience</CardTitle>
-          <CardDescription>
-            Tell us about your previous massage experience
-          </CardDescription>
+          <CardDescription>Tell us about your previous massage experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <Label>Have you received professional massage before?</Label>
             <RadioGroup
-              value={previousExperience ? 'yes' : 'no'}
-              onValueChange={(value) => setValue('previousMassageExperience', value === 'yes')}
+              value={previousExperience ? "yes" : "no"}
+              onValueChange={(value) => setValue("previousMassageExperience", value === "yes")}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="exp-yes" />
@@ -97,18 +108,14 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
             <>
               <div className="space-y-2">
                 <Label htmlFor="lastMassageDate">When was your last massage?</Label>
-                <Input
-                  id="lastMassageDate"
-                  type="date"
-                  {...register('lastMassageDate')}
-                />
+                <Input id="lastMassageDate" type="date" {...register("lastMassageDate")} />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="massageFrequency">How often do you receive massage?</Label>
                 <Input
                   id="massageFrequency"
-                  {...register('massageFrequency')}
+                  {...register("massageFrequency")}
                   placeholder="e.g., Monthly, Every few months, Rarely"
                 />
               </div>
@@ -121,21 +128,17 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
       <Card>
         <CardHeader>
           <CardTitle>Pressure Preference</CardTitle>
-          <CardDescription>
-            What level of pressure do you prefer during massage?
-          </CardDescription>
+          <CardDescription>What level of pressure do you prefer during massage?</CardDescription>
         </CardHeader>
         <CardContent>
           <RadioGroup
             value={pressurePreference}
-            onValueChange={(value: any) => setValue('pressurePreference', value)}
+            onValueChange={(value: any) => setValue("pressurePreference", value)}
           >
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="light" id="pressure-light" />
-                <Label htmlFor="pressure-light">
-                  Light - Gentle, relaxing touch
-                </Label>
+                <Label htmlFor="pressure-light">Light - Gentle, relaxing touch</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="medium" id="pressure-medium" />
@@ -183,10 +186,7 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
                   checked={areasToAvoid.includes(area)}
                   onCheckedChange={() => toggleAreaToAvoid(area)}
                 />
-                <Label 
-                  htmlFor={`avoid-${area}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
+                <Label htmlFor={`avoid-${area}`} className="text-sm font-normal cursor-pointer">
                   {area}
                 </Label>
               </div>
@@ -194,27 +194,34 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
           </div>
 
           {/* Custom areas */}
-          {areasToAvoid.filter(area => !BODY_AREAS_TO_AVOID.includes(area)).length > 0 && (
+          {areasToAvoid.filter((area) => !BODY_AREAS_TO_AVOID.includes(area)).length > 0 && (
             <div className="space-y-2">
               <Label className="text-sm">Other areas:</Label>
               <div className="flex flex-wrap gap-2">
                 {areasToAvoid
-                  .filter(area => !BODY_AREAS_TO_AVOID.includes(area))
+                  .filter((area) => !BODY_AREAS_TO_AVOID.includes(area))
                   .map((area, index) => (
-                    <div key={index} className="flex items-center gap-1 px-2 py-1 bg-secondary rounded-md">
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 px-2 py-1 bg-secondary rounded-md"
+                    >
                       <span className="text-sm">{area}</span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         className="h-4 w-4 p-0"
-                        onClick={() => setValue('areasToAvoid', areasToAvoid.filter(a => a !== area))}
+                        onClick={() =>
+                          setValue(
+                            "areasToAvoid",
+                            areasToAvoid.filter((a) => a !== area)
+                          )
+                        }
                       >
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
-                  ))
-                }
+                  ))}
               </div>
             </div>
           )}
@@ -225,9 +232,9 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
               onChange={(e) => setCustomAreaToAvoid(e.target.value)}
               placeholder="Add other area to avoid"
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  addCustomAreaToAvoid()
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCustomAreaToAvoid();
                 }
               }}
             />
@@ -260,10 +267,7 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
                   checked={preferredTechniques.includes(technique)}
                   onCheckedChange={() => togglePreferredTechnique(technique)}
                 />
-                <Label 
-                  htmlFor={`tech-${technique}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
+                <Label htmlFor={`tech-${technique}`} className="text-sm font-normal cursor-pointer">
                   {technique}
                 </Label>
               </div>
@@ -272,5 +276,5 @@ export function MassagePreferencesSection({ form }: MassagePreferencesSectionPro
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

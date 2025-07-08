@@ -153,10 +153,12 @@
 
 /* Add subtle grid lines for better visibility */
 .dark .rbc-time-view {
-  background-image: 
+  background-image:
     linear-gradient(to right, hsl(var(--border) / 0.1) 1px, transparent 1px),
     linear-gradient(to bottom, hsl(var(--border) / 0.1) 1px, transparent 1px);
-  background-size: 100% 30px, 120px 100%;
+  background-size:
+    100% 30px,
+    120px 100%;
 }
 
 /* Better contrast for overlays in dark mode */

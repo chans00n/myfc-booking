@@ -1,40 +1,40 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useBooking } from '@/contexts/BookingContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useBooking } from "@/contexts/BookingContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const intakeFormSchema = z.object({
   healthConditions: z.string().optional(),
   medications: z.string().optional(),
   allergies: z.string().optional(),
   massageExperience: z.string().optional(),
-  pressurePreference: z.enum(['light', 'medium', 'firm', 'deep']),
+  pressurePreference: z.enum(["light", "medium", "firm", "deep"]),
   focusAreas: z.string().optional(),
   avoidAreas: z.string().optional(),
   goals: z.string().optional(),
-  emergencyContactName: z.string().min(1, 'Emergency contact name is required'),
-  emergencyContactPhone: z.string().min(10, 'Valid phone number is required'),
-})
+  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
+  emergencyContactPhone: z.string().min(10, "Valid phone number is required"),
+});
 
-type IntakeFormData = z.infer<typeof intakeFormSchema>
+type IntakeFormData = z.infer<typeof intakeFormSchema>;
 
 interface IntakeFormProps {
-  onValidate: (isValid: boolean) => void
+  onValidate: (isValid: boolean) => void;
 }
 
 export function IntakeForm({ onValidate }: IntakeFormProps) {
-  const { bookingData, updateBookingData } = useBooking()
-  
+  const { bookingData, updateBookingData } = useBooking();
+
   const {
     register,
     handleSubmit,
@@ -43,24 +43,24 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
     formState: { errors, isValid },
   } = useForm<IntakeFormData>({
     resolver: zodResolver(intakeFormSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: bookingData.intakeForm || {
-      pressurePreference: 'medium',
+      pressurePreference: "medium",
     },
-  })
+  });
 
-  const formValues = watch()
+  const formValues = watch();
 
   useEffect(() => {
-    onValidate(isValid)
-  }, [isValid, onValidate])
+    onValidate(isValid);
+  }, [isValid, onValidate]);
 
   useEffect(() => {
     if (isValid) {
-      updateBookingData({ intakeForm: formValues })
+      updateBookingData({ intakeForm: formValues });
     }
   }, [
-    isValid, 
+    isValid,
     formValues.healthConditions,
     formValues.medications,
     formValues.allergies,
@@ -71,8 +71,8 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
     formValues.goals,
     formValues.emergencyContactName,
     formValues.emergencyContactPhone,
-    updateBookingData
-  ])
+    updateBookingData,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -84,7 +84,8 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          This information is confidential and will only be used to ensure your safety and comfort during your massage.
+          This information is confidential and will only be used to ensure your safety and comfort
+          during your massage.
         </AlertDescription>
       </Alert>
 
@@ -102,7 +103,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="healthConditions"
                 placeholder="e.g., High blood pressure, diabetes, recent injuries..."
-                {...register('healthConditions')}
+                {...register("healthConditions")}
               />
             </div>
 
@@ -111,7 +112,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="medications"
                 placeholder="List any medications you're currently taking..."
-                {...register('medications')}
+                {...register("medications")}
               />
             </div>
 
@@ -120,7 +121,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Input
                 id="allergies"
                 placeholder="e.g., Latex, specific oils, fragrances..."
-                {...register('allergies')}
+                {...register("allergies")}
               />
             </div>
           </CardContent>
@@ -129,9 +130,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>Massage Preferences</CardTitle>
-            <CardDescription>
-              Help us customize your massage experience
-            </CardDescription>
+            <CardDescription>Help us customize your massage experience</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -139,15 +138,15 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="massageExperience"
                 placeholder="How often do you get massages? Any specific techniques you prefer?"
-                {...register('massageExperience')}
+                {...register("massageExperience")}
               />
             </div>
 
             <div className="space-y-2">
               <Label>Pressure Preference</Label>
-              <RadioGroup 
+              <RadioGroup
                 value={formValues.pressurePreference}
-                onValueChange={(value) => setValue('pressurePreference', value as any)}
+                onValueChange={(value) => setValue("pressurePreference", value as any)}
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center space-x-2">
@@ -175,7 +174,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="focusAreas"
                 placeholder="e.g., Lower back, shoulders, neck..."
-                {...register('focusAreas')}
+                {...register("focusAreas")}
               />
             </div>
 
@@ -184,7 +183,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="avoidAreas"
                 placeholder="Any areas we should avoid or be gentle with?"
-                {...register('avoidAreas')}
+                {...register("avoidAreas")}
               />
             </div>
 
@@ -193,7 +192,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
               <Textarea
                 id="goals"
                 placeholder="What would you like to achieve from this massage?"
-                {...register('goals')}
+                {...register("goals")}
               />
             </div>
           </CardContent>
@@ -202,18 +201,13 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>Emergency Contact</CardTitle>
-            <CardDescription>
-              Required for your safety
-            </CardDescription>
+            <CardDescription>Required for your safety</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="emergencyContactName">Contact Name</Label>
-                <Input
-                  id="emergencyContactName"
-                  {...register('emergencyContactName')}
-                />
+                <Input id="emergencyContactName" {...register("emergencyContactName")} />
                 {errors.emergencyContactName && (
                   <p className="text-sm text-red-500">{errors.emergencyContactName.message}</p>
                 )}
@@ -224,7 +218,7 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
                 <Input
                   id="emergencyContactPhone"
                   type="tel"
-                  {...register('emergencyContactPhone')}
+                  {...register("emergencyContactPhone")}
                 />
                 {errors.emergencyContactPhone && (
                   <p className="text-sm text-red-500">{errors.emergencyContactPhone.message}</p>
@@ -235,5 +229,5 @@ export function IntakeForm({ onValidate }: IntakeFormProps) {
         </Card>
       </form>
     </div>
-  )
+  );
 }

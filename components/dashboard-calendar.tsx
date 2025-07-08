@@ -1,103 +1,105 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { Calendar } from '@/components/ui/calendar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { createClient } from '@/lib/supabase/client'
-import { format, startOfMonth, endOfMonth } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
+import * as React from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { createClient } from "@/lib/supabase/client";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 interface AppointmentCount {
-  date: string
-  count: number
-  hasConfirmed: boolean
+  date: string;
+  count: number;
+  hasConfirmed: boolean;
 }
 
 interface DashboardCalendarProps {
-  onDateSelect?: (date: Date | undefined) => void
-  selectedDate?: Date | undefined
+  onDateSelect?: (date: Date | undefined) => void;
+  selectedDate?: Date | undefined;
 }
 
 export function DashboardCalendar({ onDateSelect, selectedDate }: DashboardCalendarProps) {
-  const [currentMonth, setCurrentMonth] = React.useState(new Date())
-  const [appointmentDates, setAppointmentDates] = React.useState<Map<string, AppointmentCount>>(new Map())
-  const [loading, setLoading] = React.useState(true)
-  
-  const supabase = createClient()
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
+  const [appointmentDates, setAppointmentDates] = React.useState<Map<string, AppointmentCount>>(
+    new Map()
+  );
+  const [loading, setLoading] = React.useState(true);
+
+  const supabase = createClient();
 
   React.useEffect(() => {
-    fetchMonthAppointments(currentMonth)
-  }, [currentMonth])
+    fetchMonthAppointments(currentMonth);
+  }, [currentMonth]);
 
   const fetchMonthAppointments = async (month: Date) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const monthStart = startOfMonth(month)
-      const monthEnd = endOfMonth(month)
+      const monthStart = startOfMonth(month);
+      const monthEnd = endOfMonth(month);
 
       const { data: appointments, error } = await supabase
-        .from('appointments')
-        .select('appointment_date, status')
-        .gte('appointment_date', format(monthStart, 'yyyy-MM-dd'))
-        .lte('appointment_date', format(monthEnd, 'yyyy-MM-dd'))
-        .in('status', ['scheduled', 'confirmed'])
+        .from("appointments")
+        .select("appointment_date, status")
+        .gte("appointment_date", format(monthStart, "yyyy-MM-dd"))
+        .lte("appointment_date", format(monthEnd, "yyyy-MM-dd"))
+        .in("status", ["scheduled", "confirmed"]);
 
       if (error) {
-        console.error('Error fetching appointments:', error)
-        return
+        console.error("Error fetching appointments:", error);
+        return;
       }
 
-      const counts = new Map<string, AppointmentCount>()
-      
-      appointments?.forEach(apt => {
-        const dateStr = apt.appointment_date
-        const existing = counts.get(dateStr) || { date: dateStr, count: 0, hasConfirmed: false }
-        existing.count++
-        if (apt.status === 'confirmed') {
-          existing.hasConfirmed = true
-        }
-        counts.set(dateStr, existing)
-      })
+      const counts = new Map<string, AppointmentCount>();
 
-      setAppointmentDates(counts)
+      appointments?.forEach((apt) => {
+        const dateStr = apt.appointment_date;
+        const existing = counts.get(dateStr) || { date: dateStr, count: 0, hasConfirmed: false };
+        existing.count++;
+        if (apt.status === "confirmed") {
+          existing.hasConfirmed = true;
+        }
+        counts.set(dateStr, existing);
+      });
+
+      setAppointmentDates(counts);
     } catch (error) {
-      console.error('Error fetching appointments:', error)
+      console.error("Error fetching appointments:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Create dates array for modifiers
   const appointmentDatesList = React.useMemo(() => {
-    const dates: Date[] = []
+    const dates: Date[] = [];
     appointmentDates.forEach((_, dateStr) => {
       // Parse the date string properly
-      const [year, month, day] = dateStr.split('-').map(Number)
-      dates.push(new Date(year, month - 1, day))
-    })
-    return dates
-  }, [appointmentDates])
+      const [year, month, day] = dateStr.split("-").map(Number);
+      dates.push(new Date(year, month - 1, day));
+    });
+    return dates;
+  }, [appointmentDates]);
 
   const hasConfirmedDatesList = React.useMemo(() => {
-    const dates: Date[] = []
+    const dates: Date[] = [];
     appointmentDates.forEach((count, dateStr) => {
       if (count.hasConfirmed) {
-        const [year, month, day] = dateStr.split('-').map(Number)
-        dates.push(new Date(year, month - 1, day))
+        const [year, month, day] = dateStr.split("-").map(Number);
+        dates.push(new Date(year, month - 1, day));
       }
-    })
-    return dates
-  }, [appointmentDates])
+    });
+    return dates;
+  }, [appointmentDates]);
 
   const handleDateSelect = (date: Date | undefined) => {
     // Only trigger onDateSelect if the date has appointments
-    if (date && appointmentDates.has(format(date, 'yyyy-MM-dd'))) {
-      onDateSelect?.(date)
+    if (date && appointmentDates.has(format(date, "yyyy-MM-dd"))) {
+      onDateSelect?.(date);
     } else {
-      onDateSelect?.(undefined)
+      onDateSelect?.(undefined);
     }
-  }
+  };
 
   return (
     <Card>
@@ -125,12 +127,13 @@ export function DashboardCalendar({ onDateSelect, selectedDate }: DashboardCalen
                 hasConfirmed: hasConfirmedDatesList,
               }}
               modifiersClassNames={{
-                hasAppointments: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full cursor-pointer",
+                hasAppointments:
+                  "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full cursor-pointer",
                 hasConfirmed: "after:!bg-green-600",
               }}
               disabled={() => {
                 // Optionally disable dates without appointments
-                return false // Keep all dates clickable for now
+                return false; // Keep all dates clickable for now
               }}
               className="rounded-md border-0 w-full p-3"
               classNames={{
@@ -147,7 +150,8 @@ export function DashboardCalendar({ onDateSelect, selectedDate }: DashboardCalen
                 row: "flex w-full mt-2",
                 cell: "relative text-center text-sm flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                 day: "h-10 w-10 mx-auto p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md inline-flex items-center justify-center",
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                day_selected:
+                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                 day_today: "bg-accent text-accent-foreground",
                 day_outside: "text-muted-foreground opacity-50",
                 day_disabled: "text-muted-foreground opacity-50",
@@ -163,10 +167,11 @@ export function DashboardCalendar({ onDateSelect, selectedDate }: DashboardCalen
                 <div className="w-2 h-2 rounded-full bg-green-600" />
                 <span className="text-muted-foreground">Has confirmed appointments</span>
               </div>
-              {selectedDate && appointmentDates.has(format(selectedDate, 'yyyy-MM-dd')) && (
+              {selectedDate && appointmentDates.has(format(selectedDate, "yyyy-MM-dd")) && (
                 <div className="flex items-center gap-2 text-xs pt-1">
                   <Badge variant="secondary" className="text-xs">
-                    {appointmentDates.get(format(selectedDate, 'yyyy-MM-dd'))?.count || 0} appointments on {format(selectedDate, 'MMM d')}
+                    {appointmentDates.get(format(selectedDate, "yyyy-MM-dd"))?.count || 0}{" "}
+                    appointments on {format(selectedDate, "MMM d")}
                   </Badge>
                 </div>
               )}
@@ -175,5 +180,5 @@ export function DashboardCalendar({ onDateSelect, selectedDate }: DashboardCalen
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

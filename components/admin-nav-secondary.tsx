@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { LucideIcon } from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -11,17 +11,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function AdminNavSecondary({
   items,
   ...props
 }: {
   items: {
-    title: string
-    url: string
-    icon: LucideIcon
-  }[]
+    title: string;
+    url: string;
+    icon: LucideIcon;
+  }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup {...props}>
@@ -41,5 +41,5 @@ export function AdminNavSecondary({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

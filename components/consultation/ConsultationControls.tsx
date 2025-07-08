@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { PhoneOff, FileText, User, Mic, MicOff, Video, VideoOff } from 'lucide-react'
-import { useState } from 'react'
+import { Button } from "@/components/ui/button";
+import { PhoneOff, FileText, User, Mic, MicOff, Video, VideoOff } from "lucide-react";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,33 +12,33 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface ConsultationControlsProps {
-  onEndCall: () => void
-  onToggleNotes: () => void
-  onToggleClientInfo: () => void
-  isAdmin: boolean
+  onEndCall: () => void;
+  onToggleNotes: () => void;
+  onToggleClientInfo: () => void;
+  isAdmin: boolean;
 }
 
 export function ConsultationControls({
   onEndCall,
   onToggleNotes,
   onToggleClientInfo,
-  isAdmin
+  isAdmin,
 }: ConsultationControlsProps) {
-  const [showEndDialog, setShowEndDialog] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [isVideoOff, setIsVideoOff] = useState(false)
+  const [showEndDialog, setShowEndDialog] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
 
   const handleEndCall = () => {
-    setShowEndDialog(true)
-  }
+    setShowEndDialog(true);
+  };
 
   const confirmEndCall = () => {
-    setShowEndDialog(false)
-    onEndCall()
-  }
+    setShowEndDialog(false);
+    onEndCall();
+  };
 
   return (
     <>
@@ -53,9 +53,9 @@ export function ConsultationControls({
               className="h-8 sm:h-9 px-2 sm:px-3"
             >
               {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              <span className="hidden sm:inline ml-1">{isMuted ? 'Unmute' : 'Mute'}</span>
+              <span className="hidden sm:inline ml-1">{isMuted ? "Unmute" : "Mute"}</span>
             </Button>
-            
+
             <Button
               size="sm"
               variant={isVideoOff ? "destructive" : "secondary"}
@@ -63,7 +63,9 @@ export function ConsultationControls({
               className="h-8 sm:h-9 px-2 sm:px-3"
             >
               {isVideoOff ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
-              <span className="hidden sm:inline ml-1">{isVideoOff ? 'Start Video' : 'Stop Video'}</span>
+              <span className="hidden sm:inline ml-1">
+                {isVideoOff ? "Start Video" : "Stop Video"}
+              </span>
             </Button>
           </div>
 
@@ -79,7 +81,7 @@ export function ConsultationControls({
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline ml-1">Client Info</span>
               </Button>
-              
+
               <Button
                 size="sm"
                 variant="outline"
@@ -113,17 +115,21 @@ export function ConsultationControls({
           <AlertDialogHeader>
             <AlertDialogTitle>End Consultation?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to end this consultation? Make sure you have saved any important notes.
+              Are you sure you want to end this consultation? Make sure you have saved any important
+              notes.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmEndCall} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={confirmEndCall}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               End Consultation
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

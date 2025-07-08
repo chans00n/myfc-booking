@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { AdminSiteHeader } from "@/components/admin-site-header"
-import { IntakeFormManager } from '@/components/admin/IntakeFormManager'
+import { AdminSiteHeader } from "@/components/admin-site-header";
+import { IntakeFormManager } from "@/components/admin/IntakeFormManager";
 
 export default function IntakeFormsPage() {
   return (
@@ -15,5 +15,5 @@ export default function IntakeFormsPage() {
         </div>
       </div>
     </>
-  )
+  );
 }

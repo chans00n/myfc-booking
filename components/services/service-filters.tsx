@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Slider } from '@/components/ui/slider'
-import { formatPrice } from '@/lib/services/schemas'
-import { Filter, X } from 'lucide-react'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { formatPrice } from "@/lib/services/schemas";
+import { Filter, X } from "lucide-react";
 
 interface ServiceFiltersProps {
   onFilter: (filters: {
-    minPrice?: number
-    maxPrice?: number
-    minDuration?: number
-    maxDuration?: number
-  }) => void
-  onReset: () => void
+    minPrice?: number;
+    maxPrice?: number;
+    minDuration?: number;
+    maxDuration?: number;
+  }) => void;
+  onReset: () => void;
 }
 
 export function ServiceFilters({ onFilter, onReset }: ServiceFiltersProps) {
-  const [showFilters, setShowFilters] = useState(false)
-  const [priceRange, setPriceRange] = useState([0, 200])
-  const [durationRange, setDurationRange] = useState([15, 180])
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [durationRange, setDurationRange] = useState([15, 180]);
 
   const handleApplyFilters = () => {
     onFilter({
@@ -30,14 +30,14 @@ export function ServiceFilters({ onFilter, onReset }: ServiceFiltersProps) {
       maxPrice: priceRange[1] * 100,
       minDuration: durationRange[0],
       maxDuration: durationRange[1],
-    })
-  }
+    });
+  };
 
   const handleReset = () => {
-    setPriceRange([0, 200])
-    setDurationRange([15, 180])
-    onReset()
-  }
+    setPriceRange([0, 200]);
+    setDurationRange([15, 180]);
+    onReset();
+  };
 
   return (
     <div className="mb-4 sm:mb-6">
@@ -47,7 +47,7 @@ export function ServiceFilters({ onFilter, onReset }: ServiceFiltersProps) {
         className="mb-3 sm:mb-4 h-12 sm:h-10 text-base sm:text-sm touch-manipulation"
       >
         <Filter className="mr-2 h-4 w-4" />
-        {showFilters ? 'Hide Filters' : 'Show Filters'}
+        {showFilters ? "Hide Filters" : "Show Filters"}
       </Button>
 
       {showFilters && (
@@ -85,14 +85,14 @@ export function ServiceFilters({ onFilter, onReset }: ServiceFiltersProps) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              <Button 
+              <Button
                 onClick={handleApplyFilters}
                 className="h-12 sm:h-10 text-base sm:text-sm touch-manipulation flex-1 sm:flex-initial"
               >
                 Apply Filters
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleReset}
                 className="h-12 sm:h-10 text-base sm:text-sm touch-manipulation"
               >
@@ -104,5 +104,5 @@ export function ServiceFilters({ onFilter, onReset }: ServiceFiltersProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }

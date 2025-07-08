@@ -1,40 +1,43 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import Link from 'next/link'
-import { Video, Calendar, Clock, ExternalLink } from 'lucide-react'
-import { format } from 'date-fns'
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
+import { Video, Calendar, Clock, ExternalLink } from "lucide-react";
+import { format } from "date-fns";
 
 export default function TestConsultationPage() {
-  const [consultations, setConsultations] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [consultations, setConsultations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchConsultations()
-  }, [])
+    fetchConsultations();
+  }, []);
 
   const fetchConsultations = async () => {
     try {
-      const supabase = createClient()
-      
+      const supabase = createClient();
+
       // First check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser()
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
-        setError('Please log in to view consultations')
-        setLoading(false)
-        return
+        setError("Please log in to view consultations");
+        setLoading(false);
+        return;
       }
 
       // Fetch consultations with appointment details
       const { data, error: fetchError } = await supabase
-        .from('consultations')
-        .select(`
+        .from("consultations")
+        .select(
+          `
           *,
           appointments!inner(
             appointment_date,
@@ -47,39 +50,42 @@ export default function TestConsultationPage() {
             email,
             phone
           )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10)
+        `
+        )
+        .order("created_at", { ascending: false })
+        .limit(10);
 
       if (fetchError) {
-        console.error('Error fetching consultations:', fetchError)
-        setError('Failed to load consultations')
+        console.error("Error fetching consultations:", fetchError);
+        setError("Failed to load consultations");
       } else {
-        setConsultations(data || [])
+        setConsultations(data || []);
       }
     } catch (err) {
-      console.error('Error:', err)
-      setError('An error occurred')
+      console.error("Error:", err);
+      setError("An error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      scheduled: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-      no_show: 'bg-gray-100 text-gray-800'
-    }
-    
+      scheduled: "bg-blue-100 text-blue-800",
+      in_progress: "bg-yellow-100 text-yellow-800",
+      completed: "bg-green-100 text-green-800",
+      cancelled: "bg-red-100 text-red-800",
+      no_show: "bg-gray-100 text-gray-800",
+    };
+
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'}`}>
-        {status.replace('_', ' ')}
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800"}`}
+      >
+        {status.replace("_", " ")}
       </span>
-    )
-  }
+    );
+  };
 
   if (loading) {
     return (
@@ -89,7 +95,7 @@ export default function TestConsultationPage() {
           <p>Loading consultations...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -140,31 +146,35 @@ export default function TestConsultationPage() {
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span>
-                        {consultation.appointments?.appointment_date ? (
-                          (() => {
-                            try {
-                              const date = new Date(consultation.appointments.appointment_date)
-                              return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'EEEE, MMMM d, yyyy')
-                            } catch (e) {
-                              return 'Invalid date'
-                            }
-                          })()
-                        ) : 'No date'}
+                        {consultation.appointments?.appointment_date
+                          ? (() => {
+                              try {
+                                const date = new Date(consultation.appointments.appointment_date);
+                                return isNaN(date.getTime())
+                                  ? "Invalid date"
+                                  : format(date, "EEEE, MMMM d, yyyy");
+                              } catch (e) {
+                                return "Invalid date";
+                              }
+                            })()
+                          : "No date"}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span>
-                        {consultation.appointments?.start_time ? (
-                          (() => {
-                            try {
-                              const date = new Date(consultation.appointments.start_time)
-                              return isNaN(date.getTime()) ? 'Invalid time' : format(date, 'h:mm a')
-                            } catch (e) {
-                              return 'Invalid time'
-                            }
-                          })()
-                        ) : 'No time'}
+                        {consultation.appointments?.start_time
+                          ? (() => {
+                              try {
+                                const date = new Date(consultation.appointments.start_time);
+                                return isNaN(date.getTime())
+                                  ? "Invalid time"
+                                  : format(date, "h:mm a");
+                              } catch (e) {
+                                return "Invalid time";
+                              }
+                            })()
+                          : "No time"}
                       </span>
                     </div>
                   </div>
@@ -195,7 +205,7 @@ export default function TestConsultationPage() {
                         Enter Consultation Room
                       </Link>
                     </Button>
-                    {consultation.consultation_status === 'scheduled' && (
+                    {consultation.consultation_status === "scheduled" && (
                       <Button variant="outline" asChild>
                         <Link href={`/consultation/${consultation.id}?role=admin`}>
                           Enter as Therapist
@@ -221,5 +231,5 @@ export default function TestConsultationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

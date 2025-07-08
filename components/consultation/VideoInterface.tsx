@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
-import { Card } from '@/components/ui/card'
-import { Phone } from 'lucide-react'
+import { useEffect, useRef } from "react";
+import { Card } from "@/components/ui/card";
+import { Phone } from "lucide-react";
 
 interface VideoInterfaceProps {
-  roomUrl: string
-  token: string
-  isVideo: boolean
+  roomUrl: string;
+  token: string;
+  isVideo: boolean;
 }
 
 export function VideoInterface({ roomUrl, token, isVideo }: VideoInterfaceProps) {
-  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     // Add the token to the room URL
     if (iframeRef.current && roomUrl && token) {
-      const urlWithToken = `${roomUrl}?t=${token}`
-      iframeRef.current.src = urlWithToken
+      const urlWithToken = `${roomUrl}?t=${token}`;
+      iframeRef.current.src = urlWithToken;
     }
-  }, [roomUrl, token])
+  }, [roomUrl, token]);
 
   if (!isVideo) {
     return (
@@ -32,7 +32,7 @@ export function VideoInterface({ roomUrl, token, isVideo }: VideoInterfaceProps)
           </p>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -42,32 +42,32 @@ export function VideoInterface({ roomUrl, token, isVideo }: VideoInterfaceProps)
         className="w-full h-full"
         allow="camera; microphone; fullscreen; display-capture; autoplay"
         style={{
-          border: 'none',
-          backgroundColor: '#000',
-          position: 'absolute',
+          border: "none",
+          backgroundColor: "#000",
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0
+          bottom: 0,
         }}
       />
-      
+
       {/* Daily.co Branding Override */}
       <style jsx global>{`
         /* Hide Daily.co branding elements */
         .daily-video-call iframe {
           border: none !important;
         }
-        
+
         /* Custom styling for Daily.co UI */
         .daily-prejoin-ui {
           background-color: var(--background) !important;
         }
-        
+
         .daily-video-container {
           background-color: #000 !important;
         }
       `}</style>
     </div>
-  )
+  );
 }

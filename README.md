@@ -47,28 +47,33 @@ A professional massage therapy booking and management system built with Next.js 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <your-repo-url>
 cd massage-booking
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Update the `.env` file with your configuration:
+
 - Database connection string
 - Authentication secrets
 - Email service credentials
 - Optional: Payment gateway and other integrations
 
 5. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -119,11 +124,13 @@ The application can be deployed to any platform that supports Next.js applicatio
 For production deployment:
 
 1. Build the application:
+
 ```bash
 npm run build
 ```
 
 2. Start the production server:
+
 ```bash
 npm run start
 ```

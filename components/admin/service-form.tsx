@@ -1,28 +1,33 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { serviceSchema, type ServiceFormData, parsePriceInput, formatPrice } from '@/lib/services/schemas'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  serviceSchema,
+  type ServiceFormData,
+  parsePriceInput,
+  formatPrice,
+} from "@/lib/services/schemas";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
-import type { Service } from '@/types'
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
+import type { Service } from "@/types";
 
 interface ServiceFormProps {
-  service?: Service
-  onSubmit: (data: ServiceFormData) => Promise<void>
-  onCancel: () => void
-  loading?: boolean
+  service?: Service;
+  onSubmit: (data: ServiceFormData) => Promise<void>;
+  onCancel: () => void;
+  loading?: boolean;
 }
 
 export function ServiceForm({ service, onSubmit, onCancel, loading = false }: ServiceFormProps) {
@@ -34,39 +39,34 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
     setValue,
   } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
-    defaultValues: service ? {
-      name: service.name,
-      description: service.description || '',
-      duration_minutes: service.duration_minutes,
-      price_cents: service.price_cents,
-      is_active: service.is_active,
-    } : {
-      is_active: true,
-      duration_minutes: 60,
-      price_cents: 8000,
-    },
-  })
+    defaultValues: service
+      ? {
+          name: service.name,
+          description: service.description || "",
+          duration_minutes: service.duration_minutes,
+          price_cents: service.price_cents,
+          is_active: service.is_active,
+        }
+      : {
+          is_active: true,
+          duration_minutes: 60,
+          price_cents: 8000,
+        },
+  });
 
-  const isActive = watch('is_active')
+  const isActive = watch("is_active");
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cents = parsePriceInput(e.target.value)
-    setValue('price_cents', cents)
-  }
+    const cents = parsePriceInput(e.target.value);
+    setValue("price_cents", cents);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="name">Service Name</Label>
-        <Input
-          id="name"
-          placeholder="Swedish Massage"
-          {...register('name')}
-          disabled={loading}
-        />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
-        )}
+        <Input id="name" placeholder="Swedish Massage" {...register("name")} disabled={loading} />
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -75,7 +75,7 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
           id="description"
           placeholder="A relaxing full-body massage using long strokes..."
           rows={4}
-          {...register('description')}
+          {...register("description")}
           disabled={loading}
         />
         {errors.description && (
@@ -87,8 +87,8 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
         <div className="space-y-2">
           <Label htmlFor="duration">Duration</Label>
           <Select
-            value={watch('duration_minutes')?.toString()}
-            onValueChange={(value) => setValue('duration_minutes', parseInt(value))}
+            value={watch("duration_minutes")?.toString()}
+            onValueChange={(value) => setValue("duration_minutes", parseInt(value))}
             disabled={loading}
           >
             <SelectTrigger>
@@ -118,7 +118,7 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
             id="price"
             type="text"
             placeholder="$80.00"
-            defaultValue={service ? formatPrice(service.price_cents).replace('$', '') : '80.00'}
+            defaultValue={service ? formatPrice(service.price_cents).replace("$", "") : "80.00"}
             onChange={handlePriceChange}
             disabled={loading}
           />
@@ -132,7 +132,7 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
         <Switch
           id="is_active"
           checked={isActive}
-          onCheckedChange={(checked) => setValue('is_active', checked)}
+          onCheckedChange={(checked) => setValue("is_active", checked)}
           disabled={loading}
         />
         <Label htmlFor="is_active" className="cursor-pointer">
@@ -145,16 +145,24 @@ export function ServiceForm({ service, onSubmit, onCancel, loading = false }: Se
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {service ? 'Updating...' : 'Creating...'}
+              {service ? "Updating..." : "Creating..."}
             </>
+          ) : service ? (
+            "Update Service"
           ) : (
-            service ? 'Update Service' : 'Create Service'
+            "Create Service"
           )}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={loading} className="w-full sm:w-auto">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={loading}
+          className="w-full sm:w-auto"
+        >
           Cancel
         </Button>
       </div>
     </form>
-  )
+  );
 }

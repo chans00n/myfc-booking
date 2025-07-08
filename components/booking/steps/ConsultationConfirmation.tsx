@@ -1,139 +1,151 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useBooking } from '@/contexts/BookingContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Separator } from '@/components/ui/separator'
-import { CheckCircle, Calendar, Clock, Phone, Video, MapPin, Copy, ExternalLink } from 'lucide-react'
-import { format } from 'date-fns'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useBooking } from "@/contexts/BookingContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import {
+  CheckCircle,
+  Calendar,
+  Clock,
+  Phone,
+  Video,
+  MapPin,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
+import { format } from "date-fns";
 // Removed Daily.co import - will use API route instead
-import { createClient } from '@/lib/supabase/client'
-import { createConsultationAppointment } from '@/lib/consultations'
-import { toast } from 'sonner'
+import { createClient } from "@/lib/supabase/client";
+import { createConsultationAppointment } from "@/lib/consultations";
+import { toast } from "sonner";
 
 export function ConsultationConfirmation() {
-  const router = useRouter()
-  const { bookingData, resetBooking } = useBooking()
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [consultationDetails, setConsultationDetails] = useState<any>(null)
-  const [videoDetails, setVideoDetails] = useState<any>(null)
-  const [isCreating, setIsCreating] = useState(false)
+  const router = useRouter();
+  const { bookingData, resetBooking } = useBooking();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [consultationDetails, setConsultationDetails] = useState<any>(null);
+  const [videoDetails, setVideoDetails] = useState<any>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     // Prevent duplicate calls in development (React StrictMode)
-    let mounted = true
-    
+    let mounted = true;
+
     if (bookingData.service && bookingData.date && bookingData.timeSlot && !consultationDetails) {
       if (mounted) {
-        createConsultationBooking()
+        createConsultationBooking();
       }
     }
-    
+
     return () => {
-      mounted = false
-    }
-  }, [])
+      mounted = false;
+    };
+  }, []);
 
   const createConsultationBooking = async () => {
     // Prevent multiple simultaneous calls
-    if (isCreating) return
-    
-    setIsCreating(true)
-    setLoading(true)
-    setError('')
+    if (isCreating) return;
+
+    setIsCreating(true);
+    setLoading(true);
+    setError("");
 
     try {
-      const supabase = createClient()
-      
+      const supabase = createClient();
+
       // For guest users, we need to create a profile first
       let clientId = user?.id;
-      
+
       if (!clientId && bookingData.isGuest) {
         // Create a guest profile first
         const { data: newProfile, error: profileError } = await supabase
-          .from('profiles')
+          .from("profiles")
           .insert({
             email: bookingData.clientInfo!.email,
             first_name: bookingData.clientInfo!.firstName,
             last_name: bookingData.clientInfo!.lastName,
             phone: bookingData.clientInfo!.phone,
-            role: 'client'
+            role: "client",
           })
           .select()
-          .single()
-          
+          .single();
+
         if (profileError) {
-          console.error('Error creating guest profile:', profileError)
-          throw new Error('Failed to create guest profile: ' + profileError.message)
+          console.error("Error creating guest profile:", profileError);
+          throw new Error("Failed to create guest profile: " + profileError.message);
         }
-        
-        clientId = newProfile.id
+
+        clientId = newProfile.id;
       }
-      
+
       if (!clientId) {
-        throw new Error('No client ID available. Please log in or provide guest information.')
+        throw new Error("No client ID available. Please log in or provide guest information.");
       }
-      
-      console.log('Creating consultation appointment with:', {
+
+      console.log("Creating consultation appointment with:", {
         clientId,
         date: bookingData.date,
         time: bookingData.timeSlot!.start,
         type: bookingData.consultationType,
-        fullBookingData: bookingData
-      })
-      
+        fullBookingData: bookingData,
+      });
+
       if (!bookingData.consultationType) {
-        throw new Error('Consultation type is missing from booking data')
+        throw new Error("Consultation type is missing from booking data");
       }
-      
+
       // Create the consultation appointment
-      const { appointmentId, consultationId, appointment, consultation } = await createConsultationAppointment({
-        clientId,
-        appointmentDate: bookingData.date!,
-        startTime: bookingData.timeSlot!.start,
-        consultationType: bookingData.consultationType!,
-        notes: `Consultation intake submitted. Primary concerns: ${bookingData.consultationIntake?.primaryConcerns}`,
-        consultationIntake: bookingData.consultationIntake
-      })
+      const { appointmentId, consultationId, appointment, consultation } =
+        await createConsultationAppointment({
+          clientId,
+          appointmentDate: bookingData.date!,
+          startTime: bookingData.timeSlot!.start,
+          consultationType: bookingData.consultationType!,
+          notes: `Consultation intake submitted. Primary concerns: ${bookingData.consultationIntake?.primaryConcerns}`,
+          consultationIntake: bookingData.consultationIntake,
+        });
 
       setConsultationDetails({
         appointmentId,
         consultationId,
-        ...consultation
-      })
+        ...consultation,
+      });
 
       // If video consultation, set up Daily.co room via API route
-      if (bookingData.consultationType === 'video') {
+      if (bookingData.consultationType === "video") {
         try {
-          const response = await fetch('/api/consultations/create-room', {
-            method: 'POST',
+          const response = await fetch("/api/consultations/create-room", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               consultationId,
               clientName: `${bookingData.clientInfo?.firstName} ${bookingData.clientInfo?.lastName}`,
-              therapistName: 'Therapist'
-            })
-          })
+              therapistName: "Therapist",
+            }),
+          });
 
           if (!response.ok) {
-            const error = await response.json()
-            throw new Error(error.error || 'Failed to create video room')
+            const error = await response.json();
+            throw new Error(error.error || "Failed to create video room");
           }
 
-          const videoSetup = await response.json()
-          setVideoDetails(videoSetup)
+          const videoSetup = await response.json();
+          setVideoDetails(videoSetup);
         } catch (videoError: any) {
-          console.error('Failed to set up video room:', videoError)
+          console.error("Failed to set up video room:", videoError);
           // Continue without video - the consultation is still booked
-          toast.warning('Video room setup failed. You will receive alternative meeting instructions via email.')
+          toast.warning(
+            "Video room setup failed. You will receive alternative meeting instructions via email."
+          );
         }
       }
 
@@ -141,39 +153,38 @@ export function ConsultationConfirmation() {
       if (bookingData.consultationIntake) {
         // First create the form, then update submitted_at to avoid constraint issues
         const { data: intakeForm, error: intakeError } = await supabase
-          .from('intake_forms')
+          .from("intake_forms")
           .insert({
             client_id: clientId,
             appointment_id: appointmentId,
-            form_category: 'consultation',
-            status: 'completed',
+            form_category: "consultation",
+            status: "completed",
             primary_concerns: bookingData.consultationIntake.primaryConcerns,
             massage_goals: bookingData.consultationIntake.massageGoals,
             previous_massage_therapy: bookingData.consultationIntake.previousMassageExperience,
             preferred_contact_method: bookingData.consultationType,
-            best_time_to_call: bookingData.consultationIntake.bestTimeToCall
+            best_time_to_call: bookingData.consultationIntake.bestTimeToCall,
           })
           .select()
-          .single()
-          
+          .single();
+
         if (intakeError) {
-          console.error('Error creating intake form:', intakeError)
+          console.error("Error creating intake form:", intakeError);
           // Don't throw - the consultation is still booked
         } else if (intakeForm) {
           // Update submitted_at separately to ensure it's after created_at
           const { error: updateError } = await supabase
-            .from('intake_forms')
+            .from("intake_forms")
             .update({ submitted_at: new Date().toISOString() })
-            .eq('id', intakeForm.id)
-            
+            .eq("id", intakeForm.id);
+
           if (updateError) {
-            console.error('Error updating intake form submission time:', updateError)
+            console.error("Error updating intake form submission time:", updateError);
           }
         }
       }
-
     } catch (err: any) {
-      console.error('Error creating consultation:', {
+      console.error("Error creating consultation:", {
         error: err,
         message: err.message,
         details: err.details,
@@ -183,42 +194,46 @@ export function ConsultationConfirmation() {
           date: bookingData.date,
           timeSlot: bookingData.timeSlot,
           consultationType: bookingData.consultationType,
-          clientInfo: bookingData.clientInfo
-        }
-      })
-      setError(err.message || 'Failed to create consultation booking')
+          clientInfo: bookingData.clientInfo,
+        },
+      });
+      setError(err.message || "Failed to create consultation booking");
     } finally {
-      setLoading(false)
-      setIsCreating(false)
+      setLoading(false);
+      setIsCreating(false);
     }
-  }
+  };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success('Copied to clipboard!')
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
 
   const getConsultationIcon = () => {
     switch (bookingData.consultationType) {
-      case 'phone': return <Phone className="h-5 w-5" />
-      case 'video': return <Video className="h-5 w-5" />
-      case 'in_person': return <MapPin className="h-5 w-5" />
-      default: return null
+      case "phone":
+        return <Phone className="h-5 w-5" />;
+      case "video":
+        return <Video className="h-5 w-5" />;
+      case "in_person":
+        return <MapPin className="h-5 w-5" />;
+      default:
+        return null;
     }
-  }
+  };
 
   const getConsultationInstructions = () => {
     switch (bookingData.consultationType) {
-      case 'phone':
-        return "We'll call you at the scheduled time on the phone number you provided."
-      case 'video':
-        return "Click the video link below at your appointment time to join the consultation."
-      case 'in_person':
-        return "Please arrive 5 minutes early to our clinic for your consultation."
+      case "phone":
+        return "We'll call you at the scheduled time on the phone number you provided.";
+      case "video":
+        return "Click the video link below at your appointment time to join the consultation.";
+      case "in_person":
+        return "Please arrive 5 minutes early to our clinic for your consultation.";
       default:
-        return ""
+        return "";
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -226,7 +241,7 @@ export function ConsultationConfirmation() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
         <p className="text-muted-foreground">Creating your consultation booking...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -234,7 +249,7 @@ export function ConsultationConfirmation() {
       <Alert variant="destructive">
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -255,9 +270,9 @@ export function ConsultationConfirmation() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {getConsultationIcon()}
-            {bookingData.consultationType === 'phone' && 'Phone Consultation'}
-            {bookingData.consultationType === 'video' && 'Video Consultation'}
-            {bookingData.consultationType === 'in_person' && 'In-Person Consultation'}
+            {bookingData.consultationType === "phone" && "Phone Consultation"}
+            {bookingData.consultationType === "video" && "Video Consultation"}
+            {bookingData.consultationType === "in_person" && "In-Person Consultation"}
           </CardTitle>
           <CardDescription>{getConsultationInstructions()}</CardDescription>
         </CardHeader>
@@ -268,17 +283,18 @@ export function ConsultationConfirmation() {
               <div>
                 <p className="text-sm text-muted-foreground">Date</p>
                 <p className="font-medium">
-                  {bookingData.date && format(bookingData.date, 'EEEE, MMMM d, yyyy')}
+                  {bookingData.date && format(bookingData.date, "EEEE, MMMM d, yyyy")}
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">Time</p>
                 <p className="font-medium">
-                  {bookingData.timeSlot && format(bookingData.timeSlot.start, 'h:mm a')} (30 minutes)
+                  {bookingData.timeSlot && format(bookingData.timeSlot.start, "h:mm a")} (30
+                  minutes)
                 </p>
               </div>
             </div>
@@ -287,7 +303,7 @@ export function ConsultationConfirmation() {
           <Separator />
 
           {/* Video consultation details */}
-          {bookingData.consultationType === 'video' && videoDetails && (
+          {bookingData.consultationType === "video" && videoDetails && (
             <div className="space-y-3">
               <h4 className="font-medium">Video Meeting Details</h4>
               <div className="bg-muted/50 rounded-lg p-4 space-y-3">
@@ -307,7 +323,7 @@ export function ConsultationConfirmation() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => window.open(videoDetails.roomUrl, '_blank')}
+                      onClick={() => window.open(videoDetails.roomUrl, "_blank")}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -315,8 +331,8 @@ export function ConsultationConfirmation() {
                 </div>
                 <Alert>
                   <AlertDescription className="text-sm">
-                    The video room will be available 5 minutes before your scheduled time. 
-                    Make sure you have a stable internet connection and your camera/microphone are working.
+                    The video room will be available 5 minutes before your scheduled time. Make sure
+                    you have a stable internet connection and your camera/microphone are working.
                   </AlertDescription>
                 </Alert>
               </div>
@@ -324,12 +340,13 @@ export function ConsultationConfirmation() {
           )}
 
           {/* Phone consultation details */}
-          {bookingData.consultationType === 'phone' && (
+          {bookingData.consultationType === "phone" && (
             <div className="space-y-3">
               <h4 className="font-medium">Phone Call Details</h4>
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-sm">
-                  We'll call you at <strong>{bookingData.clientInfo?.phone}</strong> at the scheduled time.
+                  We'll call you at <strong>{bookingData.clientInfo?.phone}</strong> at the
+                  scheduled time.
                 </p>
                 {bookingData.consultationIntake?.bestTimeToCall && (
                   <p className="text-sm text-muted-foreground mt-2">
@@ -341,21 +358,23 @@ export function ConsultationConfirmation() {
           )}
 
           {/* In-person consultation details */}
-          {bookingData.consultationType === 'in_person' && (
+          {bookingData.consultationType === "in_person" && (
             <div className="space-y-3">
               <h4 className="font-medium">Location Details</h4>
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-sm font-medium">SOZA Massage Therapy</p>
                 <p className="text-sm text-muted-foreground">
-                  123 Wellness Street<br />
-                  Suite 100<br />
+                  123 Wellness Street
+                  <br />
+                  Suite 100
+                  <br />
                   Your City, ST 12345
                 </p>
                 <Button
                   size="sm"
                   variant="outline"
                   className="mt-3"
-                  onClick={() => window.open('https://maps.google.com', '_blank')}
+                  onClick={() => window.open("https://maps.google.com", "_blank")}
                 >
                   <MapPin className="h-4 w-4 mr-2" />
                   Get Directions
@@ -397,8 +416,8 @@ export function ConsultationConfirmation() {
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           onClick={() => {
-            resetBooking()
-            router.push('/dashboard')
+            resetBooking();
+            router.push("/dashboard");
           }}
           className="flex-1"
         >
@@ -407,8 +426,8 @@ export function ConsultationConfirmation() {
         <Button
           variant="outline"
           onClick={() => {
-            resetBooking()
-            router.push('/booking')
+            resetBooking();
+            router.push("/booking");
           }}
           className="flex-1"
         >
@@ -419,10 +438,10 @@ export function ConsultationConfirmation() {
       {/* Confirmation email notice */}
       <Alert>
         <AlertDescription>
-          A confirmation email has been sent to <strong>{bookingData.clientInfo?.email}</strong> with 
-          all the details of your consultation.
+          A confirmation email has been sent to <strong>{bookingData.clientInfo?.email}</strong>{" "}
+          with all the details of your consultation.
         </AlertDescription>
       </Alert>
     </div>
-  )
+  );
 }

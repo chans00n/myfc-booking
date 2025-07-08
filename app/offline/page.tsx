@@ -1,11 +1,11 @@
-import { WifiOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { WifiOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function OfflinePage() {
   const handleRetry = () => {
-    window.location.reload()
-  }
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -16,8 +16,8 @@ export default function OfflinePage() {
           </div>
           <CardTitle>You're Offline</CardTitle>
           <CardDescription>
-            It looks like you've lost your internet connection. 
-            Please check your connection and try again.
+            It looks like you've lost your internet connection. Please check your connection and try
+            again.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -30,5 +30,5 @@ export default function OfflinePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

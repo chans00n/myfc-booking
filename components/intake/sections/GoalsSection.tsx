@@ -1,52 +1,81 @@
-'use client'
+"use client";
 
-import { UseFormReturn } from 'react-hook-form'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import type { IntakeFormData } from '@/types/intake-forms'
+import { UseFormReturn } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { IntakeFormData } from "@/types/intake-forms";
 
 interface GoalsSectionProps {
-  form: UseFormReturn<IntakeFormData>
+  form: UseFormReturn<IntakeFormData>;
 }
 
 const TREATMENT_GOALS = [
-  { id: 'pain-relief', label: 'Pain relief', description: 'Reduce chronic or acute pain' },
-  { id: 'stress-reduction', label: 'Stress reduction', description: 'Relax and reduce stress levels' },
-  { id: 'improved-mobility', label: 'Improved mobility', description: 'Increase range of motion and flexibility' },
-  { id: 'injury-recovery', label: 'Injury recovery', description: 'Support healing from injury' },
-  { id: 'athletic-performance', label: 'Athletic performance', description: 'Enhance sports performance and recovery' },
-  { id: 'better-sleep', label: 'Better sleep', description: 'Improve sleep quality' },
-  { id: 'general-wellness', label: 'General wellness', description: 'Maintain overall health and wellbeing' },
-  { id: 'prenatal-support', label: 'Prenatal support', description: 'Support during pregnancy' },
-  { id: 'posture-improvement', label: 'Posture improvement', description: 'Correct postural imbalances' },
-  { id: 'headache-relief', label: 'Headache relief', description: 'Reduce frequency or intensity of headaches' }
-]
+  { id: "pain-relief", label: "Pain relief", description: "Reduce chronic or acute pain" },
+  {
+    id: "stress-reduction",
+    label: "Stress reduction",
+    description: "Relax and reduce stress levels",
+  },
+  {
+    id: "improved-mobility",
+    label: "Improved mobility",
+    description: "Increase range of motion and flexibility",
+  },
+  { id: "injury-recovery", label: "Injury recovery", description: "Support healing from injury" },
+  {
+    id: "athletic-performance",
+    label: "Athletic performance",
+    description: "Enhance sports performance and recovery",
+  },
+  { id: "better-sleep", label: "Better sleep", description: "Improve sleep quality" },
+  {
+    id: "general-wellness",
+    label: "General wellness",
+    description: "Maintain overall health and wellbeing",
+  },
+  { id: "prenatal-support", label: "Prenatal support", description: "Support during pregnancy" },
+  {
+    id: "posture-improvement",
+    label: "Posture improvement",
+    description: "Correct postural imbalances",
+  },
+  {
+    id: "headache-relief",
+    label: "Headache relief",
+    description: "Reduce frequency or intensity of headaches",
+  },
+];
 
 export function GoalsSection({ form }: GoalsSectionProps) {
-  const { register, watch, setValue, formState: { errors } } = form
-  const treatmentGoals = watch('treatmentGoals') || ''
-  const specificConcerns = watch('specificConcerns') || ''
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
+  const treatmentGoals = watch("treatmentGoals") || "";
+  const specificConcerns = watch("specificConcerns") || "";
 
-  const selectedGoals = treatmentGoals.split(',').filter(g => g.trim())
+  const selectedGoals = treatmentGoals.split(",").filter((g) => g.trim());
 
   const toggleGoal = (goalId: string, goalLabel: string) => {
-    const goals = selectedGoals.filter(g => g.trim())
-    const goalIndex = goals.findIndex(g => g.includes(goalLabel))
-    
+    const goals = selectedGoals.filter((g) => g.trim());
+    const goalIndex = goals.findIndex((g) => g.includes(goalLabel));
+
     if (goalIndex > -1) {
-      goals.splice(goalIndex, 1)
+      goals.splice(goalIndex, 1);
     } else {
-      goals.push(goalLabel)
+      goals.push(goalLabel);
     }
-    
-    setValue('treatmentGoals', goals.join(', '))
-  }
+
+    setValue("treatmentGoals", goals.join(", "));
+  };
 
   const isGoalSelected = (goalLabel: string) => {
-    return selectedGoals.some(g => g.includes(goalLabel))
-  }
+    return selectedGoals.some((g) => g.includes(goalLabel));
+  };
 
   return (
     <div className="space-y-6">
@@ -69,15 +98,10 @@ export function GoalsSection({ form }: GoalsSectionProps) {
                   className="mt-1"
                 />
                 <div className="space-y-1">
-                  <Label 
-                    htmlFor={goal.id}
-                    className="text-sm font-medium cursor-pointer"
-                  >
+                  <Label htmlFor={goal.id} className="text-sm font-medium cursor-pointer">
                     {goal.label}
                   </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {goal.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{goal.description}</p>
                 </div>
               </div>
             ))}
@@ -92,7 +116,7 @@ export function GoalsSection({ form }: GoalsSectionProps) {
             <Textarea
               id="treatmentGoalsCustom"
               value={treatmentGoals}
-              onChange={(e) => setValue('treatmentGoals', e.target.value)}
+              onChange={(e) => setValue("treatmentGoals", e.target.value)}
               placeholder="Feel free to add any other goals or elaborate on your selections..."
               rows={3}
             />
@@ -110,7 +134,7 @@ export function GoalsSection({ form }: GoalsSectionProps) {
         </CardHeader>
         <CardContent>
           <Textarea
-            {...register('specificConcerns')}
+            {...register("specificConcerns")}
             placeholder="For example: 'I have tension in my shoulders from computer work' or 'I'm training for a marathon and need focus on legs'..."
             rows={4}
           />
@@ -121,9 +145,7 @@ export function GoalsSection({ form }: GoalsSectionProps) {
       <Card>
         <CardHeader>
           <CardTitle>Session Expectations</CardTitle>
-          <CardDescription>
-            Help us create the best experience for you
-          </CardDescription>
+          <CardDescription>Help us create the best experience for you</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-4">
@@ -150,5 +172,5 @@ export function GoalsSection({ form }: GoalsSectionProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

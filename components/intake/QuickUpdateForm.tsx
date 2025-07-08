@@ -1,184 +1,202 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Checkbox } from '@/components/ui/checkbox'
-import { useToast } from '@/hooks/use-toast'
-import { InfoIcon, Plus, X } from 'lucide-react'
-import { updateIntakeForm, submitIntakeForm } from '@/lib/intake-forms'
-import { DigitalSignature } from './DigitalSignature'
-import type { IntakeForm } from '@/types/intake-forms'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { InfoIcon, Plus, X } from "lucide-react";
+import { updateIntakeForm, submitIntakeForm } from "@/lib/intake-forms";
+import { DigitalSignature } from "./DigitalSignature";
+import type { IntakeForm } from "@/types/intake-forms";
 
 const quickUpdateSchema = z.object({
   // Changes since last visit
-  changesSinceLastVisit: z.string().min(1, 'Please describe any changes'),
+  changesSinceLastVisit: z.string().min(1, "Please describe any changes"),
   newInjuries: z.boolean(),
   injuryDetails: z.string().optional(),
   newMedications: z.array(z.string()).default([]),
-  
+
   // Current status
   currentPainLevel: z.number().min(0).max(10),
   currentStressLevel: z.number().min(0).max(10),
-  
+
   // Today's needs
-  todaysFocus: z.string().min(1, 'Please describe what you need today'),
+  todaysFocus: z.string().min(1, "Please describe what you need today"),
   areasOfConcern: z.array(z.string()).default([]),
-  
+
   // Consent
   confirmNoChanges: z.boolean(),
   signature: z.string().optional(),
-})
+});
 
-type QuickUpdateData = z.infer<typeof quickUpdateSchema>
+type QuickUpdateData = z.infer<typeof quickUpdateSchema>;
 
 interface QuickUpdateFormProps {
-  formId: string
-  lastIntakeForm: IntakeForm
-  onComplete?: () => void
+  formId: string;
+  lastIntakeForm: IntakeForm;
+  onComplete?: () => void;
 }
 
 const COMMON_AREAS = [
-  'Neck', 'Shoulders', 'Upper Back', 'Lower Back', 'Hips', 'Legs', 'Arms', 'Head'
-]
+  "Neck",
+  "Shoulders",
+  "Upper Back",
+  "Lower Back",
+  "Hips",
+  "Legs",
+  "Arms",
+  "Head",
+];
 
 export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpdateFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newMedication, setNewMedication] = useState('')
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newMedication, setNewMedication] = useState("");
+  const { toast } = useToast();
 
   const form = useForm<QuickUpdateData>({
     resolver: zodResolver(quickUpdateSchema),
     defaultValues: {
-      changesSinceLastVisit: '',
+      changesSinceLastVisit: "",
       newInjuries: false,
-      injuryDetails: '',
+      injuryDetails: "",
       newMedications: [],
       currentPainLevel: 5,
       currentStressLevel: 5,
-      todaysFocus: '',
+      todaysFocus: "",
       areasOfConcern: [],
       confirmNoChanges: false,
-    }
-  })
+    },
+  });
 
-  const { watch, setValue } = form
-  const newInjuries = watch('newInjuries')
-  const currentPainLevel = watch('currentPainLevel')
-  const currentStressLevel = watch('currentStressLevel')
-  const areasOfConcern = watch('areasOfConcern')
-  const newMedications = watch('newMedications')
+  const { watch, setValue } = form;
+  const newInjuries = watch("newInjuries");
+  const currentPainLevel = watch("currentPainLevel");
+  const currentStressLevel = watch("currentStressLevel");
+  const areasOfConcern = watch("areasOfConcern");
+  const newMedications = watch("newMedications");
 
   const toggleArea = (area: string) => {
     if (areasOfConcern.includes(area)) {
-      setValue('areasOfConcern', areasOfConcern.filter(a => a !== area))
+      setValue(
+        "areasOfConcern",
+        areasOfConcern.filter((a) => a !== area)
+      );
     } else {
-      setValue('areasOfConcern', [...areasOfConcern, area])
+      setValue("areasOfConcern", [...areasOfConcern, area]);
     }
-  }
+  };
 
   const addMedication = () => {
     if (newMedication.trim()) {
-      setValue('newMedications', [...newMedications, newMedication.trim()])
-      setNewMedication('')
+      setValue("newMedications", [...newMedications, newMedication.trim()]);
+      setNewMedication("");
     }
-  }
+  };
 
   const removeMedication = (index: number) => {
-    setValue('newMedications', newMedications.filter((_, i) => i !== index))
-  }
+    setValue(
+      "newMedications",
+      newMedications.filter((_, i) => i !== index)
+    );
+  };
 
   const handleSubmit = async (data: QuickUpdateData) => {
     if (!data.signature) {
       toast({
-        title: 'Signature required',
-        description: 'Please provide your signature to submit the form',
-        variant: 'destructive'
-      })
-      return
+        title: "Signature required",
+        description: "Please provide your signature to submit the form",
+        variant: "destructive",
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Update the intake form with quick update data
     const updates = {
       specificConcerns: `Quick Update - ${new Date().toLocaleDateString()}\n\nChanges: ${data.changesSinceLastVisit}\n\nToday's Focus: ${data.todaysFocus}`,
-      painAreas: data.areasOfConcern.map(area => ({
+      painAreas: data.areasOfConcern.map((area) => ({
         area,
         painLevel: data.currentPainLevel,
-        description: 'See quick update notes'
+        description: "See quick update notes",
       })),
       overallPainLevel: data.currentPainLevel,
       currentMedications: [...(lastIntakeForm.current_medications || []), ...data.newMedications],
-      injuries: data.newInjuries && data.injuryDetails ? [
-        ...(lastIntakeForm.injuries || []),
-        {
-          description: data.injuryDetails,
-          date: new Date().toISOString().split('T')[0],
-          currentlyAffects: true,
-          notes: 'Reported in quick update'
-        }
-      ] : lastIntakeForm.injuries,
-    }
+      injuries:
+        data.newInjuries && data.injuryDetails
+          ? [
+              ...(lastIntakeForm.injuries || []),
+              {
+                description: data.injuryDetails,
+                date: new Date().toISOString().split("T")[0],
+                currentlyAffects: true,
+                notes: "Reported in quick update",
+              },
+            ]
+          : lastIntakeForm.injuries,
+    };
 
-    const { error: updateError } = await updateIntakeForm(formId, updates)
+    const { error: updateError } = await updateIntakeForm(formId, updates);
 
     if (updateError) {
       toast({
-        title: 'Error saving form',
+        title: "Error saving form",
         description: updateError,
-        variant: 'destructive'
-      })
-      setIsSubmitting(false)
-      return
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
     }
 
     // Submit with signature
-    const { error: submitError } = await submitIntakeForm(formId, data.signature)
+    const { error: submitError } = await submitIntakeForm(formId, data.signature);
 
     if (submitError) {
       toast({
-        title: 'Error submitting form',
+        title: "Error submitting form",
         description: submitError,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Quick update submitted',
-        description: 'Thank you for updating your information',
-      })
-      onComplete?.()
+        title: "Quick update submitted",
+        description: "Thank you for updating your information",
+      });
+      onComplete?.();
     }
 
-    setIsSubmitting(false)
-  }
+    setIsSubmitting(false);
+  };
 
-  const lastVisitDate = lastIntakeForm.submitted_at 
-    ? new Date(lastIntakeForm.submitted_at).toLocaleDateString() 
-    : 'Unknown'
+  const lastVisitDate = lastIntakeForm.submitted_at
+    ? new Date(lastIntakeForm.submitted_at).toLocaleDateString()
+    : "Unknown";
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Quick Health Update</h2>
         <p className="text-muted-foreground">
-          Welcome back! Please take a moment to update us on any changes since your last visit on {lastVisitDate}.
+          Welcome back! Please take a moment to update us on any changes since your last visit on{" "}
+          {lastVisitDate}.
         </p>
       </div>
 
       <Alert>
         <InfoIcon className="h-4 w-4" />
         <AlertDescription>
-          This quick form helps us provide you with the best care. Your previous intake information is still on file.
+          This quick form helps us provide you with the best care. Your previous intake information
+          is still on file.
         </AlertDescription>
       </Alert>
 
@@ -195,20 +213,22 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
             <Label htmlFor="changes">Please describe any changes *</Label>
             <Textarea
               id="changes"
-              {...form.register('changesSinceLastVisit')}
+              {...form.register("changesSinceLastVisit")}
               placeholder="e.g., Started new exercise routine, changed jobs, new stress, etc."
               rows={3}
             />
             {form.formState.errors.changesSinceLastVisit && (
-              <p className="text-sm text-destructive">{form.formState.errors.changesSinceLastVisit.message}</p>
+              <p className="text-sm text-destructive">
+                {form.formState.errors.changesSinceLastVisit.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-3">
             <Label>Any new injuries since your last visit?</Label>
             <RadioGroup
-              value={newInjuries ? 'yes' : 'no'}
-              onValueChange={(value) => setValue('newInjuries', value === 'yes')}
+              value={newInjuries ? "yes" : "no"}
+              onValueChange={(value) => setValue("newInjuries", value === "yes")}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="injuries-yes" />
@@ -226,7 +246,7 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
               <Label htmlFor="injury-details">Please describe the injury</Label>
               <Textarea
                 id="injury-details"
-                {...form.register('injuryDetails')}
+                {...form.register("injuryDetails")}
                 placeholder="What happened and when? How does it affect you?"
                 rows={2}
               />
@@ -254,9 +274,9 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
                 onChange={(e) => setNewMedication(e.target.value)}
                 placeholder="Enter medication name"
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    addMedication()
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addMedication();
                   }
                 }}
               />
@@ -286,7 +306,7 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
             </div>
             <Slider
               value={[currentPainLevel]}
-              onValueChange={(value) => setValue('currentPainLevel', value[0])}
+              onValueChange={(value) => setValue("currentPainLevel", value[0])}
               max={10}
               step={1}
               className="w-full"
@@ -300,7 +320,7 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
             </div>
             <Slider
               value={[currentStressLevel]}
-              onValueChange={(value) => setValue('currentStressLevel', value[0])}
+              onValueChange={(value) => setValue("currentStressLevel", value[0])}
               max={10}
               step={1}
               className="w-full"
@@ -313,9 +333,7 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
       <Card>
         <CardHeader>
           <CardTitle>Today's Session</CardTitle>
-          <CardDescription>
-            What would you like to focus on during today's massage?
-          </CardDescription>
+          <CardDescription>What would you like to focus on during today's massage?</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -339,12 +357,14 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
             <Label htmlFor="focus">What do you need from today's session? *</Label>
             <Textarea
               id="focus"
-              {...form.register('todaysFocus')}
+              {...form.register("todaysFocus")}
               placeholder="e.g., Focus on lower back pain, general relaxation, work on neck tension..."
               rows={3}
             />
             {form.formState.errors.todaysFocus && (
-              <p className="text-sm text-destructive">{form.formState.errors.todaysFocus.message}</p>
+              <p className="text-sm text-destructive">
+                {form.formState.errors.todaysFocus.message}
+              </p>
             )}
           </div>
         </CardContent>
@@ -359,19 +379,20 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
           <div className="flex items-start space-x-2">
             <Checkbox
               id="confirm"
-              checked={watch('confirmNoChanges')}
-              onCheckedChange={(checked) => setValue('confirmNoChanges', !!checked)}
+              checked={watch("confirmNoChanges")}
+              onCheckedChange={(checked) => setValue("confirmNoChanges", !!checked)}
             />
             <Label htmlFor="confirm" className="text-sm">
-              I confirm that aside from the updates above, all other information in my previous intake form remains accurate and unchanged.
+              I confirm that aside from the updates above, all other information in my previous
+              intake form remains accurate and unchanged.
             </Label>
           </div>
 
           <div className="space-y-2">
             <Label>Digital Signature</Label>
             <DigitalSignature
-              onSignatureChange={(sig) => setValue('signature', sig || '')}
-              initialSignature={watch('signature')}
+              onSignatureChange={(sig) => setValue("signature", sig || "")}
+              initialSignature={watch("signature")}
             />
           </div>
         </CardContent>
@@ -379,9 +400,9 @@ export function QuickUpdateForm({ formId, lastIntakeForm, onComplete }: QuickUpd
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit Update'}
+          {isSubmitting ? "Submitting..." : "Submit Update"}
         </Button>
       </div>
     </form>
-  )
+  );
 }

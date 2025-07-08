@@ -14,23 +14,23 @@ export default function Home() {
     {
       icon: Calendar,
       title: "Easy Booking",
-      description: "Schedule your appointment in just a few clicks"
+      description: "Schedule your appointment in just a few clicks",
     },
     {
       icon: Clock,
       title: "Flexible Hours",
-      description: "Available when you need us, with convenient time slots"
+      description: "Available when you need us, with convenient time slots",
     },
     {
       icon: Heart,
       title: "Personalized Care",
-      description: "Tailored massage therapy to meet your specific needs"
+      description: "Tailored massage therapy to meet your specific needs",
     },
     {
       icon: Sparkles,
       title: "Professional Service",
-      description: "Licensed therapists with years of experience"
-    }
+      description: "Licensed therapists with years of experience",
+    },
   ];
 
   return (
@@ -40,18 +40,14 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img 
-                src="/MYFC_logo.png" 
-                alt="MYFC Logo" 
-                className="h-6 sm:h-6 w-auto dark:hidden"
-              />
-              <img 
-                src="/MYFC_logo_white.png" 
-                alt="MYFC Logo" 
+              <img src="/MYFC_logo.png" alt="MYFC Logo" className="h-6 sm:h-6 w-auto dark:hidden" />
+              <img
+                src="/MYFC_logo_white.png"
+                alt="MYFC Logo"
                 className="h-6 sm:h-6 w-auto hidden dark:block"
               />
             </div>
-            
+
             <div className="flex items-center gap-4">
               <ThemeToggle />
               {loading ? (
@@ -59,19 +55,15 @@ export default function Home() {
               ) : user ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground hidden sm:inline">
-                    Welcome, {profile?.first_name || 'User'}
+                    Welcome, {profile?.first_name || "User"}
                   </span>
-                  {profile?.role === 'admin' ? (
+                  {profile?.role === "admin" ? (
                     <Link href="/dashboard">
-                      <Button size="sm">
-                        Dashboard
-                      </Button>
+                      <Button size="sm">Dashboard</Button>
                     </Link>
                   ) : (
                     <Link href="/booking">
-                      <Button size="sm">
-                        My Bookings
-                      </Button>
+                      <Button size="sm">My Bookings</Button>
                     </Link>
                   )}
                 </div>
@@ -83,9 +75,7 @@ export default function Home() {
                     </Button>
                   </Link>
                   <Link href="/auth/signup">
-                    <Button size="sm">
-                      Get Started
-                    </Button>
+                    <Button size="sm">Get Started</Button>
                   </Link>
                 </div>
               )}
@@ -101,14 +91,11 @@ export default function Home() {
           <div className="text-center space-y-8 mb-16">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-3xl lg:text-5xl font-normal tracking-tight">
-                Welcome to{" "}
-                <span className="text-primary">
-                  MYFC
-                </span>
+                Welcome to <span className="text-primary">MYFC</span>
               </h1>
               <p className="text-md sm:text-lg text-muted-foreground max-w-3xl mx-auto">
-                Experience therapeutic massage that rejuvenates your body and calms your mind. 
-                Book your session today and discover the difference.
+                Experience therapeutic massage that rejuvenates your body and calms your mind. Book
+                your session today and discover the difference.
               </p>
             </div>
 
@@ -165,12 +152,11 @@ export default function Home() {
 
           {/* Info Section */}
           <Card className="p-8 sm:p-12 text-center bg-muted/50">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-              Ready to Feel Your Best?
-            </h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Ready to Feel Your Best?</h2>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Our professional massage therapists are here to help you relax, recover, and rejuvenate. 
-              Whether you need relief from chronic pain or simply want to unwind, we have the perfect treatment for you.
+              Our professional massage therapists are here to help you relax, recover, and
+              rejuvenate. Whether you need relief from chronic pain or simply want to unwind, we
+              have the perfect treatment for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/services">
@@ -180,9 +166,7 @@ export default function Home() {
               </Link>
               {!user && (
                 <Link href="/auth/signup">
-                  <Button size="lg">
-                    Create Account
-                  </Button>
+                  <Button size="lg">Create Account</Button>
                 </Link>
               )}
             </div>

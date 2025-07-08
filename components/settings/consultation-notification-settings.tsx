@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/hooks/use-toast'
-import { Loader2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface ConsultationNotificationPreferences {
-  consultation_confirmation: boolean
-  consultation_24h_reminder: boolean
-  consultation_1h_reminder: boolean
-  consultation_15min_reminder: boolean
-  consultation_followup: boolean
-  admin_consultation_booked: boolean
-  admin_consultation_joined: boolean
-  admin_consultation_completed: boolean
-  admin_consultation_digest: boolean
+  consultation_confirmation: boolean;
+  consultation_24h_reminder: boolean;
+  consultation_1h_reminder: boolean;
+  consultation_15min_reminder: boolean;
+  consultation_followup: boolean;
+  admin_consultation_booked: boolean;
+  admin_consultation_joined: boolean;
+  admin_consultation_completed: boolean;
+  admin_consultation_digest: boolean;
 }
 
 export function ConsultationNotificationSettings({ userId }: { userId: string }) {
@@ -32,81 +32,79 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
     admin_consultation_joined: true,
     admin_consultation_completed: true,
     admin_consultation_digest: true,
-  })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const { toast } = useToast()
-  const supabase = createClient()
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+  const supabase = createClient();
 
   useEffect(() => {
-    loadPreferences()
-  }, [userId])
+    loadPreferences();
+  }, [userId]);
 
   const loadPreferences = async () => {
     try {
       const { data, error } = await supabase
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .single()
+        .from("notification_preferences")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error
+      if (error && error.code !== "PGRST116") {
+        throw error;
       }
 
       if (data) {
-        setPreferences(prev => ({
+        setPreferences((prev) => ({
           ...prev,
           ...data,
-        }))
+        }));
       }
     } catch (error) {
-      console.error('Error loading preferences:', error)
+      console.error("Error loading preferences:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to load notification preferences',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "Failed to load notification preferences",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const savePreferences = async () => {
-    setSaving(true)
+    setSaving(true);
     try {
-      const { error } = await supabase
-        .from('notification_preferences')
-        .upsert({
-          user_id: userId,
-          ...preferences,
-          updated_at: new Date().toISOString(),
-        })
+      const { error } = await supabase.from("notification_preferences").upsert({
+        user_id: userId,
+        ...preferences,
+        updated_at: new Date().toISOString(),
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Notification preferences saved',
-      })
+        title: "Success",
+        description: "Notification preferences saved",
+      });
     } catch (error) {
-      console.error('Error saving preferences:', error)
+      console.error("Error saving preferences:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to save notification preferences',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "Failed to save notification preferences",
+        variant: "destructive",
+      });
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleToggle = (key: keyof ConsultationNotificationPreferences) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       [key]: !prev[key],
-    }))
-  }
+    }));
+  };
 
   if (loading) {
     return (
@@ -115,22 +113,20 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
           <Loader2 className="h-6 w-6 animate-spin" />
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Consultation Notifications</CardTitle>
-        <CardDescription>
-          Configure notification settings for consultations
-        </CardDescription>
+        <CardDescription>Configure notification settings for consultations</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Client Notifications */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium">Client Notifications</h3>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
@@ -142,7 +138,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="consultation_confirmation"
                 checked={preferences.consultation_confirmation}
-                onCheckedChange={() => handleToggle('consultation_confirmation')}
+                onCheckedChange={() => handleToggle("consultation_confirmation")}
               />
             </div>
 
@@ -156,7 +152,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="consultation_24h_reminder"
                 checked={preferences.consultation_24h_reminder}
-                onCheckedChange={() => handleToggle('consultation_24h_reminder')}
+                onCheckedChange={() => handleToggle("consultation_24h_reminder")}
               />
             </div>
 
@@ -170,7 +166,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="consultation_1h_reminder"
                 checked={preferences.consultation_1h_reminder}
-                onCheckedChange={() => handleToggle('consultation_1h_reminder')}
+                onCheckedChange={() => handleToggle("consultation_1h_reminder")}
               />
             </div>
 
@@ -184,7 +180,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="consultation_15min_reminder"
                 checked={preferences.consultation_15min_reminder}
-                onCheckedChange={() => handleToggle('consultation_15min_reminder')}
+                onCheckedChange={() => handleToggle("consultation_15min_reminder")}
               />
             </div>
 
@@ -198,7 +194,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="consultation_followup"
                 checked={preferences.consultation_followup}
-                onCheckedChange={() => handleToggle('consultation_followup')}
+                onCheckedChange={() => handleToggle("consultation_followup")}
               />
             </div>
           </div>
@@ -207,7 +203,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
         {/* Admin Notifications */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium">Admin Notifications</h3>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
@@ -219,7 +215,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="admin_consultation_booked"
                 checked={preferences.admin_consultation_booked}
-                onCheckedChange={() => handleToggle('admin_consultation_booked')}
+                onCheckedChange={() => handleToggle("admin_consultation_booked")}
               />
             </div>
 
@@ -233,7 +229,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="admin_consultation_joined"
                 checked={preferences.admin_consultation_joined}
-                onCheckedChange={() => handleToggle('admin_consultation_joined')}
+                onCheckedChange={() => handleToggle("admin_consultation_joined")}
               />
             </div>
 
@@ -247,7 +243,7 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="admin_consultation_completed"
                 checked={preferences.admin_consultation_completed}
-                onCheckedChange={() => handleToggle('admin_consultation_completed')}
+                onCheckedChange={() => handleToggle("admin_consultation_completed")}
               />
             </div>
 
@@ -261,27 +257,23 @@ export function ConsultationNotificationSettings({ userId }: { userId: string })
               <Switch
                 id="admin_consultation_digest"
                 checked={preferences.admin_consultation_digest}
-                onCheckedChange={() => handleToggle('admin_consultation_digest')}
+                onCheckedChange={() => handleToggle("admin_consultation_digest")}
               />
             </div>
           </div>
         </div>
 
-        <Button
-          onClick={savePreferences}
-          disabled={saving}
-          className="w-full"
-        >
+        <Button onClick={savePreferences} disabled={saving} className="w-full">
           {saving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...
             </>
           ) : (
-            'Save Preferences'
+            "Save Preferences"
           )}
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,135 +1,149 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import { useBooking } from '@/contexts/BookingContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { createAppointment, generateConfirmationNumber, cancelAppointment } from '@/lib/appointments'
-import { createClient } from '@/lib/supabase/client'
-import { StripePaymentForm } from '@/components/payment/StripePaymentForm'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
-import { format } from 'date-fns'
+import { useState, useEffect, useRef } from "react";
+import { useBooking } from "@/contexts/BookingContext";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  createAppointment,
+  generateConfirmationNumber,
+  cancelAppointment,
+} from "@/lib/appointments";
+import { createClient } from "@/lib/supabase/client";
+import { StripePaymentForm } from "@/components/payment/StripePaymentForm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, AlertCircle } from "lucide-react";
+import { format } from "date-fns";
 
 interface PaymentStepProps {
-  onValidate: (isValid: boolean) => void
+  onValidate: (isValid: boolean) => void;
 }
 
 export function PaymentStep({ onValidate }: PaymentStepProps) {
-  const { user } = useAuth()
-  const { bookingData, updateBookingData, setCurrentStep } = useBooking()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [paymentIntent, setPaymentIntent] = useState<{ clientSecret: string; amount: number } | null>(null)
-  const [appointmentId, setAppointmentId] = useState<string | null>(null)
-  const initializingRef = useRef(false)
-  const initializedRef = useRef(false)
-  const [hasCreatedAppointment, setHasCreatedAppointment] = useState(false)
+  const { user } = useAuth();
+  const { bookingData, updateBookingData, setCurrentStep } = useBooking();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentIntent, setPaymentIntent] = useState<{
+    clientSecret: string;
+    amount: number;
+  } | null>(null);
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
+  const initializingRef = useRef(false);
+  const initializedRef = useRef(false);
+  const [hasCreatedAppointment, setHasCreatedAppointment] = useState(false);
 
   useEffect(() => {
-    onValidate(false) // Payment always starts as invalid
-  }, [onValidate])
+    onValidate(false); // Payment always starts as invalid
+  }, [onValidate]);
 
   // Create appointment and payment intent when component mounts
   useEffect(() => {
     if (!bookingData.service || !bookingData.date || !bookingData.timeSlot || !user?.id) {
-      return
+      return;
     }
-    
+
     // Use refs to ensure this only runs once even with StrictMode
     if (!initializedRef.current && !initializingRef.current) {
-      initializingRef.current = true
+      initializingRef.current = true;
       createAppointmentAndPaymentIntent().finally(() => {
-        initializedRef.current = true
-      })
+        initializedRef.current = true;
+      });
     }
-  }, [bookingData.service, bookingData.date, bookingData.timeSlot, user?.id])
+  }, [bookingData.service, bookingData.date, bookingData.timeSlot, user?.id]);
 
   const createAppointmentAndPaymentIntent = async () => {
-    if (!bookingData.service || !bookingData.date || !bookingData.timeSlot || !bookingData.clientInfo) {
-      setError('Missing booking information')
-      return
+    if (
+      !bookingData.service ||
+      !bookingData.date ||
+      !bookingData.timeSlot ||
+      !bookingData.clientInfo
+    ) {
+      setError("Missing booking information");
+      return;
     }
 
     // Prevent duplicate creation
     if (hasCreatedAppointment) {
-      console.log('Already created appointment, skipping duplicate creation')
-      return
+      console.log("Already created appointment, skipping duplicate creation");
+      return;
     }
-    
+
     // Check if we already have an appointment ID in booking data
     if (bookingData.appointmentId) {
-      console.log('Appointment already created:', bookingData.appointmentId)
-      setAppointmentId(bookingData.appointmentId)
-      
+      console.log("Appointment already created:", bookingData.appointmentId);
+      setAppointmentId(bookingData.appointmentId);
+
       // Check if we already have a payment intent
       if (bookingData.paymentIntentId && bookingData.paymentClientSecret) {
         setPaymentIntent({
           clientSecret: bookingData.paymentClientSecret,
-          amount: bookingData.service.price_cents
-        })
-        setLoading(false)
-        return
+          amount: bookingData.service.price_cents,
+        });
+        setLoading(false);
+        return;
       }
     }
 
-    setLoading(true)
-    setError(null)
-    setHasCreatedAppointment(true)
+    setLoading(true);
+    setError(null);
+    setHasCreatedAppointment(true);
 
     try {
       // If this is a reschedule, cancel the old appointment first
       if (bookingData.rescheduleId) {
-        console.log('Cancelling old appointment:', bookingData.rescheduleId)
-        const { success: cancelSuccess, error: cancelError } = await cancelAppointment(bookingData.rescheduleId)
-        
+        console.log("Cancelling old appointment:", bookingData.rescheduleId);
+        const { success: cancelSuccess, error: cancelError } = await cancelAppointment(
+          bookingData.rescheduleId
+        );
+
         if (!cancelSuccess) {
-          console.error('Failed to cancel old appointment:', cancelError)
+          console.error("Failed to cancel old appointment:", cancelError);
           // Continue with creating new appointment even if cancel fails
         }
       }
-      
+
       // First create the appointment
       const { appointment, error: appointmentError } = await createAppointment({
         serviceId: bookingData.service.id,
         clientId: user?.id,
         appointmentDate: bookingData.date,
-        startTime: format(bookingData.timeSlot.start, 'HH:mm:ss'),
-        endTime: format(bookingData.timeSlot.end, 'HH:mm:ss'),
+        startTime: format(bookingData.timeSlot.start, "HH:mm:ss"),
+        endTime: format(bookingData.timeSlot.end, "HH:mm:ss"),
         totalPriceCents: bookingData.service.price_cents,
-        paymentPreference: 'pay_now', // Since we're in PaymentStep, it's always pay_now
-        notes: '',
+        paymentPreference: "pay_now", // Since we're in PaymentStep, it's always pay_now
+        notes: "",
         guestEmail: bookingData.isGuest ? bookingData.clientInfo.email : undefined,
         guestFirstName: bookingData.isGuest ? bookingData.clientInfo.firstName : undefined,
         guestLastName: bookingData.isGuest ? bookingData.clientInfo.lastName : undefined,
         guestPhone: bookingData.isGuest ? bookingData.clientInfo.phone : undefined,
-      })
+      });
 
       if (appointmentError || !appointment) {
-        setError(appointmentError || 'Failed to create appointment')
-        return
+        setError(appointmentError || "Failed to create appointment");
+        return;
       }
 
       // Link intake form to appointment if one was created
       if (bookingData.intakeFormId && appointment.id) {
-        const supabase = createClient()
+        const supabase = createClient();
         await supabase
-          .from('intake_forms')
+          .from("intake_forms")
           .update({ appointment_id: appointment.id })
-          .eq('id', bookingData.intakeFormId)
+          .eq("id", bookingData.intakeFormId);
       }
 
-      setAppointmentId(appointment.id)
-      updateBookingData({ appointmentId: appointment.id })
-      
+      setAppointmentId(appointment.id);
+      updateBookingData({ appointmentId: appointment.id });
+
       // Small delay to ensure appointment is committed to database
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Create payment intent via API
-      const response = await fetch('/api/payments/create-intent', {
-        method: 'POST',
+      const response = await fetch("/api/payments/create-intent", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           appointment_id: appointment.id,
@@ -137,58 +151,60 @@ export function PaymentStep({ onValidate }: PaymentStepProps) {
           description: `${bookingData.service.name} appointment`,
           metadata: {
             service_name: bookingData.service.name,
-            appointment_date: format(bookingData.date, 'yyyy-MM-dd'),
-            appointment_time: format(bookingData.timeSlot.start, 'HH:mm')
-          }
-        })
-      })
-      
+            appointment_date: format(bookingData.date, "yyyy-MM-dd"),
+            appointment_time: format(bookingData.timeSlot.start, "HH:mm"),
+          },
+        }),
+      });
+
       if (!response.ok) {
-        const error = await response.json()
-        setError(error.error || 'Failed to create payment intent')
-        return
+        const error = await response.json();
+        setError(error.error || "Failed to create payment intent");
+        return;
       }
-      
-      const paymentData = await response.json()
-      
-      
+
+      const paymentData = await response.json();
+
       if (paymentData) {
         setPaymentIntent({
           clientSecret: paymentData.client_secret,
-          amount: paymentData.amount_cents
-        })
-        updateBookingData({ 
+          amount: paymentData.amount_cents,
+        });
+        updateBookingData({
           paymentIntentId: paymentData.payment_intent_id,
-          paymentClientSecret: paymentData.client_secret
-        })
+          paymentClientSecret: paymentData.client_secret,
+        });
       }
     } catch (err) {
-      console.error('Setup error:', err)
-      setError('An error occurred setting up payment. Please try again.')
+      console.error("Setup error:", err);
+      setError("An error occurred setting up payment. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-  
+  };
+
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     // Payment successful, store confirmation details
-    const confirmationNumber = generateConfirmationNumber()
-    
+    const confirmationNumber = generateConfirmationNumber();
+
     if (appointmentId) {
-      sessionStorage.setItem('lastAppointment', JSON.stringify({
-        id: appointmentId,
-        confirmationNumber,
-        paymentIntentId
-      }))
+      sessionStorage.setItem(
+        "lastAppointment",
+        JSON.stringify({
+          id: appointmentId,
+          confirmationNumber,
+          paymentIntentId,
+        })
+      );
     }
-    
-    onValidate(true)
-    setCurrentStep(6)
-  }
-  
+
+    onValidate(true);
+    setCurrentStep(6);
+  };
+
   const handlePaymentError = (error: string) => {
-    setError(error)
-  }
+    setError(error);
+  };
 
   if (!bookingData.service || !bookingData.date || !bookingData.timeSlot) {
     return (
@@ -197,7 +213,7 @@ export function PaymentStep({ onValidate }: PaymentStepProps) {
           Missing booking information
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -219,22 +235,18 @@ export function PaymentStep({ onValidate }: PaymentStepProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Date:</span>
-              <span className="font-medium">
-                {format(bookingData.date, 'EEEE, MMMM d, yyyy')}
-              </span>
+              <span className="font-medium">{format(bookingData.date, "EEEE, MMMM d, yyyy")}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Time:</span>
-              <span className="font-medium">
-                {format(bookingData.timeSlot.start, 'h:mm a')}
-              </span>
+              <span className="font-medium">{format(bookingData.timeSlot.start, "h:mm a")}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Duration:</span>
               <span className="font-medium">{bookingData.service.duration_minutes} minutes</span>
             </div>
           </div>
-          
+
           <div className="border-t pt-4">
             <div className="flex justify-between text-lg font-semibold">
               <span>Total:</span>
@@ -276,5 +288,5 @@ export function PaymentStep({ onValidate }: PaymentStepProps) {
         </Alert>
       )}
     </div>
-  )
+  );
 }

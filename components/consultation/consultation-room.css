@@ -37,15 +37,15 @@
   .consultation-header {
     padding: 0.75rem;
   }
-  
+
   .consultation-timer {
     font-size: 0.75rem;
   }
-  
+
   .consultation-controls {
     padding: 0.5rem;
   }
-  
+
   .consultation-controls button {
     padding: 0.5rem;
     font-size: 0.875rem;
@@ -58,7 +58,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -72,7 +73,8 @@
 }
 
 @keyframes fade-in-out {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
   }
   50% {
@@ -141,7 +143,7 @@ button:focus-visible {
   .consultation-header button {
     display: none !important;
   }
-  
+
   .consultation-notes {
     width: 100%;
     max-width: none;

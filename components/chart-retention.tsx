@@ -1,99 +1,98 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { createClient } from '@/lib/supabase/client'
-import { Badge } from "@/components/ui/badge"
-import { subMonths, format } from 'date-fns'
+import * as React from "react";
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { createClient } from "@/lib/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { subMonths, format } from "date-fns";
 
 interface RetentionData {
-  month: string
-  returningClients: number
-  newClients: number
-  retentionRate: number
+  month: string;
+  returningClients: number;
+  newClients: number;
+  retentionRate: number;
 }
 
 export function ChartRetention() {
-  const [data, setData] = React.useState<RetentionData[]>([])
-  const [loading, setLoading] = React.useState(true)
-  const [overallRetention, setOverallRetention] = React.useState(0)
-  
-  const supabase = createClient()
+  const [data, setData] = React.useState<RetentionData[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [overallRetention, setOverallRetention] = React.useState(0);
+
+  const supabase = createClient();
 
   React.useEffect(() => {
-    fetchRetentionData()
-  }, [])
+    fetchRetentionData();
+  }, []);
 
   const fetchRetentionData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const monthsData: RetentionData[] = []
-      const now = new Date()
-      
+      const monthsData: RetentionData[] = [];
+      const now = new Date();
+
       // Calculate retention for the last 6 months
       for (let i = 5; i >= 0; i--) {
-        const monthDate = subMonths(now, i)
-        const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1)
-        const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0)
-        
+        const monthDate = subMonths(now, i);
+        const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+        const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
         // Get all appointments for this month
         const { data: monthAppointments } = await supabase
-          .from('appointments')
-          .select('client_id')
-          .gte('appointment_date', format(monthStart, 'yyyy-MM-dd'))
-          .lte('appointment_date', format(monthEnd, 'yyyy-MM-dd'))
-          .in('status', ['completed', 'confirmed', 'scheduled'])
-        
-        const uniqueClients = new Set(monthAppointments?.map(a => a.client_id) || [])
-        
+          .from("appointments")
+          .select("client_id")
+          .gte("appointment_date", format(monthStart, "yyyy-MM-dd"))
+          .lte("appointment_date", format(monthEnd, "yyyy-MM-dd"))
+          .in("status", ["completed", "confirmed", "scheduled"]);
+
+        const uniqueClients = new Set(monthAppointments?.map((a) => a.client_id) || []);
+
         // Get clients who had appointments in previous months
-        const prevMonthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth(), 0)
+        const prevMonthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth(), 0);
         const { data: previousAppointments } = await supabase
-          .from('appointments')
-          .select('client_id')
-          .lte('appointment_date', format(prevMonthEnd, 'yyyy-MM-dd'))
-          .in('status', ['completed'])
-        
-        const previousClients = new Set(previousAppointments?.map(a => a.client_id) || [])
-        
+          .from("appointments")
+          .select("client_id")
+          .lte("appointment_date", format(prevMonthEnd, "yyyy-MM-dd"))
+          .in("status", ["completed"]);
+
+        const previousClients = new Set(previousAppointments?.map((a) => a.client_id) || []);
+
         // Calculate returning vs new clients
-        let returningCount = 0
-        let newCount = 0
-        
-        uniqueClients.forEach(clientId => {
+        let returningCount = 0;
+        let newCount = 0;
+
+        uniqueClients.forEach((clientId) => {
           if (previousClients.has(clientId)) {
-            returningCount++
+            returningCount++;
           } else {
-            newCount++
+            newCount++;
           }
-        })
-        
-        const totalClients = returningCount + newCount
-        const retentionRate = totalClients > 0 ? (returningCount / totalClients) * 100 : 0
-        
+        });
+
+        const totalClients = returningCount + newCount;
+        const retentionRate = totalClients > 0 ? (returningCount / totalClients) * 100 : 0;
+
         monthsData.push({
-          month: format(monthDate, 'MMM'),
+          month: format(monthDate, "MMM"),
           returningClients: returningCount,
           newClients: newCount,
-          retentionRate
-        })
+          retentionRate,
+        });
       }
-      
-      setData(monthsData)
-      
+
+      setData(monthsData);
+
       // Calculate overall retention rate (average of last 3 months)
-      const lastThreeMonths = monthsData.slice(-3)
-      const avgRetention = lastThreeMonths.reduce((sum, m) => sum + m.retentionRate, 0) / 3
-      setOverallRetention(avgRetention)
-      
+      const lastThreeMonths = monthsData.slice(-3);
+      const avgRetention = lastThreeMonths.reduce((sum, m) => sum + m.retentionRate, 0) / 3;
+      setOverallRetention(avgRetention);
     } catch (error) {
-      console.error('Error fetching retention data:', error)
+      console.error("Error fetching retention data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const chartConfig = {
     retentionRate: {
@@ -104,7 +103,7 @@ export function ChartRetention() {
       label: "Returning Clients",
       color: "hsl(var(--chart-2))",
     },
-  }
+  };
 
   return (
     <Card>
@@ -112,9 +111,7 @@ export function ChartRetention() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Client Retention</CardTitle>
-            <CardDescription>
-              Tracking client return rates over time
-            </CardDescription>
+            <CardDescription>Tracking client return rates over time</CardDescription>
           </div>
           {!loading && (
             <div className="text-right">
@@ -160,10 +157,10 @@ export function ChartRetention() {
                     content={
                       <ChartTooltipContent
                         formatter={(value, name) => {
-                          if (name === 'retentionRate') {
-                            return [`${value}%`, 'Retention Rate']
+                          if (name === "retentionRate") {
+                            return [`${value}%`, "Retention Rate"];
                           }
-                          return [value, name]
+                          return [value, name];
                         }}
                       />
                     }
@@ -179,7 +176,7 @@ export function ChartRetention() {
                 </LineChart>
               </ResponsiveContainer>
             </ChartContainer>
-            
+
             {/* Client breakdown */}
             <div className="mt-4 grid grid-cols-6 gap-2 text-center">
               {data.map((month, index) => (
@@ -210,5 +207,5 @@ export function ChartRetention() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
