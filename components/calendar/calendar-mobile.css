@@ -1,0 +1,173 @@
+/* Mobile-specific styles for react-big-calendar */
+
+/* Responsive toolbar */
+@media (max-width: 640px) {
+  .rbc-toolbar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  
+  .rbc-toolbar-label {
+    font-size: 0.875rem;
+    margin: 0.25rem 0;
+    width: 100%;
+    text-align: center;
+    order: -1;
+  }
+  
+  .rbc-btn-group {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .rbc-btn-group button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    min-height: 2rem;
+    touch-action: manipulation;
+  }
+  
+  /* Calendar cells */
+  .rbc-calendar {
+    font-size: 0.75rem;
+  }
+  
+  .rbc-header {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .rbc-date-cell {
+    padding: 0.25rem;
+  }
+  
+  .rbc-event {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.625rem;
+  }
+  
+  .rbc-event-label {
+    display: none;
+  }
+  
+  /* Time grid view */
+  .rbc-time-header-cell {
+    min-height: 2rem;
+  }
+  
+  .rbc-time-content {
+    padding: 0;
+  }
+  
+  .rbc-timeslot-group {
+    min-height: 2rem;
+  }
+  
+  .rbc-time-slot {
+    min-height: 1rem;
+  }
+  
+  .rbc-label {
+    font-size: 0.625rem;
+    padding: 0 0.25rem;
+  }
+  
+  /* Month view */
+  .rbc-month-view .rbc-date-cell {
+    min-height: 3rem;
+  }
+  
+  .rbc-month-row {
+    min-height: 3rem;
+  }
+  
+  /* Day/Week view adjustments */
+  .rbc-day-view .rbc-time-column,
+  .rbc-week-view .rbc-time-column {
+    width: 3rem;
+  }
+  
+  .rbc-allday-cell {
+    display: none;
+  }
+  
+  /* Selected cell */
+  .rbc-selected-cell {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Touch-friendly sizing for all screen sizes */
+.rbc-btn-group button {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  touch-action: manipulation;
+  transition: background-color 0.2s;
+}
+
+.rbc-btn-group button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.rbc-btn-group button.rbc-active {
+  background-color: rgba(59, 130, 246, 0.2);
+  font-weight: 600;
+}
+
+/* Improve event visibility */
+.rbc-event {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.rbc-event:hover {
+  opacity: 0.8;
+}
+
+/* Better scrolling on mobile */
+.rbc-time-content > * + * > * {
+  border-left: 1px solid #ddd;
+}
+
+/* Horizontal scroll indicator */
+@media (max-width: 768px) {
+  .rbc-calendar::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05));
+    pointer-events: none;
+  }
+}
+
+/* Loading state */
+.rbc-calendar.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Improve contrast for better readability */
+.rbc-off-range-bg {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.rbc-today {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Make sure text is readable on small screens */
+.rbc-toolbar button {
+  white-space: nowrap;
+}
+
+.rbc-show-more {
+  font-size: 0.625rem;
+  padding: 0.125rem 0.25rem;
+}

@@ -1,0 +1,136 @@
+/* Aggressive dark mode overrides for react-big-calendar */
+
+/* Force dark borders with !important */
+.dark .rbc-month-view,
+.dark .rbc-time-view,
+.dark .rbc-time-view *,
+.dark .rbc-month-view * {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Override all calendar borders */
+.dark .rbc-header,
+.dark .rbc-header + .rbc-header,
+.dark .rbc-month-row,
+.dark .rbc-day-bg + .rbc-day-bg,
+.dark .rbc-time-header,
+.dark .rbc-time-header-content,
+.dark .rbc-timeslot-group,
+.dark .rbc-time-slot,
+.dark .rbc-day-slot .rbc-time-slot,
+.dark .rbc-time-column + .rbc-time-column,
+.dark .rbc-toolbar {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Force increased time slot heights */
+.rbc-timeslot-group {
+  min-height: 80px !important;
+  height: 80px !important;
+}
+
+.rbc-time-slot {
+  min-height: 40px !important;
+  height: 40px !important;
+}
+
+/* Make time column wider for better visibility */
+.rbc-time-gutter {
+  min-width: 80px !important;
+}
+
+/* Dark background for headers */
+.dark .rbc-header {
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark .rbc-time-header {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Time labels styling */
+.dark .rbc-label {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 12px !important;
+}
+
+.dark .rbc-time-gutter {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Today's column highlight */
+.dark .rbc-today {
+  background-color: rgba(234, 179, 8, 0.05) !important;
+}
+
+/* Remove harsh lines between time slots */
+.dark .rbc-time-slot {
+  border-top: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+.dark .rbc-timeslot-group:nth-child(2n) {
+  background: rgba(255, 255, 255, 0.01) !important;
+}
+
+/* Toolbar styling */
+.dark .rbc-toolbar {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  padding: 1rem !important;
+}
+
+.dark .rbc-toolbar button {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.dark .rbc-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .rbc-toolbar button.rbc-active {
+  background: rgba(234, 179, 8, 0.2) !important;
+  border-color: rgba(234, 179, 8, 0.4) !important;
+  color: rgb(234, 179, 8) !important;
+}
+
+/* Event styling */
+.dark .rbc-event {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Hover effects */
+.dark .rbc-day-bg:hover,
+.dark .rbc-time-slot:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  cursor: pointer;
+}
+
+/* Date cells */
+.dark .rbc-date-cell {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark .rbc-date-cell.rbc-now {
+  color: rgb(234, 179, 8) !important;
+  font-weight: bold !important;
+}
+
+.dark .rbc-off-range-bg {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Remove the grid pattern from the calendar view */
+.dark .rbc-time-view {
+  background: transparent !important;
+}
+
+/* Make the entire calendar have subtle background */
+.dark .rbc-calendar {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}

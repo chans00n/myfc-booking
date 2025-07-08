@@ -1,0 +1,174 @@
+/* Dark mode improvements for react-big-calendar */
+
+/* Remove white borders in dark mode */
+.dark .rbc-month-view,
+.dark .rbc-time-view {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-header {
+  border-color: hsl(var(--border) / 0.2);
+  background-color: hsl(var(--background) / 0.5);
+}
+
+.dark .rbc-header + .rbc-header {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-month-row {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-day-bg + .rbc-day-bg {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-time-header {
+  border-color: hsl(var(--border) / 0.2);
+  background-color: hsl(var(--background) / 0.5);
+}
+
+.dark .rbc-time-header-content {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-timeslot-group {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-time-slot {
+  border-color: hsl(var(--border) / 0.1);
+}
+
+.dark .rbc-day-slot .rbc-time-slot {
+  border-color: hsl(var(--border) / 0.1);
+  opacity: 0.3;
+}
+
+.dark .rbc-time-column + .rbc-time-column {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-toolbar {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+/* Increase time slot heights for better spacing */
+.rbc-timeslot-group {
+  min-height: 60px; /* Increased from default */
+}
+
+.rbc-time-slot {
+  flex: 1 0 0;
+  min-height: 30px; /* Increased from default */
+}
+
+/* Better contrast for time labels in dark mode */
+.dark .rbc-label {
+  color: hsl(var(--muted-foreground) / 0.7);
+}
+
+.dark .rbc-time-gutter {
+  color: hsl(var(--muted-foreground) / 0.7);
+  background-color: hsl(var(--background) / 0.3);
+}
+
+/* Today highlight in dark mode */
+.dark .rbc-today {
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+/* Better event visibility in dark mode */
+.dark .rbc-event {
+  @apply shadow-md border;
+  border-color: hsl(var(--border) / 0.2);
+}
+
+/* Selected event in dark mode */
+.dark .rbc-selected {
+  @apply ring-2 ring-offset-2 ring-offset-background;
+  --tw-ring-color: hsl(var(--primary) / 0.5);
+}
+
+/* Current time indicator in dark mode */
+.dark .rbc-current-time-indicator {
+  background-color: hsl(var(--primary) / 0.7);
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.5);
+}
+
+/* Agenda view dark mode */
+.dark .rbc-agenda-table tbody > tr > td {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-agenda-table tbody > tr > td + td {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-agenda-table thead > tr > th {
+  border-color: hsl(var(--border) / 0.2);
+  background-color: hsl(var(--background) / 0.5);
+}
+
+/* Hover states in dark mode */
+.dark .rbc-day-bg:hover {
+  background-color: hsl(var(--accent) / 0.05);
+}
+
+.dark .rbc-time-slot:hover {
+  background-color: hsl(var(--accent) / 0.05);
+}
+
+/* Better visibility for date cells */
+.dark .rbc-date-cell {
+  color: hsl(var(--muted-foreground) / 0.8);
+}
+
+.dark .rbc-date-cell.rbc-now {
+  @apply text-primary font-bold;
+}
+
+.dark .rbc-date-cell.rbc-off-range {
+  @apply opacity-30;
+}
+
+/* Improve toolbar buttons in dark mode */
+.dark .rbc-toolbar button {
+  border-color: hsl(var(--border) / 0.2);
+}
+
+.dark .rbc-toolbar button:hover {
+  background-color: hsl(var(--accent) / 0.2);
+}
+
+.dark .rbc-toolbar button.rbc-active {
+  background-color: hsl(var(--primary) / 0.9);
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+/* Week view specific improvements */
+.rbc-time-view .rbc-day-slot {
+  min-width: 120px; /* Give more space to each day column */
+}
+
+/* Add subtle grid lines for better visibility */
+.dark .rbc-time-view {
+  background-image: 
+    linear-gradient(to right, hsl(var(--border) / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border) / 0.1) 1px, transparent 1px);
+  background-size: 100% 30px, 120px 100%;
+}
+
+/* Better contrast for overlays in dark mode */
+.dark .rbc-overlay {
+  @apply bg-popover backdrop-blur-sm border;
+  opacity: 0.95;
+  border-color: hsl(var(--border) / 0.2);
+}
+
+/* Smooth transitions */
+.dark .rbc-event,
+.dark .rbc-day-bg,
+.dark .rbc-time-slot {
+  transition: background-color 0.2s ease;
+}

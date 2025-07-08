@@ -1,0 +1,57 @@
+/* Custom calendar styles for better mobile experience */
+
+/* Ensure calendar takes full width */
+[data-state="open"] {
+  width: 100% !important;
+}
+
+/* Calendar container styles */
+.rdp {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.rdp-months {
+  width: 100% !important;
+}
+
+.rdp-month {
+  width: 100% !important;
+}
+
+.rdp-table {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Fix navigation button positioning */
+.rdp-month_caption {
+  padding-left: 3rem !important;
+  padding-right: 3rem !important;
+}
+
+/* Make calendar cells touch-friendly on mobile */
+@media (max-width: 640px) {
+  /* Remove any default margins */
+  .rdp {
+    --rdp-cell-size: calc((100vw - 48px) / 7) !important;
+  }
+  
+  /* Ensure cells are properly sized */
+  .rdp-day {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
+/* Improve calendar spacing */
+[data-calendar] button {
+  touch-action: manipulation;
+}
+
+/* Better hover states for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  [data-calendar] button:active {
+    transform: scale(0.98);
+  }
+}

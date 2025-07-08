@@ -1,0 +1,151 @@
+/* Consultation Room Custom Styles */
+
+/* Daily.co iframe integration */
+.consultation-video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+}
+
+.consultation-video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Hide Daily.co branding */
+.daily-video-topbar-button[aria-label="Daily"],
+.daily-video-topbar-button[title="Daily"],
+.daily-powered-by {
+  display: none !important;
+}
+
+/* Custom Daily.co theme */
+.daily-video-call {
+  --daily-primary: hsl(var(--primary));
+  --daily-background: hsl(var(--background));
+  --daily-foreground: hsl(var(--foreground));
+  --daily-border: hsl(var(--border));
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .consultation-header {
+    padding: 0.75rem;
+  }
+  
+  .consultation-timer {
+    font-size: 0.75rem;
+  }
+  
+  .consultation-controls {
+    padding: 0.5rem;
+  }
+  
+  .consultation-controls button {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Waiting room animations */
+.waiting-room-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Notes auto-save indicator */
+.notes-saving {
+  animation: fade-in-out 1s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Mobile drawer animations */
+.mobile-drawer-backdrop {
+  animation: fade-in 0.3s ease-out;
+}
+
+.mobile-drawer-content {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Ensure proper video aspect ratio on mobile */
+@media (max-width: 768px) {
+  .consultation-video-container {
+    min-height: 50vh;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .consultation-room {
+  background-color: hsl(var(--background));
+}
+
+.dark .consultation-video-container {
+  background-color: #000;
+}
+
+/* Accessibility improvements */
+.consultation-room:focus-within {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -2px;
+}
+
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Print styles for consultation notes */
+@media print {
+  .consultation-controls,
+  .consultation-sidebar-toggle,
+  .consultation-header button {
+    display: none !important;
+  }
+  
+  .consultation-notes {
+    width: 100%;
+    max-width: none;
+    border: none;
+    box-shadow: none;
+  }
+}
